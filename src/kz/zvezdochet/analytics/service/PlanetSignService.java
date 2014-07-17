@@ -30,7 +30,7 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Base getEntityByCode(String code) throws DataAccessException {
+	public Base find(String code) throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}

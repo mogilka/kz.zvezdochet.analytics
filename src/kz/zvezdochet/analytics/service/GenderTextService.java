@@ -26,7 +26,7 @@ public class GenderTextService extends BaseService implements IReferenceService 
 	}
 
 	@Override
-	public Base getEntityByCode(String code) throws DataAccessException {
+	public Base find(String code) throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}

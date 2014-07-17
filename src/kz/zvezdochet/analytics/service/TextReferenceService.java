@@ -22,7 +22,7 @@ import kz.zvezdochet.core.tool.Connector;
 public class TextReferenceService extends ReferenceService implements IReferenceService {
 
 	@Override
-	public Base getEntityByCode(String code) throws DataAccessException {
+	public Base find(String code) throws DataAccessException {
         TextReference type = new TextReference();
         PreparedStatement ps = null;
         ResultSet rs = null;
