@@ -6,33 +6,33 @@ import java.sql.SQLException;
 import java.util.List;
 
 import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.EntityService;
+import kz.zvezdochet.core.service.BaseService;
 import kz.zvezdochet.core.service.IReferenceService;
 import kz.zvezdochet.core.tool.Connector;
 
 /**
  * Реализация сервиса толкований для мужчин и женщин
- * @author nataly
+ * @author Nataly Didenko
  *
- * @see EntityService Реализация интерфейса сервиса управления объектами на уровне БД  
+ * @see BaseService Реализация интерфейса сервиса управления объектами на уровне БД  
  * @see IReferenceService Интерфейс управления справочниками на уровне БД  
  */
-public class GenderTextService extends EntityService implements IReferenceService {
+public class GenderTextService extends BaseService implements IReferenceService {
 
 	public GenderTextService() {
 		tableName = "textgender";
 	}
 
 	@Override
-	public BaseEntity getEntityByCode(String code) throws DataAccessException {
+	public Base getEntityByCode(String code) throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public BaseEntity getEntityById(Long id) throws DataAccessException {
+	public Base find(Long id) throws DataAccessException {
 		GenderText genderText = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -42,7 +42,7 @@ public class GenderTextService extends EntityService implements IReferenceServic
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) 
-				genderText = initEntity(rs);
+				genderText = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -57,13 +57,13 @@ public class GenderTextService extends EntityService implements IReferenceServic
 	}
 
 	@Override
-	public List<BaseEntity> getOrderedEntities() throws DataAccessException {
+	public List<Base> getList() throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		GenderText reference = (GenderText)element;
 		int result = -1;
         PreparedStatement ps = null;
@@ -105,7 +105,7 @@ public class GenderTextService extends EntityService implements IReferenceServic
 	}
 
 	@Override
-	public GenderText initEntity(ResultSet rs) throws DataAccessException, SQLException {
+	public GenderText init(ResultSet rs) throws DataAccessException, SQLException {
 		GenderText genderText = new GenderText();
 		genderText.setId(Long.parseLong(rs.getString("ID")));
 		genderText.setMaletext(rs.getString("Male"));
@@ -114,7 +114,7 @@ public class GenderTextService extends EntityService implements IReferenceServic
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		// TODO Auto-generated method stub
 		return null;
 	}

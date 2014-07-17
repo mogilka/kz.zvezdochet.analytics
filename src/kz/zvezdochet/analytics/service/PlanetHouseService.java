@@ -11,14 +11,17 @@ import kz.zvezdochet.analytics.bean.PlanetHouseTextReference;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.BeanUtil;
+import kz.zvezdochet.service.AspectTypeService;
+import kz.zvezdochet.service.HouseService;
+import kz.zvezdochet.service.PlanetService;
 
 /**
  * Реализация сервиса справочника "Планеты в астрологических домах"
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Реализация сервиса простого справочника  
  */
@@ -36,19 +39,20 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	 * @return описание позиции планеты в доме
 	 * @throws DataAccessException
 	 */
-	public BaseEntity getEntity(Planet planet, House house, AspectType aspectType) throws DataAccessException {
+	public Base getEntity(Planet planet, House house, AspectType aspectType) throws DataAccessException {
         PlanetHouseTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
 
 		 //TODO доработать с учетом других признаков
+		AspectTypeService service = new AspectTypeService();
 		if (aspectType == null)
 			aspectType = (AspectType)BeanUtil.getReferenceByCode(
-				AspectType.getService().getList(), "NEUTRAL");
+					service.getList(), "NEUTRAL");
 		if (planet.isDamaged())
 			aspectType = (AspectType)BeanUtil.getReferenceByCode(
-				AspectType.getService().getList(), "NEGATIVE");
+					service.getList(), "NEGATIVE");
 		
 		try {
 			query = "select * from " + tableName + 
@@ -58,7 +62,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next())
-				reference = initEntity(rs);
+				reference = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -73,7 +77,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public BaseEntity getEntityById(Long id) throws DataAccessException {
+	public Base find(Long id) throws DataAccessException {
 		PlanetHouseTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -83,7 +87,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next())
-				reference = initEntity(rs);
+				reference = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -98,8 +102,8 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public List<BaseEntity> getOrderedEntities() throws DataAccessException {
-        List<BaseEntity> list = new ArrayList<BaseEntity>();
+	public List<Base> getList() throws DataAccessException {
+        List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -108,7 +112,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				PlanetHouseTextReference reference = initEntity(rs);
+				PlanetHouseTextReference reference = init(rs);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -125,9 +129,9 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		PlanetHouseTextReference reference = (PlanetHouseTextReference)element;
-		reference.setGenderText((GenderText)new GenderTextService().saveEntity(reference.getGenderText()));
+		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -180,22 +184,22 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			updateDictionary();
+			update();
 		}
 		return reference;
 	}
 
 	@Override
-	public PlanetHouseTextReference initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		PlanetHouseTextReference reference = (PlanetHouseTextReference)super.initEntity(rs);
-		reference.setPlanet((Planet)Planet.getService().getEntityById(Long.parseLong(rs.getString("PlanetID"))));
-		reference.setHouse((House)House.getService().getEntityById(Long.parseLong(rs.getString("HouseID"))));
-		reference.setAspectType((AspectType)AspectType.getService().getEntityById(Long.parseLong(rs.getString("TypeID"))));
+	public PlanetHouseTextReference init(ResultSet rs) throws DataAccessException, SQLException {
+		PlanetHouseTextReference reference = (PlanetHouseTextReference)super.init(rs);
+		reference.setPlanet((Planet)new PlanetService().find(Long.parseLong(rs.getString("PlanetID"))));
+		reference.setHouse((House)new HouseService().find(Long.parseLong(rs.getString("HouseID"))));
+		reference.setAspectType((AspectType)new AspectTypeService().find(Long.parseLong(rs.getString("TypeID"))));
 		return reference;
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new PlanetHouseTextReference();
 	}
 }

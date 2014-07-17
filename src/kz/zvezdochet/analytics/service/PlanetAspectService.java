@@ -10,13 +10,15 @@ import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.PlanetAspectTextReference;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
+import kz.zvezdochet.service.AspectTypeService;
+import kz.zvezdochet.service.PlanetService;
 
 /**
  * Реализация сервиса справочника Аспекты планет
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Реализация сервиса простого справочника  
  */
@@ -34,7 +36,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	 * @return аспект между планетами
 	 * @throws DataAccessException
 	 */
-	public BaseEntity getEntity(Planet planet1, Planet planet2, AspectType aspectType) throws DataAccessException {
+	public Base getEntity(Planet planet1, Planet planet2, AspectType aspectType) throws DataAccessException {
         PlanetAspectTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -47,7 +49,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next())
-				reference = initEntity(rs);
+				reference = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -62,7 +64,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public BaseEntity getEntityById(Long id) throws DataAccessException {
+	public Base find(Long id) throws DataAccessException {
         PlanetAspectTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -72,7 +74,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next())
-				reference = initEntity(rs);
+				reference = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -87,8 +89,8 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public List<BaseEntity> getOrderedEntities() throws DataAccessException {
-        List<BaseEntity> list = new ArrayList<BaseEntity>();
+	public List<Base> getList() throws DataAccessException {
+        List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -97,7 +99,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				PlanetAspectTextReference reference = initEntity(rs);
+				PlanetAspectTextReference reference = init(rs);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -114,9 +116,9 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		PlanetAspectTextReference reference = (PlanetAspectTextReference)element;
-		reference.setGenderText((GenderText)new GenderTextService().saveEntity(reference.getGenderText()));
+		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -169,22 +171,23 @@ public class PlanetAspectService extends GenderTextReferenceService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			updateDictionary();
+			update();
 		}
 		return reference;
 	}
 
 	@Override
-	public PlanetAspectTextReference initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		PlanetAspectTextReference reference = (PlanetAspectTextReference)super.initEntity(rs);
-		reference.setPlanet1((Planet)Planet.getService().getEntityById(Long.parseLong(rs.getString("Planet1ID"))));
-		reference.setPlanet2((Planet)Planet.getService().getEntityById(Long.parseLong(rs.getString("Planet2ID"))));
-		reference.setType((AspectType)AspectType.getService().getEntityById(Long.parseLong(rs.getString("TypeID"))));
+	public PlanetAspectTextReference init(ResultSet rs) throws DataAccessException, SQLException {
+		PlanetAspectTextReference reference = (PlanetAspectTextReference)super.init(rs);
+		PlanetService service = new PlanetService();
+		reference.setPlanet1((Planet)service.find(Long.parseLong(rs.getString("Planet1ID"))));
+		reference.setPlanet2((Planet)service.find(Long.parseLong(rs.getString("Planet2ID"))));
+		reference.setType((AspectType)new AspectTypeService().find(Long.parseLong(rs.getString("TypeID"))));
 		return reference;
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new PlanetAspectTextReference();
 	}
 }

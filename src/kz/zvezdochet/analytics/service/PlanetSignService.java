@@ -11,13 +11,15 @@ import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.PlanetSignTextReference;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
+import kz.zvezdochet.service.PlanetService;
+import kz.zvezdochet.service.SignService;
 
 /**
  * Реализация сервиса справочника "Планеты в знаках Зодиака"
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Реализация сервиса справочников  
  */
@@ -28,13 +30,13 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public BaseEntity getEntityByCode(String code) throws DataAccessException {
+	public Base getEntityByCode(String code) throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public BaseEntity getEntityById(Long id) throws DataAccessException {
+	public Base find(Long id) throws DataAccessException {
 		PlanetSignTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -44,7 +46,7 @@ public class PlanetSignService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next()) 
-				reference = initEntity(rs);
+				reference = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -59,8 +61,8 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public List<BaseEntity> getOrderedEntities() throws DataAccessException {
-        List<BaseEntity> list = new ArrayList<BaseEntity>();
+	public List<Base> getList() throws DataAccessException {
+        List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -69,7 +71,7 @@ public class PlanetSignService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				PlanetSignTextReference reference = initEntity(rs);
+				PlanetSignTextReference reference = init(rs);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -86,9 +88,9 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		PlanetSignTextReference reference = (PlanetSignTextReference)element;
-		reference.setGenderText((GenderText)new GenderTextService().saveEntity(reference.getGenderText()));
+		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -139,22 +141,22 @@ public class PlanetSignService extends GenderTextReferenceService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			updateDictionary();
+			update();
 		}
 		return reference;
 	}
 
 	@Override
-	public PlanetSignTextReference initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		PlanetSignTextReference reference = (PlanetSignTextReference)super.initEntity(rs);
-		reference.setSign((Sign)Sign.getService().getEntityById(Long.parseLong(rs.getString("SignID"))));
-		reference.setCategory((Category)new CategoryService().getEntityById(Long.parseLong(rs.getString("TypeID"))));
-		reference.setPlanet((Planet)Planet.getService().getEntityById(reference.getCategory().getObjectId()));
+	public PlanetSignTextReference init(ResultSet rs) throws DataAccessException, SQLException {
+		PlanetSignTextReference reference = (PlanetSignTextReference)super.init(rs);
+		reference.setSign((Sign)new SignService().find(Long.parseLong(rs.getString("SignID"))));
+		reference.setCategory((Category)new CategoryService().find(Long.parseLong(rs.getString("TypeID"))));
+		reference.setPlanet((Planet)new PlanetService().find(reference.getCategory().getObjectId()));
 		return reference;
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new PlanetSignTextReference();
 	}
 }

@@ -3,7 +3,7 @@ package kz.zvezdochet.analytics.service;
 
 /**
  * Реализация сервиса справочника Синастрические аспекты планет
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see PlanetAspectService Реализация интерфейса сервиса аспектов планет  
  */

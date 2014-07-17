@@ -6,13 +6,19 @@ import kz.zvezdochet.analytics.bean.Halfsphere;
 import kz.zvezdochet.analytics.bean.InYan;
 import kz.zvezdochet.analytics.bean.Square;
 import kz.zvezdochet.analytics.bean.Zone;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.analytics.service.CrossService;
+import kz.zvezdochet.analytics.service.ElementService;
+import kz.zvezdochet.analytics.service.HalfsphereService;
+import kz.zvezdochet.analytics.service.InYanService;
+import kz.zvezdochet.analytics.service.SquareService;
+import kz.zvezdochet.analytics.service.ZoneService;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.util.CalcUtil;
 
 /**
  * Класс, предоставляющий методы для работы с объектами аналитики
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class AnalyticsUtil {
@@ -113,7 +119,7 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Element getElement(String code) throws DataAccessException {
-		for (BaseEntity entity : Element.getService().getList())
+		for (Base entity : new ElementService().getList())
 			if (((Element)entity).getCode().toUpperCase().equals(code))
 				return (Element)entity;
 		return null;
@@ -126,7 +132,7 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Zone getZone(String code) throws DataAccessException {
-		for (BaseEntity entity : Zone.getService().getList())
+		for (Base entity : new ZoneService().getList())
 			if (((Zone)entity).getCode().toUpperCase().equals(code))
 				return (Zone)entity;
 		return null;
@@ -139,7 +145,7 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Cross getCross(String code) throws DataAccessException {
-		for (BaseEntity entity : Cross.getService().getList())
+		for (Base entity : new CrossService().getList())
 			if (((Cross)entity).getCode().toUpperCase().equals(code))
 				return (Cross)entity;
 		return null;
@@ -246,7 +252,7 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static InYan getInYan(String code) throws DataAccessException {
-		for (BaseEntity entity : InYan.getService().getList())
+		for (Base entity : new InYanService().getList())
 			if (((InYan)entity).getCode().toUpperCase().equals(code))
 				return (InYan)entity;
 		return null;
@@ -259,7 +265,7 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Halfsphere getHalfsphere(String code) throws DataAccessException {
-		for (BaseEntity entity : Halfsphere.getService().getList())
+		for (Base entity : new HalfsphereService().getList())
 			if (((Halfsphere)entity).getCode().toUpperCase().equals(code))
 				return (Halfsphere)entity;
 		return null;
@@ -272,7 +278,7 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Square getSquare(String code) throws DataAccessException {
-		for (BaseEntity entity : Square.getService().getList())
+		for (Base entity : new SquareService().getList())
 			if (((Square)entity).getCode().toUpperCase().equals(code))
 				return (Square)entity;
 		return null;

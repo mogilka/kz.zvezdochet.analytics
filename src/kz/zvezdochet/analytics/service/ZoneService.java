@@ -1,11 +1,11 @@
 package kz.zvezdochet.analytics.service;
 
 import kz.zvezdochet.analytics.bean.Zone;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 
 /**
  * Реализация сервиса зон
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */
@@ -16,7 +16,7 @@ public class ZoneService extends GenderTextDiagramService {
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new Zone();
 	}
 }

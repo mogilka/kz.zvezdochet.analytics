@@ -5,24 +5,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import kz.zvezdochet.bean.TextReference;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.EntityService;
+import kz.zvezdochet.core.service.BaseService;
 import kz.zvezdochet.core.service.IReferenceService;
 import kz.zvezdochet.core.service.ReferenceService;
 import kz.zvezdochet.core.tool.Connector;
 
 /**
  * Реализация сервиса справочников с расширенной текстовой информацией
- * @author nataly
+ * @author Nataly Didenko
  *
- * @see EntityService Реализация интерфейса сервиса управления объектами на уровне БД  
+ * @see BaseService Реализация интерфейса сервиса управления объектами на уровне БД  
  * @see IReferenceService Интерфейс управления справочниками на уровне БД  
  */
 public class TextReferenceService extends ReferenceService implements IReferenceService {
 
 	@Override
-	public BaseEntity getEntityByCode(String code) throws DataAccessException {
+	public Base getEntityByCode(String code) throws DataAccessException {
         TextReference type = new TextReference();
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -32,7 +32,7 @@ public class TextReferenceService extends ReferenceService implements IReference
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next()) 
-				type = initEntity(rs);
+				type = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -47,7 +47,7 @@ public class TextReferenceService extends ReferenceService implements IReference
 	}
 
 	@Override
-	public BaseEntity getEntityById(Long id) throws DataAccessException {
+	public Base find(Long id) throws DataAccessException {
         TextReference type = new TextReference();
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -57,7 +57,7 @@ public class TextReferenceService extends ReferenceService implements IReference
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next()) 
-				type = initEntity(rs);
+				type = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -72,7 +72,7 @@ public class TextReferenceService extends ReferenceService implements IReference
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		TextReference reference = (TextReference)element;
 		int result = -1;
         PreparedStatement ps = null;
@@ -113,20 +113,20 @@ public class TextReferenceService extends ReferenceService implements IReference
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			updateDictionary();
+			update();
 		}
 		return reference;
 	}
 
 	@Override
-	public TextReference initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		TextReference type = (TextReference)super.initEntity(rs);
+	public TextReference init(ResultSet rs) throws DataAccessException, SQLException {
+		TextReference type = (TextReference)super.init(rs);
 		type.setText(rs.getString("Text"));
 		return type;
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		// TODO Auto-generated method stub
 		return null;
 	}

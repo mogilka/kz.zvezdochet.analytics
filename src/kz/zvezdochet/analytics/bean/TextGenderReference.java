@@ -5,7 +5,7 @@ import kz.zvezdochet.bean.TextReference;
 /**
  * Прототип справочника, содержащего толкования
  * для мужского и женского пола
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class TextGenderReference extends TextReference {

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.TextGenderReference;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.CoreUtil;
@@ -15,23 +15,23 @@ import kz.zvezdochet.util.IDiagramObject;
 
 /**
  * Прототип реализации сервиса объектов, имеющих цвет
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */
 public abstract class GenderTextColorService extends GenderTextReferenceService { //TODO удалить класс??
 
 	@Override
-	public TextGenderReference initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		TextGenderReference type = (TextGenderReference)super.initEntity(rs);
+	public TextGenderReference init(ResultSet rs) throws DataAccessException, SQLException {
+		TextGenderReference type = (TextGenderReference)super.init(rs);
 		((IColorizedObject)type).setColor(CoreUtil.rgbToColor(rs.getString("Color")));
 		return type;
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		TextGenderReference reference = (TextGenderReference)element;
-		reference.setGenderText((GenderText)new GenderTextService().saveEntity(reference.getGenderText()));
+		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -80,7 +80,7 @@ public abstract class GenderTextColorService extends GenderTextReferenceService 
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			updateDictionary();
+			update();
 		}
 		return reference;
 	}

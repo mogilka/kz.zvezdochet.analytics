@@ -5,7 +5,7 @@ import kz.zvezdochet.bean.Planet;
 
 /**
  * Справочник "Аспекты планет"
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class PlanetAspectTextReference extends TextGenderReference {

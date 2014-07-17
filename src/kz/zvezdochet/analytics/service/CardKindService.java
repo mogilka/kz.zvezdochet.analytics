@@ -3,7 +3,7 @@ package kz.zvezdochet.analytics.service;
 
 /**
  * Реализация сервиса видов космограмм
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */

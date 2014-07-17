@@ -5,7 +5,7 @@ import kz.zvezdochet.core.bean.Reference;
 
 /**
  * Класс, представляющий Категорию объектов
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class Category extends Reference {

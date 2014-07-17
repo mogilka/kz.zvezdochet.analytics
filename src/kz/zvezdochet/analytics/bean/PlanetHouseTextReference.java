@@ -6,7 +6,7 @@ import kz.zvezdochet.bean.Planet;
 
 /**
  * Справочник "Планеты в астрологических домах"
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class PlanetHouseTextReference extends TextGenderReference {

@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kz.zvezdochet.analytics.bean.Element;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.CoreUtil;
 
 /**
  * Реализация сервиса стихий
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Реализация сервиса простого справочника  
  */
@@ -25,8 +25,8 @@ public class ElementService extends GenderTextDiagramService {
 	}
 
 	@Override
-	public List<BaseEntity> getOrderedEntities() throws DataAccessException {
-        List<BaseEntity> list = new ArrayList<BaseEntity>();
+	public List<Base> getList() throws DataAccessException {
+        List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -35,7 +35,7 @@ public class ElementService extends GenderTextDiagramService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				Element element = initEntity(rs);
+				Element element = init(rs);
 				list.add(element);
 			}
 		} catch (Exception e) {
@@ -52,15 +52,15 @@ public class ElementService extends GenderTextDiagramService {
 	}
 
 	@Override
-	public Element initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		Element element = (Element)super.initEntity(rs);
+	public Element init(ResultSet rs) throws DataAccessException, SQLException {
+		Element element = (Element)super.init(rs);
 		element.setColor(CoreUtil.rgbToColor(rs.getString("Color")));
 		element.setDiaName(rs.getString("Diagram"));
 		return element;
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new Element();
 	}
 }

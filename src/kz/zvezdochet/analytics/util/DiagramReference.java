@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Color;
 
 /**
  * Класс, представляющий абстрактный диаграммный справочник
- * @author nataly
+ * @author Nataly Didenko
  */
 public abstract class DiagramReference extends TextGenderReference implements IColorizedObject, IDiagramObject {
 	private static final long serialVersionUID = 3257825153209037032L;

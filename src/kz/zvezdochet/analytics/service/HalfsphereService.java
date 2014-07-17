@@ -1,11 +1,11 @@
 package kz.zvezdochet.analytics.service;
 
 import kz.zvezdochet.analytics.bean.Halfsphere;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 
 /**
  * Реализация сервиса полусфер
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */
@@ -16,7 +16,7 @@ public class HalfsphereService extends GenderTextDiagramService {
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new Halfsphere();
 	}
 }

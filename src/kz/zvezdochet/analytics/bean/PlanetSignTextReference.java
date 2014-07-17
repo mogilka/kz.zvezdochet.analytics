@@ -5,7 +5,7 @@ import kz.zvezdochet.bean.Sign;
 
 /**
  * Справочник "Планеты в знаках Зодиака"
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class PlanetSignTextReference extends TextGenderReference {

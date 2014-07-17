@@ -5,7 +5,7 @@ import kz.zvezdochet.core.bean.Reference;
 
 /**
  * Класс, представляющий вид позиции объекта
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class PositionType extends Reference {

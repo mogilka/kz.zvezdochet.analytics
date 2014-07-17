@@ -5,7 +5,7 @@ import kz.zvezdochet.bean.Sign;
 
 /**
  * Прототип справочника синастрии по выбранной планете
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class SynastryTextReference extends TextGenderReference {

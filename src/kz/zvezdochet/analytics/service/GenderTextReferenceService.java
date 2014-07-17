@@ -8,21 +8,21 @@ import java.util.List;
 
 import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.TextGenderReference;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.ReferenceService;
 import kz.zvezdochet.core.tool.Connector;
 
 /**
  * Прототип реализации сервиса простого справочника
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see ReferenceService Реализация сервиса справочников  
  */
 public abstract class GenderTextReferenceService extends ReferenceService {
 
 	@Override
-	public BaseEntity getEntityById(Long id) throws DataAccessException {
+	public Base find(Long id) throws DataAccessException {
 		TextGenderReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -32,7 +32,7 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next())
-				reference = initEntity(rs);
+				reference = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -47,8 +47,8 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 	}
 
 	@Override
-	public List<BaseEntity> getOrderedEntities() throws DataAccessException {
-        List<BaseEntity> list = new ArrayList<BaseEntity>();
+	public List<Base> getList() throws DataAccessException {
+        List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -57,7 +57,7 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				TextGenderReference reference = initEntity(rs);
+				TextGenderReference reference = init(rs);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -74,9 +74,9 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		TextGenderReference reference = (TextGenderReference)element;
-		reference.setGenderText((GenderText)new GenderTextService().saveEntity(reference.getGenderText()));
+		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -122,17 +122,17 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			updateDictionary();
+			update();
 		}
 		return reference;
 	}
 
 	@Override
-	public TextGenderReference initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		TextGenderReference type = (TextGenderReference)super.initEntity(rs);
+	public TextGenderReference init(ResultSet rs) throws DataAccessException, SQLException {
+		TextGenderReference type = (TextGenderReference)super.init(rs);
 		type.setText(rs.getString("Text"));
 		if (rs.getString("GenderID") != null) {
-			GenderText genderText = (GenderText)new GenderTextService().getEntityById(Long.parseLong(rs.getString("GenderID")));
+			GenderText genderText = (GenderText)new GenderTextService().find(Long.parseLong(rs.getString("GenderID")));
 			if (genderText != null)
 				type.setGenderText(genderText);
 		}
@@ -140,7 +140,7 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new TextGenderReference();
 	}
 }

@@ -3,7 +3,7 @@ package kz.zvezdochet.analytics.service;
 
 /**
  * Реализация сервиса справочника Дирекции планет
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see PlanetAspectService Реализация сервиса аспектов планет  
  */

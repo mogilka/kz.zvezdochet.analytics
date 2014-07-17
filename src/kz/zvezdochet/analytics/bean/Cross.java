@@ -4,7 +4,7 @@ import kz.zvezdochet.analytics.util.DiagramReference;
 
 /**
  * Класс, представляющий Крест
- * @author nataly
+ * @author Nataly Didenko
  */
 public class Cross extends DiagramReference {
 	private static final long serialVersionUID = -7024846494191754532L;

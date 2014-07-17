@@ -13,6 +13,7 @@ Bundle-ActivationPolicy: lazy
 Import-Package: kz.zvezdochet.bean,
  kz.zvezdochet.core.bean,
  kz.zvezdochet.core.service,
+ kz.zvezdochet.service,
  kz.zvezdochet.util
 Export-Package: kz.zvezdochet.analytics.bean,
  kz.zvezdochet.analytics.service,

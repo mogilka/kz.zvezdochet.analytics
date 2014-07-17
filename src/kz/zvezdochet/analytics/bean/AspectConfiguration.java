@@ -4,7 +4,7 @@ import kz.zvezdochet.bean.TextReference;
 
 /**
  * Класс, представляющий Конфигурацию аспектов
- * @author Nataly
+ * @author Nataly Didenko
  *
  */
 public class AspectConfiguration extends TextReference {

@@ -10,14 +10,16 @@ import java.util.List;
 import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.DateUtil;
+import kz.zvezdochet.service.PlanetService;
+import kz.zvezdochet.service.SignService;
 
 /**
  * Класс, обеспечивающий взаимодействие с БД
- * @author nataly
+ * @author Nataly Didenko
  */
 public class AnalyticsService {
 
@@ -85,7 +87,7 @@ order by initialDate
 	 * @return список людей
 	 * @throws DataAccessException
 	 */
-	public List<Event> getTwins(List<BaseEntity> planets) throws DataAccessException {
+	public List<Event> getTwins(List<Base> planets) throws DataAccessException {
 		if (planets == null) return null;
 		double sunInitial = 0, sunFinal = 0,
 			moonInitial = 0, moonFinal = 0,
@@ -93,7 +95,7 @@ order by initialDate
 			venusInitial = 0, venusFinal = 0,
 			marsInitial = 0, marsFinal = 0;
 		
-		for (BaseEntity entity : planets) {
+		for (Base entity : planets) {
 			Planet planet = (Planet)entity;
 			if (planet.getSign() != null) {
 				if (planet.getCode().equals("Sun")) {
@@ -200,7 +202,7 @@ order by e.initialDate
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				Long id = Long.parseLong(rs.getString(0));
-				Sign sign = (Sign)Sign.getService().getEntityById(id);
+				Sign sign = (Sign)new SignService().find(id);
 				list.add(sign);
 			}
 		} catch (Exception e) {
@@ -239,7 +241,7 @@ order by e.initialDate
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				Long id = Long.parseLong(rs.getString(1));
-				planet = (Planet)Planet.getService().getEntityById(id);
+				planet = (Planet)new PlanetService().find(id);
 				if (!planet.isFictitious())
 					return planet;
 			}

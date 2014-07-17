@@ -10,13 +10,15 @@ import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.SynastryTextReference;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
+import kz.zvezdochet.service.PlanetService;
+import kz.zvezdochet.service.SignService;
 
 /**
  * Реализация сервиса справочника синастрий (Планета в знаках партнеров)
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see GenderTextReferenceService Реализация сервиса справочников  
  */
@@ -27,13 +29,13 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 	
 	@Override
-	public BaseEntity getEntityByCode(String code) throws DataAccessException {
+	public Base getEntityByCode(String code) throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public BaseEntity getEntityById(Long id) throws DataAccessException {
+	public Base find(Long id) throws DataAccessException {
 		SynastryTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -43,7 +45,7 @@ public class SynastrySignService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next()) 
-				reference = initEntity(rs);
+				reference = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -58,8 +60,8 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public List<BaseEntity> getOrderedEntities() throws DataAccessException {
-        List<BaseEntity> list = new ArrayList<BaseEntity>();
+	public List<Base> getList() throws DataAccessException {
+        List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -68,7 +70,7 @@ public class SynastrySignService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				SynastryTextReference reference = initEntity(rs);
+				SynastryTextReference reference = init(rs);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -85,9 +87,9 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		SynastryTextReference reference = (SynastryTextReference)element;
-		reference.setGenderText((GenderText)new GenderTextService().saveEntity(reference.getGenderText()));
+		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -140,22 +142,23 @@ public class SynastrySignService extends GenderTextReferenceService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			updateDictionary();
+			update();
 		}
 		return reference;
 	}
 
 	@Override
-	public SynastryTextReference initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		SynastryTextReference reference = (SynastryTextReference)super.initEntity(rs);
-		reference.setSign1((Sign)Sign.getService().getEntityById(Long.parseLong(rs.getString("Sign1ID"))));
-		reference.setSign2((Sign)Sign.getService().getEntityById(Long.parseLong(rs.getString("Sign2ID"))));
-		reference.setPlanet((Planet)Planet.getService().getEntityById(Long.parseLong(rs.getString("PlanetID"))));
+	public SynastryTextReference init(ResultSet rs) throws DataAccessException, SQLException {
+		SynastryTextReference reference = (SynastryTextReference)super.init(rs);
+		SignService service = new SignService();
+		reference.setSign1((Sign)service.find(Long.parseLong(rs.getString("Sign1ID"))));
+		reference.setSign2((Sign)service.find(Long.parseLong(rs.getString("Sign2ID"))));
+		reference.setPlanet((Planet)new PlanetService().find(Long.parseLong(rs.getString("PlanetID"))));
 		return reference;
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new SynastryTextReference();
 	}
 }

@@ -5,7 +5,7 @@ import kz.zvezdochet.core.bean.Reference;
 
 /**
  * Класс, представляющий описание справочника
- * @author Nataly
+ * @author Nataly Didenko
  * 
  * @see Reference Справочник
  */

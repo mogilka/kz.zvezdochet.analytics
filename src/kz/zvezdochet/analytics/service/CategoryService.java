@@ -8,14 +8,15 @@ import java.util.List;
 
 import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.bean.Planet;
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.ReferenceService;
 import kz.zvezdochet.core.tool.Connector;
+import kz.zvezdochet.service.PlanetService;
 
 /**
  * Реализация сервиса категорий
- * @author nataly
+ * @author Nataly Didenko
  *
  * @see ReferenceService Реализация сервиса справочников  
  */
@@ -26,7 +27,7 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public BaseEntity getEntityById(Long id) throws DataAccessException {
+	public Base find(Long id) throws DataAccessException {
         Category category = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -36,7 +37,7 @@ public class CategoryService extends ReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next()) 
-				category = initEntity(rs);
+				category = init(rs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -51,8 +52,8 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public List<BaseEntity> getOrderedEntities() throws DataAccessException {
-        List<BaseEntity> list = new ArrayList<BaseEntity>();
+	public List<Base> getList() throws DataAccessException {
+        List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -61,7 +62,7 @@ public class CategoryService extends ReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				Category category = initEntity(rs);
+				Category category = init(rs);
 				list.add(category);
 			}
 		} catch (Exception e) {
@@ -78,7 +79,7 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public BaseEntity saveEntity(BaseEntity element) throws DataAccessException {
+	public Base save(Base element) throws DataAccessException {
 		Category reference = (Category)element;
 		int result = -1;
         PreparedStatement ps = null;
@@ -122,22 +123,22 @@ public class CategoryService extends ReferenceService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			updateDictionary();
+			update();
 		}
 		return reference;
 	}
 
 	@Override
-	public Category initEntity(ResultSet rs) throws DataAccessException, SQLException {
-		Category type = (Category)super.initEntity(rs);
+	public Category init(ResultSet rs) throws DataAccessException, SQLException {
+		Category type = (Category)super.init(rs);
 		type.setPriority(Integer.parseInt(rs.getString("Priority")));
 		type.setObjectId(Long.parseLong(rs.getString("ObjectID")));
-		type.setPlanet((Planet)Planet.getService().getEntityById(type.getObjectId()));
+		type.setPlanet((Planet)new PlanetService().find(type.getObjectId()));
 		return type;
 	}
 
 	@Override
-	public BaseEntity createEntity() {
+	public Base create() {
 		return new Category();
 	}
 }

@@ -1,14 +1,15 @@
 package kz.zvezdochet.analytics.bean;
 
-import kz.zvezdochet.core.bean.BaseEntity;
+import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.service.BaseService;
 
 /**
  * Класс, представляющий текстовую информацию
  * для мужского и женского пола
- * @author nataly
+ * @author Nataly Didenko
  *
  */
-public class GenderText extends BaseEntity {
+public class GenderText extends Base {
 	private static final long serialVersionUID = 7663798183215999740L;
 
 	/**
@@ -35,5 +36,10 @@ public class GenderText extends BaseEntity {
 
 	public void setFemaletext(String femaletext) {
 		this.femaletext = femaletext;
+	}
+
+	@Override
+	public BaseService getService() {
+		return null;
 	}
 }
