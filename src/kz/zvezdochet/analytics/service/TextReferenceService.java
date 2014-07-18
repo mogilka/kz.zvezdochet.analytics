@@ -32,32 +32,7 @@ public class TextReferenceService extends ReferenceService implements IReference
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next()) 
-				type = init(rs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return type;
-	}
-
-	@Override
-	public Base find(Long id) throws DataAccessException {
-        TextReference type = new TextReference();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		String query;
-		try {
-			query = "select * from " + tableName + " where id = " + id;
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
-			rs = ps.executeQuery();
-			if (rs.next()) 
-				type = init(rs);
+				type = init(rs, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -119,15 +94,10 @@ public class TextReferenceService extends ReferenceService implements IReference
 	}
 
 	@Override
-	public TextReference init(ResultSet rs) throws DataAccessException, SQLException {
-		TextReference type = (TextReference)super.init(rs);
+	public TextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+		TextReference type = new TextReference();
+		super.init(rs, type);
 		type.setText(rs.getString("Text"));
 		return type;
-	}
-
-	@Override
-	public Base create() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

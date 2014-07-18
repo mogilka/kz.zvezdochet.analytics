@@ -1,7 +1,5 @@
 package kz.zvezdochet.analytics.service;
 
-import kz.zvezdochet.analytics.bean.Cross;
-import kz.zvezdochet.core.bean.Base;
 
 /**
  * Реализация сервиса крестов
@@ -13,10 +11,5 @@ public class CrossService extends GenderTextDiagramService {
 
 	public CrossService() {
 		tableName = "crosses";
-	}
-
-	@Override
-	public Base create() {
-		return new Cross();
 	}
 }

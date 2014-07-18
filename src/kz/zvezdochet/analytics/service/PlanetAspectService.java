@@ -49,32 +49,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next())
-				reference = init(rs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return reference;
-	}
-
-	@Override
-	public Base find(Long id) throws DataAccessException {
-        PlanetAspectTextReference reference = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		String query;
-		try {
-			query = "select * from " + tableName + " where id = " + id;
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
-			rs = ps.executeQuery();
-			if (rs.next())
-				reference = init(rs);
+				reference = init(rs, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -99,7 +74,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				PlanetAspectTextReference reference = init(rs);
+				PlanetAspectTextReference reference = init(rs, null);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -177,17 +152,13 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetAspectTextReference init(ResultSet rs) throws DataAccessException, SQLException {
-		PlanetAspectTextReference reference = (PlanetAspectTextReference)super.init(rs);
+	public PlanetAspectTextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+		PlanetAspectTextReference reference = new PlanetAspectTextReference();
+		super.init(rs, reference);
 		PlanetService service = new PlanetService();
 		reference.setPlanet1((Planet)service.find(Long.parseLong(rs.getString("Planet1ID"))));
 		reference.setPlanet2((Planet)service.find(Long.parseLong(rs.getString("Planet2ID"))));
 		reference.setType((AspectType)new AspectTypeService().find(Long.parseLong(rs.getString("TypeID"))));
 		return reference;
-	}
-
-	@Override
-	public Base create() {
-		return new PlanetAspectTextReference();
 	}
 }

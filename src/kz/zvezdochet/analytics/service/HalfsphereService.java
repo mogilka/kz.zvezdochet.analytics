@@ -1,7 +1,5 @@
 package kz.zvezdochet.analytics.service;
 
-import kz.zvezdochet.analytics.bean.Halfsphere;
-import kz.zvezdochet.core.bean.Base;
 
 /**
  * Реализация сервиса полусфер
@@ -13,10 +11,5 @@ public class HalfsphereService extends GenderTextDiagramService {
 
 	public HalfsphereService() {
 		tableName = "halfspheres";
-	}
-
-	@Override
-	public Base create() {
-		return new Halfsphere();
 	}
 }

@@ -22,8 +22,9 @@ import kz.zvezdochet.util.IDiagramObject;
 public abstract class GenderTextColorService extends GenderTextReferenceService { //TODO удалить класс??
 
 	@Override
-	public TextGenderReference init(ResultSet rs) throws DataAccessException, SQLException {
-		TextGenderReference type = (TextGenderReference)super.init(rs);
+	public TextGenderReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+		TextGenderReference type = new TextGenderReference();
+		super.init(rs, type);
 		((IColorizedObject)type).setColor(CoreUtil.rgbToColor(rs.getString("Color")));
 		return type;
 	}

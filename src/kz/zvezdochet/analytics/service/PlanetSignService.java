@@ -36,31 +36,6 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Base find(Long id) throws DataAccessException {
-		PlanetSignTextReference reference = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		String query;
-		try {
-			query = "select * from " + tableName + " where id = " + id;
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
-			rs = ps.executeQuery();
-			if (rs.next()) 
-				reference = init(rs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return reference;
-	}
-
-	@Override
 	public List<Base> getList() throws DataAccessException {
         List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
@@ -71,7 +46,7 @@ public class PlanetSignService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				PlanetSignTextReference reference = init(rs);
+				PlanetSignTextReference reference = init(rs, null);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -147,16 +122,12 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetSignTextReference init(ResultSet rs) throws DataAccessException, SQLException {
-		PlanetSignTextReference reference = (PlanetSignTextReference)super.init(rs);
+	public PlanetSignTextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+		PlanetSignTextReference reference = new PlanetSignTextReference();
+		super.init(rs, null);
 		reference.setSign((Sign)new SignService().find(Long.parseLong(rs.getString("SignID"))));
 		reference.setCategory((Category)new CategoryService().find(Long.parseLong(rs.getString("TypeID"))));
 		reference.setPlanet((Planet)new PlanetService().find(reference.getCategory().getObjectId()));
 		return reference;
-	}
-
-	@Override
-	public Base create() {
-		return new PlanetSignTextReference();
 	}
 }

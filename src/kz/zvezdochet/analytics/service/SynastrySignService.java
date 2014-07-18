@@ -35,31 +35,6 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Base find(Long id) throws DataAccessException {
-		SynastryTextReference reference = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		String query;
-		try {
-			query = "select * from " + tableName + " where id = " + id;
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
-			rs = ps.executeQuery();
-			if (rs.next()) 
-				reference = init(rs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return reference;
-	}
-
-	@Override
 	public List<Base> getList() throws DataAccessException {
         List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
@@ -70,7 +45,7 @@ public class SynastrySignService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				SynastryTextReference reference = init(rs);
+				SynastryTextReference reference = init(rs, null);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -148,17 +123,13 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public SynastryTextReference init(ResultSet rs) throws DataAccessException, SQLException {
-		SynastryTextReference reference = (SynastryTextReference)super.init(rs);
+	public SynastryTextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+		SynastryTextReference reference = new SynastryTextReference();
+		super.init(rs, reference);
 		SignService service = new SignService();
 		reference.setSign1((Sign)service.find(Long.parseLong(rs.getString("Sign1ID"))));
 		reference.setSign2((Sign)service.find(Long.parseLong(rs.getString("Sign2ID"))));
 		reference.setPlanet((Planet)new PlanetService().find(Long.parseLong(rs.getString("PlanetID"))));
 		return reference;
-	}
-
-	@Override
-	public Base create() {
-		return new SynastryTextReference();
 	}
 }

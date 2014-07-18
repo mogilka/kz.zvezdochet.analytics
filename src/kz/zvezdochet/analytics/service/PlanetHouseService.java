@@ -62,32 +62,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			if (rs.next())
-				reference = init(rs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return reference;
-	}
-
-	@Override
-	public Base find(Long id) throws DataAccessException {
-		PlanetHouseTextReference reference = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		String query;
-		try {
-			query = "select * from " + tableName + " where id = " + id;
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
-			rs = ps.executeQuery();
-			if (rs.next())
-				reference = init(rs);
+				reference = init(rs, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -112,7 +87,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				PlanetHouseTextReference reference = init(rs);
+				PlanetHouseTextReference reference = init(rs, null);
 				list.add(reference);
 			}
 		} catch (Exception e) {
@@ -190,16 +165,12 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetHouseTextReference init(ResultSet rs) throws DataAccessException, SQLException {
-		PlanetHouseTextReference reference = (PlanetHouseTextReference)super.init(rs);
+	public PlanetHouseTextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+		PlanetHouseTextReference reference = new PlanetHouseTextReference();
+		super.init(rs, reference);
 		reference.setPlanet((Planet)new PlanetService().find(Long.parseLong(rs.getString("PlanetID"))));
 		reference.setHouse((House)new HouseService().find(Long.parseLong(rs.getString("HouseID"))));
 		reference.setAspectType((AspectType)new AspectTypeService().find(Long.parseLong(rs.getString("TypeID"))));
 		return reference;
-	}
-
-	@Override
-	public Base create() {
-		return new PlanetHouseTextReference();
 	}
 }

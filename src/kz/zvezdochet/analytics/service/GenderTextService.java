@@ -42,7 +42,7 @@ public class GenderTextService extends BaseService implements IReferenceService 
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) 
-				genderText = init(rs);
+				genderText = init(rs, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -105,17 +105,11 @@ public class GenderTextService extends BaseService implements IReferenceService 
 	}
 
 	@Override
-	public GenderText init(ResultSet rs) throws DataAccessException, SQLException {
+	public GenderText init(ResultSet rs, Base base) throws DataAccessException, SQLException {
 		GenderText genderText = new GenderText();
 		genderText.setId(Long.parseLong(rs.getString("ID")));
 		genderText.setMaletext(rs.getString("Male"));
 		genderText.setFemaletext(rs.getString("Female"));
 		return genderText;
-	}
-
-	@Override
-	public Base create() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

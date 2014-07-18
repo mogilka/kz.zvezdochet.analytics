@@ -27,31 +27,6 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public Base find(Long id) throws DataAccessException {
-        Category category = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		String query;
-		try {
-			query = "select * from " + tableName + " where id = " + id;
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
-			rs = ps.executeQuery();
-			if (rs.next()) 
-				category = init(rs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return category;
-	}
-
-	@Override
 	public List<Base> getList() throws DataAccessException {
         List<Base> list = new ArrayList<Base>();
         PreparedStatement ps = null;
@@ -62,7 +37,7 @@ public class CategoryService extends ReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				Category category = init(rs);
+				Category category = init(rs, null);
 				list.add(category);
 			}
 		} catch (Exception e) {
@@ -129,16 +104,12 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public Category init(ResultSet rs) throws DataAccessException, SQLException {
-		Category type = (Category)super.init(rs);
+	public Category init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+		Category type = new Category();
+		super.init(rs, type);
 		type.setPriority(Integer.parseInt(rs.getString("Priority")));
 		type.setObjectId(Long.parseLong(rs.getString("ObjectID")));
 		type.setPlanet((Planet)new PlanetService().find(type.getObjectId()));
 		return type;
-	}
-
-	@Override
-	public Base create() {
-		return new Category();
 	}
 }
