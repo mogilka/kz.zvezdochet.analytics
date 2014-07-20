@@ -7,7 +7,7 @@ import kz.zvezdochet.core.service.ModelService;
  * Класс, представляющий текстовую информацию
  * для мужского и женского пола
  * @author Nataly Didenko
- *
+ * @todo добавить описание для детей
  */
 public class GenderText extends Model {
 	private static final long serialVersionUID = 7663798183215999740L;

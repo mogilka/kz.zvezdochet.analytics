@@ -23,9 +23,10 @@ public abstract class GenderTextColorService extends GenderTextReferenceService 
 
 	@Override
 	public TextGenderReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		TextGenderReference type = new TextGenderReference();
+		TextGenderReference type = (TextGenderReference)create();
 		super.init(rs, type);
-		((IColorizedObject)type).setColor(CoreUtil.rgbToColor(rs.getString("Color")));
+		if (type instanceof IColorizedObject)
+			((IColorizedObject)type).setColor(CoreUtil.rgbToColor(rs.getString("Color")));
 		return type;
 	}
 
@@ -58,7 +59,8 @@ public abstract class GenderTextColorService extends GenderTextReferenceService 
 			ps.setString(3, reference.getCode());
 			ps.setString(4, reference.getName());
 			ps.setString(5, reference.getDescription());
-			ps.setString(6, CoreUtil.colorToRGB(((IColorizedObject)reference).getColor()));
+			if (reference instanceof IColorizedObject)
+				ps.setString(6, CoreUtil.colorToRGB(((IColorizedObject)reference).getColor()));
 			ps.setString(7, ((IDiagramObject)reference).getDiaName());
 			result = ps.executeUpdate();
 			if (result == 1) {

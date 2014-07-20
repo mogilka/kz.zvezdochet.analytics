@@ -119,9 +119,9 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Element getElement(String code) throws DataAccessException {
-		for (Model entity : new ElementService().getList())
-			if (((Element)entity).getCode().toUpperCase().equals(code))
-				return (Element)entity;
+		for (Model model : new ElementService().getList())
+			if (((Element)model).getCode().toUpperCase().equals(code))
+				return (Element)model;
 		return null;
 	}
 

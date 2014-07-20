@@ -74,15 +74,21 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 	}
 
 	@Override
-	public TextGenderReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		TextGenderReference type = new TextGenderReference();
-		super.init(rs, type);
-		type.setText(rs.getString("Text"));
+	public TextGenderReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		if (null == model)
+			model = (TextGenderReference)create();
+		super.init(rs, model);
+		((TextGenderReference)model).setText(rs.getString("Text"));
 		if (rs.getString("GenderID") != null) {
 			GenderText genderText = (GenderText)new GenderTextService().find(Long.parseLong(rs.getString("GenderID")));
 			if (genderText != null)
-				type.setGenderText(genderText);
+				((TextGenderReference)model).setGenderText(genderText);
 		}
-		return type;
+		return (TextGenderReference)model;
+	}
+
+	@Override
+	public Model create() {
+		return new TextGenderReference();
 	}
 }

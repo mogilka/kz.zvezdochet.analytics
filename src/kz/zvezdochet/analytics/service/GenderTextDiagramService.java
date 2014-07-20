@@ -22,12 +22,14 @@ import kz.zvezdochet.util.IDiagramObject;
 public abstract class GenderTextDiagramService extends GenderTextReferenceService {
 
 	@Override
-	public TextGenderReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		TextGenderReference type = new TextGenderReference();
-		super.init(rs, type);
-		((IColorizedObject)type).setColor(CoreUtil.rgbToColor(rs.getString("Color")));
-		((IDiagramObject)type).setDiaName(rs.getString("Diagram"));
-		return type;
+	public TextGenderReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		if (null == model)
+			model = (TextGenderReference)create();
+		super.init(rs, model);
+		if (model instanceof IColorizedObject)
+			((IColorizedObject)model).setColor(CoreUtil.rgbToColor(rs.getString("Color")));
+		((IDiagramObject)model).setDiaName(rs.getString("Diagram"));
+		return (TextGenderReference)model;
 	}
 
 	@Override
@@ -60,7 +62,8 @@ public abstract class GenderTextDiagramService extends GenderTextReferenceServic
 			ps.setString(3, reference.getCode());
 			ps.setString(4, reference.getName());
 			ps.setString(5, reference.getDescription());
-			ps.setString(6, CoreUtil.colorToRGB(((IColorizedObject)reference).getColor()));
+			if (reference instanceof IColorizedObject)
+				ps.setString(6, CoreUtil.colorToRGB(((IColorizedObject)reference).getColor()));
 			ps.setString(7, ((IDiagramObject)reference).getDiaName());
 			result = ps.executeUpdate();
 			if (result == 1) {
