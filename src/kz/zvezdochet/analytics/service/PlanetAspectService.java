@@ -10,7 +10,7 @@ import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.PlanetAspectTextReference;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.AspectTypeService;
@@ -36,7 +36,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	 * @return аспект между планетами
 	 * @throws DataAccessException
 	 */
-	public Base getEntity(Planet planet1, Planet planet2, AspectType aspectType) throws DataAccessException {
+	public Model getEntity(Planet planet1, Planet planet2, AspectType aspectType) throws DataAccessException {
         PlanetAspectTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -64,8 +64,8 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public List<Base> getList() throws DataAccessException {
-        List<Base> list = new ArrayList<Base>();
+	public List<Model> getList() throws DataAccessException {
+        List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -91,14 +91,14 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Base save(Base element) throws DataAccessException {
-		PlanetAspectTextReference reference = (PlanetAspectTextReference)element;
+	public Model save(Model model) throws DataAccessException {
+		PlanetAspectTextReference reference = (PlanetAspectTextReference)model;
 		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
 			String query;
-			if (element.getId() == null) 
+			if (model.getId() == null) 
 				query = "insert into " + tableName + 
 					"(text, genderid, code, name, description, planet1id, planet2id, typeid) " +
 					"values(?,?,?,?,?,?,?,?)";
@@ -127,12 +127,12 @@ public class PlanetAspectService extends GenderTextReferenceService {
 			ps.setLong(8, reference.getType().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (element.getId() == null) { 
+				if (model.getId() == null) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {
 				        autoIncKeyFromApi = rsid.getLong(1);
-				        element.setId(autoIncKeyFromApi);
+				        model.setId(autoIncKeyFromApi);
 					    //System.out.println("inserted " + tableName + "\t" + autoIncKeyFromApi);
 					}
 					if (rsid != null) rsid.close();
@@ -152,13 +152,18 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetAspectTextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
-		PlanetAspectTextReference reference = new PlanetAspectTextReference();
+	public PlanetAspectTextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
+		PlanetAspectTextReference reference = (PlanetAspectTextReference)create();
 		super.init(rs, reference);
 		PlanetService service = new PlanetService();
 		reference.setPlanet1((Planet)service.find(Long.parseLong(rs.getString("Planet1ID"))));
 		reference.setPlanet2((Planet)service.find(Long.parseLong(rs.getString("Planet2ID"))));
 		reference.setType((AspectType)new AspectTypeService().find(Long.parseLong(rs.getString("TypeID"))));
 		return reference;
+	}
+
+	@Override
+	public Model create() {
+		return new PlanetAspectTextReference();
 	}
 }

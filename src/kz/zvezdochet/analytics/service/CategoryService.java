@@ -8,7 +8,7 @@ import java.util.List;
 
 import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.bean.Planet;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.ReferenceService;
 import kz.zvezdochet.core.tool.Connector;
@@ -27,8 +27,8 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public List<Base> getList() throws DataAccessException {
-        List<Base> list = new ArrayList<Base>();
+	public List<Model> getList() throws DataAccessException {
+        List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -54,7 +54,7 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public Base save(Base element) throws DataAccessException {
+	public Model save(Model element) throws DataAccessException {
 		Category reference = (Category)element;
 		int result = -1;
         PreparedStatement ps = null;
@@ -104,12 +104,17 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public Category init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+	public Category init(ResultSet rs, Model base) throws DataAccessException, SQLException {
 		Category type = new Category();
 		super.init(rs, type);
 		type.setPriority(Integer.parseInt(rs.getString("Priority")));
 		type.setObjectId(Long.parseLong(rs.getString("ObjectID")));
 		type.setPlanet((Planet)new PlanetService().find(type.getObjectId()));
 		return type;
+	}
+
+	@Override
+	public Model create() {
+		return new Category();
 	}
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.DateUtil;
@@ -87,7 +87,7 @@ order by initialDate
 	 * @return список людей
 	 * @throws DataAccessException
 	 */
-	public List<Event> getTwins(List<Base> planets) throws DataAccessException {
+	public List<Event> getTwins(List<Model> planets) throws DataAccessException {
 		if (planets == null) return null;
 		double sunInitial = 0, sunFinal = 0,
 			moonInitial = 0, moonFinal = 0,
@@ -95,7 +95,7 @@ order by initialDate
 			venusInitial = 0, venusFinal = 0,
 			marsInitial = 0, marsFinal = 0;
 		
-		for (Base entity : planets) {
+		for (Model entity : planets) {
 			Planet planet = (Planet)entity;
 			if (planet.getSign() != null) {
 				if (planet.getCode().equals("Sun")) {

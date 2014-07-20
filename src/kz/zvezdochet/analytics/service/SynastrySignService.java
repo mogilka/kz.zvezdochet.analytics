@@ -10,7 +10,7 @@ import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.SynastryTextReference;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.PlanetService;
@@ -29,14 +29,14 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 	
 	@Override
-	public Base find(String code) throws DataAccessException {
+	public Model find(String code) throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Base> getList() throws DataAccessException {
-        List<Base> list = new ArrayList<Base>();
+	public List<Model> getList() throws DataAccessException {
+        List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -62,14 +62,14 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Base save(Base element) throws DataAccessException {
-		SynastryTextReference reference = (SynastryTextReference)element;
+	public Model save(Model model) throws DataAccessException {
+		SynastryTextReference reference = (SynastryTextReference)model;
 		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
 			String query;
-			if (element.getId() == null) 
+			if (model.getId() == null) 
 				query = "insert into " + tableName + 
 					"(text, genderid, code, name, description, sign1id, sign2id, planetid) " +
 					"values(?,?,?,?,?,?,?,?)";
@@ -98,12 +98,12 @@ public class SynastrySignService extends GenderTextReferenceService {
 			ps.setLong(8, reference.getPlanet().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (element.getId() == null) { 
+				if (model.getId() == null) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {
 				        autoIncKeyFromApi = rsid.getLong(1);
-				        element.setId(autoIncKeyFromApi);
+				        model.setId(autoIncKeyFromApi);
 					    //System.out.println("inserted " + tableName + "\t" + autoIncKeyFromApi);
 					}
 					if (rsid != null) rsid.close();
@@ -123,13 +123,18 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public SynastryTextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
-		SynastryTextReference reference = new SynastryTextReference();
+	public SynastryTextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
+		SynastryTextReference reference = (SynastryTextReference)create();
 		super.init(rs, reference);
 		SignService service = new SignService();
 		reference.setSign1((Sign)service.find(Long.parseLong(rs.getString("Sign1ID"))));
 		reference.setSign2((Sign)service.find(Long.parseLong(rs.getString("Sign2ID"))));
 		reference.setPlanet((Planet)new PlanetService().find(Long.parseLong(rs.getString("PlanetID"))));
 		return reference;
+	}
+
+	@Override
+	public Model create() {
+		return new SynastryTextReference();
 	}
 }

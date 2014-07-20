@@ -6,9 +6,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.BaseService;
+import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.service.IReferenceService;
 import kz.zvezdochet.core.tool.Connector;
 
@@ -16,54 +16,29 @@ import kz.zvezdochet.core.tool.Connector;
  * Реализация сервиса толкований для мужчин и женщин
  * @author Nataly Didenko
  *
- * @see BaseService Реализация интерфейса сервиса управления объектами на уровне БД  
+ * @see ModelService Реализация интерфейса сервиса управления объектами на уровне БД  
  * @see IReferenceService Интерфейс управления справочниками на уровне БД  
  */
-public class GenderTextService extends BaseService implements IReferenceService {
+public class GenderTextService extends ModelService implements IReferenceService {
 
 	public GenderTextService() {
 		tableName = "textgender";
 	}
 
 	@Override
-	public Base find(String code) throws DataAccessException {
+	public Model find(String code) throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Base find(Long id) throws DataAccessException {
-		GenderText genderText = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		String query;
-		try {
-			query = "select * from " + tableName + " where id = " + id;
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
-			rs = ps.executeQuery();
-			while (rs.next()) 
-				genderText = init(rs, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return genderText;
-	}
-
-	@Override
-	public List<Base> getList() throws DataAccessException {
+	public List<Model> getList() throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Base save(Base element) throws DataAccessException {
+	public Model save(Model element) throws DataAccessException {
 		GenderText reference = (GenderText)element;
 		int result = -1;
         PreparedStatement ps = null;
@@ -105,11 +80,22 @@ public class GenderTextService extends BaseService implements IReferenceService 
 	}
 
 	@Override
-	public GenderText init(ResultSet rs, Base base) throws DataAccessException, SQLException {
-		GenderText genderText = new GenderText();
+	public GenderText init(ResultSet rs, Model base) throws DataAccessException, SQLException {
+		GenderText genderText = (GenderText)create();
 		genderText.setId(Long.parseLong(rs.getString("ID")));
 		genderText.setMaletext(rs.getString("Male"));
 		genderText.setFemaletext(rs.getString("Female"));
 		return genderText;
+	}
+
+	@Override
+	public Model find(Long id) throws DataAccessException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Model create() {
+		return new GenderText();
 	}
 }

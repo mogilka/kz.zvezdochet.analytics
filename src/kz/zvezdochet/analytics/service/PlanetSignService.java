@@ -11,7 +11,7 @@ import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.PlanetSignTextReference;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.PlanetService;
@@ -30,14 +30,14 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Base find(String code) throws DataAccessException {
+	public Model find(String code) throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Base> getList() throws DataAccessException {
-        List<Base> list = new ArrayList<Base>();
+	public List<Model> getList() throws DataAccessException {
+        List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -63,14 +63,14 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Base save(Base element) throws DataAccessException {
-		PlanetSignTextReference reference = (PlanetSignTextReference)element;
+	public Model save(Model model) throws DataAccessException {
+		PlanetSignTextReference reference = (PlanetSignTextReference)model;
 		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
 			String query;
-			if (element.getId() == null) 
+			if (model.getId() == null) 
 				query = "insert into " + tableName + 
 					"(signid, typeid, text, genderid, code, name, description) " +
 					"values(?,?,?,?,?,?,?)";
@@ -97,12 +97,12 @@ public class PlanetSignService extends GenderTextReferenceService {
 			ps.setString(7, reference.getDescription());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (element.getId() == null) { 
+				if (model.getId() == null) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {
 				        autoIncKeyFromApi = rsid.getLong(1);
-				        element.setId(autoIncKeyFromApi);
+				        model.setId(autoIncKeyFromApi);
 					    //System.out.println("inserted " + tableName + "\t" + autoIncKeyFromApi);
 					}
 					if (rsid != null) rsid.close();
@@ -122,12 +122,17 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetSignTextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
-		PlanetSignTextReference reference = new PlanetSignTextReference();
+	public PlanetSignTextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
+		PlanetSignTextReference reference = (PlanetSignTextReference)create();
 		super.init(rs, null);
 		reference.setSign((Sign)new SignService().find(Long.parseLong(rs.getString("SignID"))));
 		reference.setCategory((Category)new CategoryService().find(Long.parseLong(rs.getString("TypeID"))));
 		reference.setPlanet((Planet)new PlanetService().find(reference.getCategory().getObjectId()));
 		return reference;
+	}
+
+	@Override
+	public Model create() {
+		return new PlanetSignTextReference();
 	}
 }

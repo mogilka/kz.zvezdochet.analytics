@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import kz.zvezdochet.analytics.bean.Element;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.util.CoreUtil;
 
@@ -21,11 +21,16 @@ public class ElementService extends GenderTextDiagramService {
 	}
 
 	@Override
-	public Element init(ResultSet rs, Base base) throws DataAccessException, SQLException {
-		Element element = new Element();
+	public Element init(ResultSet rs, Model base) throws DataAccessException, SQLException {
+		Element element = (Element)create();
 		super.init(rs, element);
 		element.setColor(CoreUtil.rgbToColor(rs.getString("Color")));
 		element.setDiaName(rs.getString("Diagram"));
 		return element;
+	}
+
+	@Override
+	public Model create() {
+		return new Element();
 	}
 }

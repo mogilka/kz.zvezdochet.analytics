@@ -1,7 +1,7 @@
 package kz.zvezdochet.analytics.bean;
 
-import kz.zvezdochet.core.bean.Base;
-import kz.zvezdochet.core.service.BaseService;
+import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Класс, представляющий текстовую информацию
@@ -9,7 +9,7 @@ import kz.zvezdochet.core.service.BaseService;
  * @author Nataly Didenko
  *
  */
-public class GenderText extends Base {
+public class GenderText extends Model {
 	private static final long serialVersionUID = 7663798183215999740L;
 
 	/**
@@ -39,7 +39,7 @@ public class GenderText extends Base {
 	}
 
 	@Override
-	public BaseService getService() {
+	public ModelService getService() {
 		return null;
 	}
 }

@@ -11,7 +11,7 @@ import kz.zvezdochet.analytics.bean.PlanetHouseTextReference;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.BeanUtil;
@@ -39,7 +39,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	 * @return описание позиции планеты в доме
 	 * @throws DataAccessException
 	 */
-	public Base getEntity(Planet planet, House house, AspectType aspectType) throws DataAccessException {
+	public Model getEntity(Planet planet, House house, AspectType aspectType) throws DataAccessException {
         PlanetHouseTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -77,8 +77,8 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public List<Base> getList() throws DataAccessException {
-        List<Base> list = new ArrayList<Base>();
+	public List<Model> getList() throws DataAccessException {
+        List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String query;
@@ -104,7 +104,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Base save(Base element) throws DataAccessException {
+	public Model save(Model element) throws DataAccessException {
 		PlanetHouseTextReference reference = (PlanetHouseTextReference)element;
 		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
@@ -165,12 +165,17 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetHouseTextReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
-		PlanetHouseTextReference reference = new PlanetHouseTextReference();
+	public PlanetHouseTextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
+		PlanetHouseTextReference reference = (PlanetHouseTextReference)create();
 		super.init(rs, reference);
 		reference.setPlanet((Planet)new PlanetService().find(Long.parseLong(rs.getString("PlanetID"))));
 		reference.setHouse((House)new HouseService().find(Long.parseLong(rs.getString("HouseID"))));
 		reference.setAspectType((AspectType)new AspectTypeService().find(Long.parseLong(rs.getString("TypeID"))));
 		return reference;
+	}
+
+	@Override
+	public Model create() {
+		return new PlanetHouseTextReference();
 	}
 }

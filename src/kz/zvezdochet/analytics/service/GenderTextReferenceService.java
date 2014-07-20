@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.analytics.bean.TextGenderReference;
-import kz.zvezdochet.core.bean.Base;
+import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.ReferenceService;
 import kz.zvezdochet.core.tool.Connector;
@@ -20,7 +20,7 @@ import kz.zvezdochet.core.tool.Connector;
 public abstract class GenderTextReferenceService extends ReferenceService {
 
 	@Override
-	public Base save(Base element) throws DataAccessException {
+	public Model save(Model element) throws DataAccessException {
 		TextGenderReference reference = (TextGenderReference)element;
 		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
 		int result = -1;
@@ -74,7 +74,7 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 	}
 
 	@Override
-	public TextGenderReference init(ResultSet rs, Base base) throws DataAccessException, SQLException {
+	public TextGenderReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
 		TextGenderReference type = new TextGenderReference();
 		super.init(rs, type);
 		type.setText(rs.getString("Text"));

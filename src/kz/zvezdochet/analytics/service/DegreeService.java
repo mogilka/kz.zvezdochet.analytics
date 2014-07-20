@@ -1,5 +1,8 @@
 package kz.zvezdochet.analytics.service;
 
+import kz.zvezdochet.analytics.bean.Degree;
+import kz.zvezdochet.core.bean.Model;
+
 
 
 /**
@@ -12,5 +15,10 @@ public class DegreeService extends GenderTextReferenceService {
 
 	public DegreeService() {
 		tableName = "degrees";
+	}
+
+	@Override
+	public Model create() {
+		return new Degree();
 	}
 }

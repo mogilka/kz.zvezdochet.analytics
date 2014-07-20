@@ -1,5 +1,8 @@
 package kz.zvezdochet.analytics.service;
 
+import kz.zvezdochet.analytics.bean.Square;
+import kz.zvezdochet.core.bean.Model;
+
 
 /**
  * Реализация сервиса крестов
@@ -11,5 +14,10 @@ public class SquareService extends GenderTextDiagramService {
 
 	public SquareService() {
 		tableName = "squares";
+	}
+
+	@Override
+	public Model create() {
+		return new Square();
 	}
 }
