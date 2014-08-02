@@ -39,7 +39,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	 * @return описание позиции планеты в доме
 	 * @throws DataAccessException
 	 */
-	public Model getEntity(Planet planet, House house, AspectType aspectType) throws DataAccessException {
+	public Model find(Planet planet, House house, AspectType aspectType) throws DataAccessException {
         PlanetHouseTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -165,8 +165,8 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetHouseTextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		PlanetHouseTextReference reference = (PlanetHouseTextReference)create();
+	public PlanetHouseTextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		PlanetHouseTextReference reference = (model != null) ? (PlanetHouseTextReference)model : (PlanetHouseTextReference)create();
 		super.init(rs, reference);
 		reference.setPlanet((Planet)new PlanetService().find(Long.parseLong(rs.getString("PlanetID"))));
 		reference.setHouse((House)new HouseService().find(Long.parseLong(rs.getString("HouseID"))));

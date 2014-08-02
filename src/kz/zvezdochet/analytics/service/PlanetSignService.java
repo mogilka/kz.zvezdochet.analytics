@@ -122,9 +122,9 @@ public class PlanetSignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetSignTextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		PlanetSignTextReference reference = (PlanetSignTextReference)create();
-		super.init(rs, null);
+	public PlanetSignTextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		PlanetSignTextReference reference = (model != null) ? (PlanetSignTextReference)model : (PlanetSignTextReference)create();
+		super.init(rs, reference);
 		reference.setSign((Sign)new SignService().find(Long.parseLong(rs.getString("SignID"))));
 		reference.setCategory((Category)new CategoryService().find(Long.parseLong(rs.getString("TypeID"))));
 		reference.setPlanet((Planet)new PlanetService().find(reference.getCategory().getObjectId()));

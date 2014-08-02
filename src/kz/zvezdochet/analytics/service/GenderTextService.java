@@ -80,18 +80,12 @@ public class GenderTextService extends ModelService implements IReferenceService
 	}
 
 	@Override
-	public GenderText init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		GenderText genderText = (GenderText)create();
+	public GenderText init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		GenderText genderText = (model != null) ? (GenderText)model : (GenderText)create();
 		genderText.setId(Long.parseLong(rs.getString("ID")));
 		genderText.setMaletext(rs.getString("Male"));
 		genderText.setFemaletext(rs.getString("Female"));
 		return genderText;
-	}
-
-	@Override
-	public Model find(Long id) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

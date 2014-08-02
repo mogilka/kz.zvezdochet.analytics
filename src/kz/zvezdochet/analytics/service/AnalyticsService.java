@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import kz.zvezdochet.bean.Event;
@@ -23,62 +22,6 @@ import kz.zvezdochet.service.SignService;
  */
 public class AnalyticsService {
 
-	/**
-	 * Поиск известных событий, 
-	 * произошедших в указанную дату
-	 * @param date дата
-	 * @return список людей
-	 * @throws DataAccessException
-	 */
-	public List<Event> getCelebrities(String date) throws DataAccessException {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(DateUtil.getDate(date));
-		int day = calendar.get(Calendar.DAY_OF_MONTH);
-		int month = calendar.get(Calendar.MONTH) + 1;
-/*
-select surname, callname, initialDate, comment
-from events 
-where cast(initialDate as char) like '%-08-07%'
-and celebrity = true
-order by initialDate		
- */
-        List<Event> list = new ArrayList<Event>();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		try {
-			String sql = 
-				"select surname, callname, initialDate, comment " +
-				"from events " +
-				"where celebrity = true " +
-				"and cast(initialDate as char) like '%-" + 
-					DateUtil.formatDateNumber(month) + "-" + 
-					DateUtil.formatDateNumber(day) + "%' " + 
-				"order by initialDate";
-			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				Event event = new Event();
-				if (rs.getString("Callname") != null)
-					event.setName(rs.getString("Callname"));
-				if (rs.getString("Surname") != null)
-					event.setSurname(rs.getString("Surname"));
-				event.setBirth(DateUtil.getDatabaseDateTime(rs.getString("initialdate")));
-				if (rs.getString("Comment") != null)
-					event.setDescription(rs.getString("Comment"));
-				list.add(event);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return list;
-	}
 
 	/**
 	 * Поиск известных событий, 
@@ -95,8 +38,8 @@ order by initialDate
 			venusInitial = 0, venusFinal = 0,
 			marsInitial = 0, marsFinal = 0;
 		
-		for (Model entity : planets) {
-			Planet planet = (Planet)entity;
+		for (Model model : planets) {
+			Planet planet = (Planet)model;
 			if (planet.getSign() != null) {
 				if (planet.getCode().equals("Sun")) {
 					sunInitial = planet.getSign().getInitialPoint();

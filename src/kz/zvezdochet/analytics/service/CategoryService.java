@@ -104,8 +104,8 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public Category init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		Category type = new Category();
+	public Category init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		Category type = (model != null) ? (Category)model : (Category)create();
 		super.init(rs, type);
 		type.setPriority(Integer.parseInt(rs.getString("Priority")));
 		type.setObjectId(Long.parseLong(rs.getString("ObjectID")));

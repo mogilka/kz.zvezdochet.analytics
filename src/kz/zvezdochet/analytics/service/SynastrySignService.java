@@ -123,8 +123,8 @@ public class SynastrySignService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public SynastryTextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		SynastryTextReference reference = (SynastryTextReference)create();
+	public SynastryTextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		SynastryTextReference reference = (model != null) ? (SynastryTextReference)model : (SynastryTextReference)create();
 		super.init(rs, reference);
 		SignService service = new SignService();
 		reference.setSign1((Sign)service.find(Long.parseLong(rs.getString("Sign1ID"))));

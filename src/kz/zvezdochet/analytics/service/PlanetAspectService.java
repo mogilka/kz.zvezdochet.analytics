@@ -36,7 +36,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	 * @return аспект между планетами
 	 * @throws DataAccessException
 	 */
-	public Model getEntity(Planet planet1, Planet planet2, AspectType aspectType) throws DataAccessException {
+	public Model find(Planet planet1, Planet planet2, AspectType aspectType) throws DataAccessException {
         PlanetAspectTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -152,8 +152,8 @@ public class PlanetAspectService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public PlanetAspectTextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		PlanetAspectTextReference reference = (PlanetAspectTextReference)create();
+	public PlanetAspectTextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		PlanetAspectTextReference reference = (model != null) ? (PlanetAspectTextReference)model : (PlanetAspectTextReference)create();
 		super.init(rs, reference);
 		PlanetService service = new PlanetService();
 		reference.setPlanet1((Planet)service.find(Long.parseLong(rs.getString("Planet1ID"))));

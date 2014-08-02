@@ -69,8 +69,8 @@ public class TextReferenceService extends ReferenceService implements IReference
 	}
 
 	@Override
-	public TextReference init(ResultSet rs, Model base) throws DataAccessException, SQLException {
-		TextReference type = (TextReference)create();
+	public TextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		TextReference type = (model != null) ? (TextReference)model : (TextReference)create();
 		super.init(rs, type);
 		type.setText(rs.getString("Text"));
 		return type;

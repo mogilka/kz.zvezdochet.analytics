@@ -23,11 +23,10 @@ public class ElementService extends GenderTextDiagramService {
 
 	@Override
 	public Element init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		if (null == model)
-			model = (Element)create();
+		Element element = (model != null) ? (Element)model : (Element)create();
 		super.init(rs, model);
-		((Element)model).setColor(CoreUtil.rgbToColor(rs.getString("Color")));
-		((Element)model).setDiaName(rs.getString("Diagram"));
+		element.setColor(CoreUtil.rgbToColor(rs.getString("Color")));
+		element.setDiaName(rs.getString("Diagram"));
 		return (Element)model;
 	}
 

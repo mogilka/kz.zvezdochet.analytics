@@ -132,9 +132,9 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Zone getZone(String code) throws DataAccessException {
-		for (Model entity : new ZoneService().getList())
-			if (((Zone)entity).getCode().toUpperCase().equals(code))
-				return (Zone)entity;
+		for (Model model : new ZoneService().getList())
+			if (((Zone)model).getCode().toUpperCase().equals(code))
+				return (Zone)model;
 		return null;
 	}
 
@@ -145,9 +145,9 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Cross getCross(String code) throws DataAccessException {
-		for (Model entity : new CrossService().getList())
-			if (((Cross)entity).getCode().toUpperCase().equals(code))
-				return (Cross)entity;
+		for (Model model : new CrossService().getList())
+			if (((Cross)model).getCode().toUpperCase().equals(code))
+				return (Cross)model;
 		return null;
 	}
 
@@ -252,9 +252,9 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static InYan getInYan(String code) throws DataAccessException {
-		for (Model entity : new InYanService().getList())
-			if (((InYan)entity).getCode().toUpperCase().equals(code))
-				return (InYan)entity;
+		for (Model model : new InYanService().getList())
+			if (((InYan)model).getCode().toUpperCase().equals(code))
+				return (InYan)model;
 		return null;
 	}
 
@@ -265,9 +265,9 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Halfsphere getHalfsphere(String code) throws DataAccessException {
-		for (Model entity : new HalfsphereService().getList())
-			if (((Halfsphere)entity).getCode().toUpperCase().equals(code))
-				return (Halfsphere)entity;
+		for (Model model : new HalfsphereService().getList())
+			if (((Halfsphere)model).getCode().toUpperCase().equals(code))
+				return (Halfsphere)model;
 		return null;
 	}
 
@@ -278,9 +278,9 @@ public class AnalyticsUtil {
 	 * @throws DataAccessException 
 	 */
 	public static Square getSquare(String code) throws DataAccessException {
-		for (Model entity : new SquareService().getList())
-			if (((Square)entity).getCode().toUpperCase().equals(code))
-				return (Square)entity;
+		for (Model model : new SquareService().getList())
+			if (((Square)model).getCode().toUpperCase().equals(code))
+				return (Square)model;
 		return null;
 	}
 }
