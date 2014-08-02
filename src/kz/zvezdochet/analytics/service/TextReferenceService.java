@@ -27,17 +27,17 @@ public class TextReferenceService extends ReferenceService implements IReference
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (model.getId() == null) 
-				query = "insert into " + tableName + "(code, name, description, text) values(?,?,?,?)";
+				sql = "insert into " + tableName + "(code, name, description, text) values(?,?,?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"code = ?, " +
 					"name = ?, " +
 					"description = ?, " +
 					"text = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, reference.getCode());
 			ps.setString(2, reference.getName());
 			ps.setString(3, reference.getDescription());

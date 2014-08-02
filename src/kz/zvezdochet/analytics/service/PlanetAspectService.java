@@ -40,13 +40,13 @@ public class PlanetAspectService extends GenderTextReferenceService {
         PlanetAspectTextReference reference = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-		String query;
+		String sql;
 		try {
-			query = "select * from " + tableName + 
+			sql = "select * from " + tableName + 
 				" where typeid = " + aspectType.getId() +
 				" and planet1id = " + planet1.getId() +
 				" and planet2id = " + planet2.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			if (rs.next())
 				reference = init(rs, null);
@@ -68,10 +68,10 @@ public class PlanetAspectService extends GenderTextReferenceService {
         List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
-		String query;
+		String sql;
 		try {
-			query = "select * from " + tableName + " order by planet1ID, planet2ID, TypeID";
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			sql = "select * from " + tableName + " order by planet1ID, planet2ID, TypeID";
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				PlanetAspectTextReference reference = init(rs, null);
@@ -97,13 +97,13 @@ public class PlanetAspectService extends GenderTextReferenceService {
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (model.getId() == null) 
-				query = "insert into " + tableName + 
+				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, planet1id, planet2id, typeid) " +
 					"values(?,?,?,?,?,?,?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"text = ?, " +
 					"genderid = ?, " +
 					"code = ?, " +
@@ -113,7 +113,7 @@ public class PlanetAspectService extends GenderTextReferenceService {
 					"planet2id = ?, " +
 					"typeid = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, reference.getText());
 			if (reference.getGenderText() != null)
 				ps.setLong(2, reference.getGenderText().getId());
@@ -156,9 +156,9 @@ public class PlanetAspectService extends GenderTextReferenceService {
 		PlanetAspectTextReference reference = (model != null) ? (PlanetAspectTextReference)model : (PlanetAspectTextReference)create();
 		super.init(rs, reference);
 		PlanetService service = new PlanetService();
-		reference.setPlanet1((Planet)service.find(Long.parseLong(rs.getString("Planet1ID"))));
-		reference.setPlanet2((Planet)service.find(Long.parseLong(rs.getString("Planet2ID"))));
-		reference.setType((AspectType)new AspectTypeService().find(Long.parseLong(rs.getString("TypeID"))));
+		reference.setPlanet1((Planet)service.find(rs.getLong("Planet1ID")));
+		reference.setPlanet2((Planet)service.find(rs.getLong("Planet2ID")));
+		reference.setType((AspectType)new AspectTypeService().find(rs.getLong("TypeID")));
 		return reference;
 	}
 

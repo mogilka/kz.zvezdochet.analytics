@@ -40,10 +40,10 @@ public class PlanetSignService extends GenderTextReferenceService {
         List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
-		String query;
+		String sql;
 		try {
-			query = "select * from " + tableName + " order by signID";
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			sql = "select * from " + tableName + " order by signID";
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				PlanetSignTextReference reference = init(rs, null);
@@ -69,13 +69,13 @@ public class PlanetSignService extends GenderTextReferenceService {
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (model.getId() == null) 
-				query = "insert into " + tableName + 
+				sql = "insert into " + tableName + 
 					"(signid, typeid, text, genderid, code, name, description) " +
 					"values(?,?,?,?,?,?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"signid = ?, " +
 					"typeid = ?, " +
 					"text = ?, " +
@@ -84,7 +84,7 @@ public class PlanetSignService extends GenderTextReferenceService {
 					"name = ?, " +
 					"description = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, reference.getSign().getId());
 			ps.setLong(2, reference.getCategory().getId());
 			ps.setString(3, reference.getText());
@@ -125,8 +125,8 @@ public class PlanetSignService extends GenderTextReferenceService {
 	public PlanetSignTextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
 		PlanetSignTextReference reference = (model != null) ? (PlanetSignTextReference)model : (PlanetSignTextReference)create();
 		super.init(rs, reference);
-		reference.setSign((Sign)new SignService().find(Long.parseLong(rs.getString("SignID"))));
-		reference.setCategory((Category)new CategoryService().find(Long.parseLong(rs.getString("TypeID"))));
+		reference.setSign((Sign)new SignService().find(rs.getLong("SignID")));
+		reference.setCategory((Category)new CategoryService().find(rs.getLong("TypeID")));
 		reference.setPlanet((Planet)new PlanetService().find(reference.getCategory().getObjectId()));
 		return reference;
 	}

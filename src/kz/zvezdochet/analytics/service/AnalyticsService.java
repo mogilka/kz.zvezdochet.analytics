@@ -122,44 +122,6 @@ order by e.initialDate
 		return list;
 	}
 
-	/**
-	 * Поиск знаков Зодиака
-	 * @param planet планета
-	 * @param type тип позиции планеты в знаке
-	 * @return список знаков Зодиака
-	 * @throws DataAccessException
-	 */
-	public List<Sign> getSigns(Planet planet, String type) throws DataAccessException {
-        List<Sign> list = new ArrayList<Sign>();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		String query;
-		try {
-			query = "select p.signid from planetsignposition p " +
-					"inner join positionType t on p.typeid = t.id " +
-					"where p.planetid = ? " +
-					"and t.code like ?";
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
-			ps.setLong(1, planet.getId());
-			ps.setString(2, type);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				Long id = Long.parseLong(rs.getString(0));
-				Sign sign = (Sign)new SignService().find(id);
-				list.add(sign);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try { 
-				if (rs != null) rs.close();
-				if (ps != null) ps.close();
-			} catch (SQLException e) { 
-				e.printStackTrace(); 
-			}
-		}
-		return list;
-	}
 
 	/**
 	 * Поиск планеты-управителя знака Зодиака
@@ -173,12 +135,12 @@ order by e.initialDate
         PreparedStatement ps = null;
         ResultSet rs = null;
 		try {
-			String query = 
+			String sql = 
 					"select p.planetid from planetsignposition p " +
 					"inner join positiontype t on p.typeid = t.id " +
 					"where p.signid = ? " +
 					"and t.code like ?";
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, sign.getId());
 			ps.setString(2, type);
 			rs = ps.executeQuery();

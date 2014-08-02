@@ -39,12 +39,12 @@ public abstract class GenderTextDiagramService extends GenderTextReferenceServic
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (element.getId() == null) 
-				query = "insert into " + tableName + 
+				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, color, diagram) values(?,?,?,?,?,?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"text = ?, " +
 					"genderid = ?, " +
 					"code = ?, " +
@@ -53,7 +53,7 @@ public abstract class GenderTextDiagramService extends GenderTextReferenceServic
 					"color = ?, " +
 					"diagram = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, reference.getText());
 			if (reference.getGenderText() != null)
 				ps.setLong(2, reference.getGenderText().getId());

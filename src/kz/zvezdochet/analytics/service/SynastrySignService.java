@@ -39,10 +39,10 @@ public class SynastrySignService extends GenderTextReferenceService {
         List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
-		String query;
+		String sql;
 		try {
-			query = "select * from " + tableName + " order by planetID, sign1ID, sign2ID";
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			sql = "select * from " + tableName + " order by planetID, sign1ID, sign2ID";
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				SynastryTextReference reference = init(rs, null);
@@ -68,13 +68,13 @@ public class SynastrySignService extends GenderTextReferenceService {
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (model.getId() == null) 
-				query = "insert into " + tableName + 
+				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, sign1id, sign2id, planetid) " +
 					"values(?,?,?,?,?,?,?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"text = ?, " +
 					"genderid = ?, " +
 					"code = ?, " +
@@ -84,7 +84,7 @@ public class SynastrySignService extends GenderTextReferenceService {
 					"sign2id = ?, " +
 					"planetid = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, reference.getText());
 			if (reference.getGenderText() != null)
 				ps.setLong(2, reference.getGenderText().getId());
@@ -127,9 +127,9 @@ public class SynastrySignService extends GenderTextReferenceService {
 		SynastryTextReference reference = (model != null) ? (SynastryTextReference)model : (SynastryTextReference)create();
 		super.init(rs, reference);
 		SignService service = new SignService();
-		reference.setSign1((Sign)service.find(Long.parseLong(rs.getString("Sign1ID"))));
-		reference.setSign2((Sign)service.find(Long.parseLong(rs.getString("Sign2ID"))));
-		reference.setPlanet((Planet)new PlanetService().find(Long.parseLong(rs.getString("PlanetID"))));
+		reference.setSign1((Sign)service.find(rs.getLong("Sign1ID")));
+		reference.setSign2((Sign)service.find(rs.getLong("Sign2ID")));
+		reference.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
 		return reference;
 	}
 

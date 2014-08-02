@@ -26,19 +26,19 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (element.getId() == null) 
-				query = "insert into " + tableName + 
+				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description) values(?,?,?,?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"text = ?, " +
 					"genderid = ?, " +
 					"code = ?, " +
 					"name = ?, " +
 					"description = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, reference.getText());
 			if (reference.getGenderText() != null)
 				ps.setLong(2, reference.getGenderText().getId());
@@ -79,7 +79,7 @@ public abstract class GenderTextReferenceService extends ReferenceService {
 		super.init(rs, model);
 		type.setText(rs.getString("Text"));
 		if (rs.getString("GenderID") != null) {
-			GenderText genderText = (GenderText)new GenderTextService().find(Long.parseLong(rs.getString("GenderID")));
+			GenderText genderText = (GenderText)new GenderTextService().find(rs.getLong("GenderID"));
 			if (genderText != null)
 				type.setGenderText(genderText);
 		}

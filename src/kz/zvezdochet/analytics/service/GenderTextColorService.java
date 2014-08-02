@@ -37,12 +37,12 @@ public abstract class GenderTextColorService extends GenderTextReferenceService 
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (element.getId() == null) 
-				query = "insert into " + tableName + 
+				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, color) values(?,?,?,?,?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"text = ?, " +
 					"genderid = ?, " +
 					"code = ?, " +
@@ -50,7 +50,7 @@ public abstract class GenderTextColorService extends GenderTextReferenceService 
 					"description = ?, " +
 					"color = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, reference.getText());
 			if (reference.getGenderText() != null)
 				ps.setLong(2, reference.getGenderText().getId());

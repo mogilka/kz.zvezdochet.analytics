@@ -31,10 +31,10 @@ public class CategoryService extends ReferenceService {
         List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
-		String query;
+		String sql;
 		try {
-			query = "select * from " + tableName + " order by objectid, priority";
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			sql = "select * from " + tableName + " order by objectid, priority";
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				Category category = init(rs, null);
@@ -59,19 +59,19 @@ public class CategoryService extends ReferenceService {
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (element.getId() == null) 
-				query = "insert into " + tableName + 
+				sql = "insert into " + tableName + 
 					"(priority, objectid, code, name, description) values(?,?,?,?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"priority = ?, " +
 					"objectid = ?, " +
 					"code = ?, " +
 					"name = ?, " +
 					"description = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setInt(1, reference.getPriority());
 			ps.setLong(2, reference.getObjectId());
 			ps.setString(3, reference.getCode());
@@ -107,8 +107,8 @@ public class CategoryService extends ReferenceService {
 	public Category init(ResultSet rs, Model model) throws DataAccessException, SQLException {
 		Category type = (model != null) ? (Category)model : (Category)create();
 		super.init(rs, type);
-		type.setPriority(Integer.parseInt(rs.getString("Priority")));
-		type.setObjectId(Long.parseLong(rs.getString("ObjectID")));
+		type.setPriority(rs.getInt("Priority"));
+		type.setObjectId(rs.getLong("ObjectID"));
 		type.setPlanet((Planet)new PlanetService().find(type.getObjectId()));
 		return type;
 	}

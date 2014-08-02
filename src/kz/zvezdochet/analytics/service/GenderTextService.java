@@ -43,15 +43,15 @@ public class GenderTextService extends ModelService implements IReferenceService
 		int result = -1;
         PreparedStatement ps = null;
 		try {
-			String query;
+			String sql;
 			if (element.getId() == null) 
-				query = "insert into " + tableName + "(male, female) values(?,?)";
+				sql = "insert into " + tableName + "(male, female) values(?,?)";
 			else
-				query = "update " + tableName + " set " +
+				sql = "update " + tableName + " set " +
 					"male = ?, " +
 					"female = ? " +
 					"where id = " + reference.getId();
-			ps = Connector.getInstance().getConnection().prepareStatement(query);
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, reference.getMaletext());
 			ps.setString(2, reference.getFemaletext());
 			result = ps.executeUpdate();
@@ -82,7 +82,7 @@ public class GenderTextService extends ModelService implements IReferenceService
 	@Override
 	public GenderText init(ResultSet rs, Model model) throws DataAccessException, SQLException {
 		GenderText genderText = (model != null) ? (GenderText)model : (GenderText)create();
-		genderText.setId(Long.parseLong(rs.getString("ID")));
+		genderText.setId(rs.getLong("ID"));
 		genderText.setMaletext(rs.getString("Male"));
 		genderText.setFemaletext(rs.getString("Female"));
 		return genderText;
