@@ -10,17 +10,15 @@ import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.ReferenceService;
+import kz.zvezdochet.core.service.DictionaryService;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.PlanetService;
 
 /**
- * Реализация сервиса категорий
+ * Сервис категорий
  * @author Nataly Didenko
- *
- * @see ReferenceService Реализация сервиса справочников  
  */
-public class CategoryService extends ReferenceService {
+public class CategoryService extends DictionaryService {
 
 	public CategoryService() {
 		tableName = "categories";
@@ -54,13 +52,13 @@ public class CategoryService extends ReferenceService {
 	}
 
 	@Override
-	public Model save(Model element) throws DataAccessException {
-		Category reference = (Category)element;
+	public Model save(Model model) throws DataAccessException {
+		Category dict = (Category)model;
 		int result = -1;
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (element.getId() == null) 
+			if (model.getId() == null) 
 				sql = "insert into " + tableName + 
 					"(priority, objectid, code, name, description) values(?,?,?,?,?)";
 			else
@@ -70,22 +68,21 @@ public class CategoryService extends ReferenceService {
 					"code = ?, " +
 					"name = ?, " +
 					"description = ? " +
-					"where id = " + reference.getId();
+					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setInt(1, reference.getPriority());
-			ps.setLong(2, reference.getObjectId());
-			ps.setString(3, reference.getCode());
-			ps.setString(4, reference.getName());
-			ps.setString(5, reference.getDescription());
+			ps.setInt(1, dict.getPriority());
+			ps.setLong(2, dict.getObjectId());
+			ps.setString(3, dict.getCode());
+			ps.setString(4, dict.getName());
+			ps.setString(5, dict.getDescription());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (element.getId() == null) { 
+				if (model.getId() == null) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {
 				        autoIncKeyFromApi = rsid.getLong(1);
-				        element.setId(autoIncKeyFromApi);
-					    //System.out.println("inserted " + tableName + "\t" + autoIncKeyFromApi);
+				        model.setId(autoIncKeyFromApi);
 					}
 					if (rsid != null) rsid.close();
 				}
@@ -100,7 +97,7 @@ public class CategoryService extends ReferenceService {
 			}
 			update();
 		}
-		return reference;
+		return dict;
 	}
 
 	@Override

@@ -6,12 +6,9 @@ import kz.zvezdochet.analytics.bean.Halfsphere;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 
-
 /**
- * Реализация сервиса полусфер
+ * Сервис полусфер
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */
 public class HalfsphereService extends GenderTextDiagramService {
 

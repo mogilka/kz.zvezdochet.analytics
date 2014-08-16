@@ -4,26 +4,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import kz.zvezdochet.bean.TextReference;
+import kz.zvezdochet.bean.TextDictionary;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.ModelService;
-import kz.zvezdochet.core.service.IReferenceService;
-import kz.zvezdochet.core.service.ReferenceService;
+import kz.zvezdochet.core.service.DictionaryService;
+import kz.zvezdochet.core.service.IDictionaryService;
 import kz.zvezdochet.core.tool.Connector;
 
 /**
- * Реализация сервиса справочников с расширенной текстовой информацией
+ * Сервис справочников с расширенной текстовой информацией
  * @author Nataly Didenko
- *
- * @see ModelService Реализация интерфейса сервиса управления объектами на уровне БД  
- * @see IReferenceService Интерфейс управления справочниками на уровне БД  
  */
-public class TextReferenceService extends ReferenceService implements IReferenceService {
+public class TextDictionaryService extends DictionaryService implements IDictionaryService {
 
 	@Override
 	public Model save(Model model) throws DataAccessException {
-		TextReference reference = (TextReference)model;
+		TextDictionary dict = (TextDictionary)model;
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -36,12 +32,12 @@ public class TextReferenceService extends ReferenceService implements IReference
 					"name = ?, " +
 					"description = ?, " +
 					"text = ? " +
-					"where id = " + reference.getId();
+					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setString(1, reference.getCode());
-			ps.setString(2, reference.getName());
-			ps.setString(3, reference.getDescription());
-			ps.setString(4, reference.getText());
+			ps.setString(1, dict.getCode());
+			ps.setString(2, dict.getName());
+			ps.setString(3, dict.getDescription());
+			ps.setString(4, dict.getText());
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (model.getId() == null) { 
@@ -65,12 +61,12 @@ public class TextReferenceService extends ReferenceService implements IReference
 			}
 			update();
 		}
-		return reference;
+		return dict;
 	}
 
 	@Override
-	public TextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		TextReference type = (model != null) ? (TextReference)model : (TextReference)create();
+	public TextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		TextDictionary type = (model != null) ? (TextDictionary)model : (TextDictionary)create();
 		super.init(rs, type);
 		type.setText(rs.getString("Text"));
 		return type;
@@ -78,6 +74,6 @@ public class TextReferenceService extends ReferenceService implements IReference
 
 	@Override
 	public Model create() {
-		return new TextReference();
+		return new TextDictionary();
 	}
 }

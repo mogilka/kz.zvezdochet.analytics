@@ -7,10 +7,8 @@ import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 
 /**
- * Реализация сервиса Инь-Ян
+ * Сервис Инь-Ян
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */
 public class InYanService extends GenderTextDiagramService {
 

@@ -6,12 +6,9 @@ import kz.zvezdochet.analytics.bean.Cross;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 
-
 /**
- * Реализация сервиса крестов
+ * Сервис крестов
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */
 public class CrossService extends GenderTextDiagramService {
 

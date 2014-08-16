@@ -8,7 +8,7 @@ import java.util.List;
 
 import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.PlanetSignTextReference;
+import kz.zvezdochet.analytics.bean.PlanetSignTextDictionary;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
 import kz.zvezdochet.core.bean.Model;
@@ -18,21 +18,13 @@ import kz.zvezdochet.service.PlanetService;
 import kz.zvezdochet.service.SignService;
 
 /**
- * Реализация сервиса справочника "Планеты в знаках Зодиака"
+ * Сервис планет в знаках Зодиака
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Реализация сервиса справочников  
  */
-public class PlanetSignService extends GenderTextReferenceService {
+public class PlanetSignService extends GenderTextDictionaryService {
 
 	public PlanetSignService() {
 		tableName = "planetsigns";
-	}
-
-	@Override
-	public Model find(String code) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -45,10 +37,8 @@ public class PlanetSignService extends GenderTextReferenceService {
 			sql = "select * from " + tableName + " order by signID";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
-			while (rs.next()) {
-				PlanetSignTextReference reference = init(rs, null);
-				list.add(reference);
-			}
+			while (rs.next())
+				list.add(init(rs, null));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -64,8 +54,8 @@ public class PlanetSignService extends GenderTextReferenceService {
 
 	@Override
 	public Model save(Model model) throws DataAccessException {
-		PlanetSignTextReference reference = (PlanetSignTextReference)model;
-		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
+		PlanetSignTextDictionary dict = (PlanetSignTextDictionary)model;
+		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -83,18 +73,18 @@ public class PlanetSignService extends GenderTextReferenceService {
 					"code = ?, " +
 					"name = ?, " +
 					"description = ? " +
-					"where id = " + reference.getId();
+					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setLong(1, reference.getSign().getId());
-			ps.setLong(2, reference.getCategory().getId());
-			ps.setString(3, reference.getText());
-			if (reference.getGenderText() != null)
-				ps.setLong(4, reference.getGenderText().getId());
+			ps.setLong(1, dict.getSign().getId());
+			ps.setLong(2, dict.getCategory().getId());
+			ps.setString(3, dict.getText());
+			if (dict.getGenderText() != null)
+				ps.setLong(4, dict.getGenderText().getId());
 			else
 				ps.setLong(4, java.sql.Types.NULL);
-			ps.setString(5, reference.getCode());
-			ps.setString(6, reference.getName());
-			ps.setString(7, reference.getDescription());
+			ps.setString(5, dict.getCode());
+			ps.setString(6, dict.getName());
+			ps.setString(7, dict.getDescription());
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (model.getId() == null) { 
@@ -118,21 +108,21 @@ public class PlanetSignService extends GenderTextReferenceService {
 			}
 			update();
 		}
-		return reference;
+		return dict;
 	}
 
 	@Override
-	public PlanetSignTextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		PlanetSignTextReference reference = (model != null) ? (PlanetSignTextReference)model : (PlanetSignTextReference)create();
-		super.init(rs, reference);
-		reference.setSign((Sign)new SignService().find(rs.getLong("SignID")));
-		reference.setCategory((Category)new CategoryService().find(rs.getLong("TypeID")));
-		reference.setPlanet((Planet)new PlanetService().find(reference.getCategory().getObjectId()));
-		return reference;
+	public PlanetSignTextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		PlanetSignTextDictionary dict = (model != null) ? (PlanetSignTextDictionary)model : (PlanetSignTextDictionary)create();
+		super.init(rs, dict);
+		dict.setSign((Sign)new SignService().find(rs.getLong("SignID")));
+		dict.setCategory((Category)new CategoryService().find(rs.getLong("TypeID")));
+		dict.setPlanet((Planet)new PlanetService().find(dict.getCategory().getObjectId()));
+		return dict;
 	}
 
 	@Override
 	public Model create() {
-		return new PlanetSignTextReference();
+		return new PlanetSignTextDictionary();
 	}
 }

@@ -7,25 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.PlanetHouseTextReference;
+import kz.zvezdochet.analytics.bean.PlanetHouseTextDictionary;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
-import kz.zvezdochet.core.util.BeanUtil;
 import kz.zvezdochet.service.AspectTypeService;
 import kz.zvezdochet.service.HouseService;
 import kz.zvezdochet.service.PlanetService;
 
 /**
- * Реализация сервиса справочника "Планеты в астрологических домах"
+ * Сервис планет в астрологических домах
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Реализация сервиса простого справочника  
  */
-public class PlanetHouseService extends GenderTextReferenceService {
+public class PlanetHouseService extends GenderTextDictionaryService {
 
 	public PlanetHouseService() {
 		tableName = "planethouses";
@@ -40,7 +37,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	 * @throws DataAccessException
 	 */
 	public Model find(Planet planet, House house, AspectType aspectType) throws DataAccessException {
-        PlanetHouseTextReference reference = null;
+        PlanetHouseTextDictionary dict = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
@@ -48,11 +45,9 @@ public class PlanetHouseService extends GenderTextReferenceService {
 		 //TODO доработать с учетом других признаков
 		AspectTypeService service = new AspectTypeService();
 		if (aspectType == null)
-			aspectType = (AspectType)BeanUtil.getReferenceByCode(
-					service.getList(), "NEUTRAL");
+			aspectType = (AspectType)service.find("NEUTRAL");
 		if (planet.isDamaged())
-			aspectType = (AspectType)BeanUtil.getReferenceByCode(
-					service.getList(), "NEGATIVE");
+			aspectType = (AspectType)service.find("NEGATIVE");
 		
 		try {
 			sql = "select * from " + tableName + 
@@ -62,7 +57,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			if (rs.next())
-				reference = init(rs, null);
+				dict = init(rs, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -73,7 +68,7 @@ public class PlanetHouseService extends GenderTextReferenceService {
 				e.printStackTrace(); 
 			}
 		}
-		return reference;
+		return dict;
 	}
 
 	@Override
@@ -86,10 +81,8 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			sql = "select * from " + tableName + " order by planetID, houseID";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
-			while (rs.next()) {
-				PlanetHouseTextReference reference = init(rs, null);
-				list.add(reference);
-			}
+			while (rs.next())
+				list.add(init(rs, null));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -104,14 +97,14 @@ public class PlanetHouseService extends GenderTextReferenceService {
 	}
 
 	@Override
-	public Model save(Model element) throws DataAccessException {
-		PlanetHouseTextReference reference = (PlanetHouseTextReference)element;
-		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
+	public Model save(Model model) throws DataAccessException {
+		PlanetHouseTextDictionary dict = (PlanetHouseTextDictionary)model;
+		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (element.getId() == null) 
+			if (model.getId() == null) 
 				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, planetid, houseid, typeid) " +
 					"values(?,?,?,?,?,?,?,?)";
@@ -125,28 +118,27 @@ public class PlanetHouseService extends GenderTextReferenceService {
 					"planetid = ?, " +
 					"houseid = ?, " +
 					"typeid = ? " +
-					"where id = " + reference.getId();
+					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setString(1, reference.getText());
-			if (reference.getGenderText() != null)
-				ps.setLong(2, reference.getGenderText().getId());
+			ps.setString(1, dict.getText());
+			if (dict.getGenderText() != null)
+				ps.setLong(2, dict.getGenderText().getId());
 			else
 				ps.setLong(2, java.sql.Types.NULL);
-			ps.setString(3, reference.getCode());
-			ps.setString(4, reference.getName());
-			ps.setString(5, reference.getDescription());
-			ps.setLong(6, reference.getPlanet().getId());
-			ps.setLong(7, reference.getHouse().getId());
-			ps.setLong(8, reference.getAspectType().getId());
+			ps.setString(3, dict.getCode());
+			ps.setString(4, dict.getName());
+			ps.setString(5, dict.getDescription());
+			ps.setLong(6, dict.getPlanet().getId());
+			ps.setLong(7, dict.getHouse().getId());
+			ps.setLong(8, dict.getAspectType().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (element.getId() == null) { 
+				if (model.getId() == null) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {
 				        autoIncKeyFromApi = rsid.getLong(1);
-				        element.setId(autoIncKeyFromApi);
-					    //System.out.println("inserted " + tableName + "\t" + autoIncKeyFromApi);
+				        model.setId(autoIncKeyFromApi);
 					}
 					if (rsid != null) rsid.close();
 				}
@@ -161,21 +153,21 @@ public class PlanetHouseService extends GenderTextReferenceService {
 			}
 			update();
 		}
-		return reference;
+		return dict;
 	}
 
 	@Override
-	public PlanetHouseTextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		PlanetHouseTextReference reference = (model != null) ? (PlanetHouseTextReference)model : (PlanetHouseTextReference)create();
-		super.init(rs, reference);
-		reference.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
-		reference.setHouse((House)new HouseService().find(rs.getLong("HouseID")));
-		reference.setAspectType((AspectType)new AspectTypeService().find(rs.getLong("TypeID")));
-		return reference;
+	public PlanetHouseTextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		PlanetHouseTextDictionary dict = (model != null) ? (PlanetHouseTextDictionary)model : (PlanetHouseTextDictionary)create();
+		super.init(rs, dict);
+		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
+		dict.setHouse((House)new HouseService().find(rs.getLong("HouseID")));
+		dict.setAspectType((AspectType)new AspectTypeService().find(rs.getLong("TypeID")));
+		return dict;
 	}
 
 	@Override
 	public Model create() {
-		return new PlanetHouseTextReference();
+		return new PlanetHouseTextDictionary();
 	}
 }

@@ -1,11 +1,11 @@
 package kz.zvezdochet.analytics.bean;
 
-import kz.zvezdochet.analytics.util.DiagramReference;
+import kz.zvezdochet.analytics.util.DiagramDictionary;
 
 /**
- * Класс, представляющий Крест
+ * Крест
  * @author Nataly Didenko
  */
-public class Cross extends DiagramReference {
+public class Cross extends DiagramDictionary {
 	private static final long serialVersionUID = -7024846494191754532L;
 }

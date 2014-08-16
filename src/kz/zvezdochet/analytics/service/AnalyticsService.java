@@ -14,10 +14,9 @@ import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.DateUtil;
 import kz.zvezdochet.service.PlanetService;
-import kz.zvezdochet.service.SignService;
 
 /**
- * Класс, обеспечивающий взаимодействие с БД
+ * Сервис взаимодействия с БД
  * @author Nataly Didenko
  */
 public class AnalyticsService {

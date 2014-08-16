@@ -10,10 +10,8 @@ import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.util.CoreUtil;
 
 /**
- * Реализация сервиса стихий
+ * Сервис стихий
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Реализация сервиса простого справочника  
  */
 public class ElementService extends GenderTextDiagramService {
 
@@ -27,7 +25,7 @@ public class ElementService extends GenderTextDiagramService {
 		super.init(rs, model);
 		element.setColor(CoreUtil.rgbToColor(rs.getString("Color")));
 		element.setDiaName(rs.getString("Diagram"));
-		return (Element)model;
+		return element;
 	}
 
 	@Override

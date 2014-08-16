@@ -1,11 +1,11 @@
 package kz.zvezdochet.analytics.bean;
 
-import kz.zvezdochet.analytics.util.DiagramReference;
+import kz.zvezdochet.analytics.util.DiagramDictionary;
 
 /**
- * Класс, представляющий Квадрат
+ * Квадрат
  * @author Nataly Didenko
  */
-public class Square extends DiagramReference {
+public class Square extends DiagramDictionary {
 	private static final long serialVersionUID = 5558399056763429548L;
 }

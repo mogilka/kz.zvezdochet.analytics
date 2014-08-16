@@ -1,14 +1,11 @@
 package kz.zvezdochet.analytics.service;
 
-import kz.zvezdochet.core.service.ReferenceService;
 
 /**
- * Реализация сервиса конфигураций аспектов
+ * Сервис конфигурации аспектов
  * @author Nataly Didenko
- *
- * @see ReferenceService Реализация сервиса справочника  
  */
-public class AspectConfigurationService extends TextReferenceService {
+public class AspectConfigurationService extends TextDictionaryService {
 
 	public AspectConfigurationService() {
 		tableName = "aspectconfigurations";

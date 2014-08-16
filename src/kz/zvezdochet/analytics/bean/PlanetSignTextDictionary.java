@@ -4,11 +4,11 @@ import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
 
 /**
- * Справочник "Планеты в знаках Зодиака"
+ * Толкование планеты в знаке Зодиака
  * @author Nataly Didenko
  *
  */
-public class PlanetSignTextReference extends TextGenderReference {
+public class PlanetSignTextDictionary extends TextGenderDictionary {
 	private static final long serialVersionUID = 2671603240435126965L;
 
 	/**

@@ -3,14 +3,11 @@ package kz.zvezdochet.analytics.service;
 import kz.zvezdochet.analytics.bean.CardType;
 import kz.zvezdochet.core.bean.Model;
 
-
 /**
- * Реализация сервиса типов космограмм
+ * Сервис типов космограмм
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */
-public class CardTypeService extends GenderTextReferenceService {
+public class CardTypeService extends GenderTextDictionaryService {
 
 	public CardTypeService() {
 		tableName = "cardtypes";

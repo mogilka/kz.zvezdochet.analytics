@@ -1,12 +1,12 @@
 package kz.zvezdochet.analytics.bean;
 
-import kz.zvezdochet.bean.TextReference;
+import kz.zvezdochet.bean.TextDictionary;
 
 /**
- * Класс, представляющий Конфигурацию аспектов
+ * Конфигурация аспектов
  * @author Nataly Didenko
  *
  */
-public class AspectConfiguration extends TextReference {
+public class AspectConfiguration extends TextDictionary {
 	private static final long serialVersionUID = 3014044501287835392L;
 }

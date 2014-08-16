@@ -4,23 +4,35 @@ import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.ModelService;
 
 /**
- * Класс, представляющий текстовую информацию
- * для мужского и женского пола
+ * Толкование для различных типов персон:
+ * 	- мужчины
+ * 	- женщины
+ * 	- дети
  * @author Nataly Didenko
- * @todo добавить описание для детей
  */
 public class GenderText extends Model {
 	private static final long serialVersionUID = 7663798183215999740L;
 
 	/**
-	 * Текст для мужчин
+	 * Текст для мужчины
 	 */
     private String maletext;
-
 	/**
-	 * Текст для женщин
+	 * Текст для женщины
 	 */
     private String femaletext;
+	/**
+	 * Текст для ребёнка
+	 */
+    private String childtext;
+
+	public String getChildtext() {
+		return childtext;
+	}
+
+	public void setChildtext(String childtext) {
+		this.childtext = childtext;
+	}
 
 	public String getMaletext() {
 		return maletext;

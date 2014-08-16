@@ -1,11 +1,11 @@
 package kz.zvezdochet.analytics.bean;
 
-import kz.zvezdochet.analytics.util.DiagramReference;
+import kz.zvezdochet.analytics.util.DiagramDictionary;
 
 /**
- * Класс, представляющий Инь-Ян
+ * Женское и мужское начало Инь-Ян
  * @author Nataly Didenko
  */
-public class InYan extends DiagramReference {
+public class InYan extends DiagramDictionary {
 	private static final long serialVersionUID = 8688080691435619306L;
 }

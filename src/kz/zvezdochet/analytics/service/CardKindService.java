@@ -5,12 +5,10 @@ import kz.zvezdochet.core.bean.Model;
 
 
 /**
- * Реализация сервиса видов космограмм
+ * Сервис вида космограммы
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Прототип реализации сервиса простого справочника  
  */
-public class CardKindService extends GenderTextReferenceService {
+public class CardKindService extends GenderTextDictionaryService {
 
 	public CardKindService() {
 		tableName = "cardkinds";

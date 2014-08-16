@@ -1,27 +1,13 @@
 package kz.zvezdochet.analytics.util;
 
-import kz.zvezdochet.analytics.bean.Cross;
-import kz.zvezdochet.analytics.bean.Element;
-import kz.zvezdochet.analytics.bean.Halfsphere;
-import kz.zvezdochet.analytics.bean.InYan;
-import kz.zvezdochet.analytics.bean.Square;
-import kz.zvezdochet.analytics.bean.Zone;
-import kz.zvezdochet.analytics.service.CrossService;
-import kz.zvezdochet.analytics.service.ElementService;
-import kz.zvezdochet.analytics.service.HalfsphereService;
-import kz.zvezdochet.analytics.service.InYanService;
-import kz.zvezdochet.analytics.service.SquareService;
-import kz.zvezdochet.analytics.service.ZoneService;
-import kz.zvezdochet.core.bean.Model;
-import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.util.CalcUtil;
 
 /**
  * Класс, предоставляющий методы для работы с объектами аналитики
  * @author Nataly Didenko
- *
+ * //TODO сделать связи в БД и брать оттуда
  */
-public class AnalyticsUtil {
+public class AnalyticsUtil { 
 	/**
 	 * Определение стихии, к которой принадлежит знак Зодиака
 	 * @param index порядковый номер знака
@@ -110,45 +96,6 @@ public class AnalyticsUtil {
 		case 5-8 : return "CREATIVE";
 		default: return "TRANSFORM"; //9-13
 		}
-	}
-
-	/**
-	 * Поиск стихии
-	 * @param code код стихии
-	 * @return стихия
-	 * @throws DataAccessException 
-	 */
-	public static Element getElement(String code) throws DataAccessException {
-		for (Model model : new ElementService().getList())
-			if (((Element)model).getCode().toUpperCase().equals(code))
-				return (Element)model;
-		return null;
-	}
-
-	/**
-	 * Поиск зоны
-	 * @param code код зоны
-	 * @return зона
-	 * @throws DataAccessException 
-	 */
-	public static Zone getZone(String code) throws DataAccessException {
-		for (Model model : new ZoneService().getList())
-			if (((Zone)model).getCode().toUpperCase().equals(code))
-				return (Zone)model;
-		return null;
-	}
-
-	/**
-	 * Поиск креста
-	 * @param code код креста
-	 * @return крест
-	 * @throws DataAccessException 
-	 */
-	public static Cross getCross(String code) throws DataAccessException {
-		for (Model model : new CrossService().getList())
-			if (((Cross)model).getCode().toUpperCase().equals(code))
-				return (Cross)model;
-		return null;
 	}
 
 	/**
@@ -243,44 +190,5 @@ public class AnalyticsUtil {
 		//по индексу трети определяем дом, в котором она находится
 		int i = CalcUtil.trunc((index + 2) / 3);
 		return signToZone(i);
-	}
-
-	/**
-	 * Поиск инь-ян
-	 * @param code код инь-ян
-	 * @return инь-ян
-	 * @throws DataAccessException 
-	 */
-	public static InYan getInYan(String code) throws DataAccessException {
-		for (Model model : new InYanService().getList())
-			if (((InYan)model).getCode().toUpperCase().equals(code))
-				return (InYan)model;
-		return null;
-	}
-
-	/**
-	 * Поиск полусферы
-	 * @param code код полусферы
-	 * @return полусфера
-	 * @throws DataAccessException 
-	 */
-	public static Halfsphere getHalfsphere(String code) throws DataAccessException {
-		for (Model model : new HalfsphereService().getList())
-			if (((Halfsphere)model).getCode().toUpperCase().equals(code))
-				return (Halfsphere)model;
-		return null;
-	}
-
-	/**
-	 * Поиск квадрата
-	 * @param code код квадрата
-	 * @return квадрат
-	 * @throws DataAccessException 
-	 */
-	public static Square getSquare(String code) throws DataAccessException {
-		for (Model model : new SquareService().getList())
-			if (((Square)model).getCode().toUpperCase().equals(code))
-				return (Square)model;
-		return null;
 	}
 }

@@ -8,18 +8,15 @@ import java.util.List;
 import kz.zvezdochet.analytics.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
+import kz.zvezdochet.core.service.IDictionaryService;
 import kz.zvezdochet.core.service.ModelService;
-import kz.zvezdochet.core.service.IReferenceService;
 import kz.zvezdochet.core.tool.Connector;
 
 /**
- * Реализация сервиса толкований для мужчин и женщин
+ * Сервис толкований для мужчин, женщин, детей
  * @author Nataly Didenko
- *
- * @see ModelService Реализация интерфейса сервиса управления объектами на уровне БД  
- * @see IReferenceService Интерфейс управления справочниками на уровне БД  
  */
-public class GenderTextService extends ModelService implements IReferenceService {
+public class GenderTextService extends ModelService implements IDictionaryService {
 
 	public GenderTextService() {
 		tableName = "textgender";
@@ -38,31 +35,30 @@ public class GenderTextService extends ModelService implements IReferenceService
 	}
 
 	@Override
-	public Model save(Model element) throws DataAccessException {
-		GenderText reference = (GenderText)element;
+	public Model save(Model model) throws DataAccessException {
+		GenderText dict = (GenderText)model;
 		int result = -1;
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (element.getId() == null) 
+			if (model.getId() == null) 
 				sql = "insert into " + tableName + "(male, female) values(?,?)";
 			else
 				sql = "update " + tableName + " set " +
 					"male = ?, " +
 					"female = ? " +
-					"where id = " + reference.getId();
+					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setString(1, reference.getMaletext());
-			ps.setString(2, reference.getFemaletext());
+			ps.setString(1, dict.getMaletext());
+			ps.setString(2, dict.getFemaletext());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (element.getId() == null) { 
+				if (model.getId() == null) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {
 				        autoIncKeyFromApi = rsid.getLong(1);
-				        element.setId(autoIncKeyFromApi);
-					    //System.out.println("inserted " + tableName + "\t" + autoIncKeyFromApi);
+				        model.setId(autoIncKeyFromApi);
 					}
 					if (rsid != null) rsid.close();
 				}
@@ -76,7 +72,7 @@ public class GenderTextService extends ModelService implements IReferenceService
 				e.printStackTrace();
 			}
 		}
-		return reference;
+		return dict;
 	}
 
 	@Override

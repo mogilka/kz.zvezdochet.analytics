@@ -1,14 +1,14 @@
 package kz.zvezdochet.analytics.bean;
 
 import kz.zvezdochet.bean.Planet;
-import kz.zvezdochet.core.bean.Reference;
+import kz.zvezdochet.core.bean.Dictionary;
 
 /**
- * Класс, представляющий Категорию объектов
+ * Категория объектов
  * @author Nataly Didenko
  *
  */
-public class Category extends Reference {
+public class Category extends Dictionary {
 	private static final long serialVersionUID = -2878256195661519033L;
 
 	/**

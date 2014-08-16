@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.SynastryTextReference;
+import kz.zvezdochet.analytics.bean.SynastryTextDictionary;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
 import kz.zvezdochet.core.bean.Model;
@@ -17,12 +17,10 @@ import kz.zvezdochet.service.PlanetService;
 import kz.zvezdochet.service.SignService;
 
 /**
- * Реализация сервиса справочника синастрий (Планета в знаках партнеров)
+ * Сервис синастрических планет
  * @author Nataly Didenko
- *
- * @see GenderTextReferenceService Реализация сервиса справочников  
  */
-public class SynastrySignService extends GenderTextReferenceService {
+public class SynastrySignService extends GenderTextDictionaryService {
 
 	public SynastrySignService() {
 		tableName = "synastrysigns";
@@ -44,10 +42,8 @@ public class SynastrySignService extends GenderTextReferenceService {
 			sql = "select * from " + tableName + " order by planetID, sign1ID, sign2ID";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
-			while (rs.next()) {
-				SynastryTextReference reference = init(rs, null);
-				list.add(reference);
-			}
+			while (rs.next())
+				list.add(init(rs, null));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -63,8 +59,8 @@ public class SynastrySignService extends GenderTextReferenceService {
 
 	@Override
 	public Model save(Model model) throws DataAccessException {
-		SynastryTextReference reference = (SynastryTextReference)model;
-		reference.setGenderText((GenderText)new GenderTextService().save(reference.getGenderText()));
+		SynastryTextDictionary dict = (SynastryTextDictionary)model;
+		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -83,19 +79,19 @@ public class SynastrySignService extends GenderTextReferenceService {
 					"sign1id = ?, " +
 					"sign2id = ?, " +
 					"planetid = ? " +
-					"where id = " + reference.getId();
+					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setString(1, reference.getText());
-			if (reference.getGenderText() != null)
-				ps.setLong(2, reference.getGenderText().getId());
+			ps.setString(1, dict.getText());
+			if (dict.getGenderText() != null)
+				ps.setLong(2, dict.getGenderText().getId());
 			else
 				ps.setLong(2, java.sql.Types.NULL);
-			ps.setString(3, reference.getCode());
-			ps.setString(4, reference.getName());
-			ps.setString(5, reference.getDescription());
-			ps.setLong(6, reference.getSign1().getId());
-			ps.setLong(7, reference.getSign2().getId());
-			ps.setLong(8, reference.getPlanet().getId());
+			ps.setString(3, dict.getCode());
+			ps.setString(4, dict.getName());
+			ps.setString(5, dict.getDescription());
+			ps.setLong(6, dict.getSign1().getId());
+			ps.setLong(7, dict.getSign2().getId());
+			ps.setLong(8, dict.getPlanet().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (model.getId() == null) { 
@@ -119,22 +115,22 @@ public class SynastrySignService extends GenderTextReferenceService {
 			}
 			update();
 		}
-		return reference;
+		return dict;
 	}
 
 	@Override
-	public SynastryTextReference init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		SynastryTextReference reference = (model != null) ? (SynastryTextReference)model : (SynastryTextReference)create();
-		super.init(rs, reference);
+	public SynastryTextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		SynastryTextDictionary dict = (model != null) ? (SynastryTextDictionary)model : (SynastryTextDictionary)create();
+		super.init(rs, dict);
 		SignService service = new SignService();
-		reference.setSign1((Sign)service.find(rs.getLong("Sign1ID")));
-		reference.setSign2((Sign)service.find(rs.getLong("Sign2ID")));
-		reference.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
-		return reference;
+		dict.setSign1((Sign)service.find(rs.getLong("Sign1ID")));
+		dict.setSign2((Sign)service.find(rs.getLong("Sign2ID")));
+		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
+		return dict;
 	}
 
 	@Override
 	public Model create() {
-		return new SynastryTextReference();
+		return new SynastryTextDictionary();
 	}
 }

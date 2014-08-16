@@ -4,11 +4,11 @@ import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
 
 /**
- * Справочник "Аспекты планет"
+ * Толкование аспекта планет
  * @author Nataly Didenko
  *
  */
-public class PlanetAspectTextReference extends TextGenderReference {
+public class PlanetAspectTextDictionary extends TextGenderDictionary {
 	private static final long serialVersionUID = -1987115320328881211L;
 
 	/**

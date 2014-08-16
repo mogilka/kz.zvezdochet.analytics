@@ -1,6 +1,6 @@
 package kz.zvezdochet.analytics.bean;
 
-import kz.zvezdochet.bean.TextReference;
+import kz.zvezdochet.bean.TextDictionary;
 
 /**
  * Прототип справочника, содержащего толкования
@@ -8,7 +8,7 @@ import kz.zvezdochet.bean.TextReference;
  * @author Nataly Didenko
  *
  */
-public class TextGenderReference extends TextReference {
+public class TextGenderDictionary extends TextDictionary {
 	private static final long serialVersionUID = 4426110756083980222L;
 
 	/**

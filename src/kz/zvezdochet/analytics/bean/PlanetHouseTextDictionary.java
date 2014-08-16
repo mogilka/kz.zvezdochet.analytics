@@ -5,11 +5,11 @@ import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
 
 /**
- * Справочник "Планеты в астрологических домах"
+ * Толкование планеты в астрологическом доме
  * @author Nataly Didenko
  *
  */
-public class PlanetHouseTextReference extends TextGenderReference {
+public class PlanetHouseTextDictionary extends TextGenderDictionary {
 	private static final long serialVersionUID = 743166962242413913L;
 
 	/**

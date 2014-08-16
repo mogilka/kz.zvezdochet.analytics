@@ -1,16 +1,16 @@
 package kz.zvezdochet.analytics.util;
 
-import kz.zvezdochet.analytics.bean.TextGenderReference;
+import kz.zvezdochet.analytics.bean.TextGenderDictionary;
 import kz.zvezdochet.util.IColorizedObject;
 import kz.zvezdochet.util.IDiagramObject;
 
 import org.eclipse.swt.graphics.Color;
 
 /**
- * Класс, представляющий абстрактный диаграммный справочник
+ * Прототип диаграммного толкования
  * @author Nataly Didenko
  */
-public abstract class DiagramReference extends TextGenderReference implements IColorizedObject, IDiagramObject {
+public abstract class DiagramDictionary extends TextGenderDictionary implements IColorizedObject, IDiagramObject {
 	private static final long serialVersionUID = 3257825153209037032L;
 
 	/**

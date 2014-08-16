@@ -8,7 +8,7 @@ import kz.zvezdochet.bean.Sign;
  * @author Nataly Didenko
  *
  */
-public class SynastryTextReference extends TextGenderReference {
+public class SynastryTextDictionary extends TextGenderDictionary {
 	private static final long serialVersionUID = -7027009322004688751L;
 
 	/**
