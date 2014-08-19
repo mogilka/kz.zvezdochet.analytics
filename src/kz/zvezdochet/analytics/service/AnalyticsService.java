@@ -30,7 +30,7 @@ public class AnalyticsService {
 	 * @throws DataAccessException
 	 */
 	public List<Event> getTwins(List<Model> planets) throws DataAccessException {
-		if (planets == null) return null;
+		if (null == planets) return null;
 		double sunInitial = 0, sunFinal = 0,
 			moonInitial = 0, moonFinal = 0,
 			mercuryInitial = 0, mercuryFinal = 0,

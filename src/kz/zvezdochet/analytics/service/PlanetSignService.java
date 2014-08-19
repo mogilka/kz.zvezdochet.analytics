@@ -60,7 +60,7 @@ public class PlanetSignService extends GenderTextDictionaryService {
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (model.getId() == null) 
+			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
 					"(signid, typeid, text, genderid, code, name, description) " +
 					"values(?,?,?,?,?,?,?)";
@@ -87,7 +87,7 @@ public class PlanetSignService extends GenderTextDictionaryService {
 			ps.setString(7, dict.getDescription());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (model.getId() == null) { 
+				if (null == model.getId()) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {

@@ -65,7 +65,7 @@ public class SynastrySignService extends GenderTextDictionaryService {
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (model.getId() == null) 
+			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, sign1id, sign2id, planetid) " +
 					"values(?,?,?,?,?,?,?,?)";
@@ -94,7 +94,7 @@ public class SynastrySignService extends GenderTextDictionaryService {
 			ps.setLong(8, dict.getPlanet().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (model.getId() == null) { 
+				if (null == model.getId()) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {

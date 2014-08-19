@@ -96,7 +96,7 @@ public class PlanetAspectService extends GenderTextDictionaryService {
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (model.getId() == null) 
+			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, planet1id, planet2id, typeid) " +
 					"values(?,?,?,?,?,?,?,?)";
@@ -125,7 +125,7 @@ public class PlanetAspectService extends GenderTextDictionaryService {
 			ps.setLong(8, dict.getType().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (model.getId() == null) { 
+				if (null == model.getId()) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {

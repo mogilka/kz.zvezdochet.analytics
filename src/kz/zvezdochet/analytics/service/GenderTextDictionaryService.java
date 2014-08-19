@@ -25,7 +25,7 @@ public abstract class GenderTextDictionaryService extends DictionaryService {
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (model.getId() == null) 
+			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description) values(?,?,?,?,?)";
 			else
@@ -47,7 +47,7 @@ public abstract class GenderTextDictionaryService extends DictionaryService {
 			ps.setString(5, dict.getDescription());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (model.getId() == null) { 
+				if (null == model.getId()) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {

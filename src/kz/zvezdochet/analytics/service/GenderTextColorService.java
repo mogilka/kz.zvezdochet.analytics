@@ -36,7 +36,7 @@ public abstract class GenderTextColorService extends GenderTextDictionaryService
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (model.getId() == null) 
+			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, color) values(?,?,?,?,?,?)";
 			else
@@ -62,7 +62,7 @@ public abstract class GenderTextColorService extends GenderTextDictionaryService
 			ps.setString(7, ((IDiagramObject)dict).getDiaName());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (model.getId() == null) { 
+				if (null == model.getId()) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {

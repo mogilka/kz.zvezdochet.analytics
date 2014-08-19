@@ -44,7 +44,7 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 
 		 //TODO доработать с учетом других признаков
 		AspectTypeService service = new AspectTypeService();
-		if (aspectType == null)
+		if (null == aspectType)
 			aspectType = (AspectType)service.find("NEUTRAL");
 		if (planet.isDamaged())
 			aspectType = (AspectType)service.find("NEGATIVE");
@@ -104,7 +104,7 @@ public class PlanetHouseService extends GenderTextDictionaryService {
         PreparedStatement ps = null;
 		try {
 			String sql;
-			if (model.getId() == null) 
+			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
 					"(text, genderid, code, name, description, planetid, houseid, typeid) " +
 					"values(?,?,?,?,?,?,?,?)";
@@ -133,7 +133,7 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 			ps.setLong(8, dict.getAspectType().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
-				if (model.getId() == null) { 
+				if (null == model.getId()) { 
 					Long autoIncKeyFromApi = -1L;
 					ResultSet rsid = ps.getGeneratedKeys();
 					if (rsid.next()) {
