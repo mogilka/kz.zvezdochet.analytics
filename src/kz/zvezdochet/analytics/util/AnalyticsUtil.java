@@ -27,7 +27,7 @@ public class AnalyticsUtil {
 	 * @param index порядковый номер знака
 	 * @return код зоны
 	 */
-	public static String signToInYan(int index) {
+	public static String signToYinYang(int index) {
 		switch (index) {
 		case 1 : case 3 : case 5 : case 7 : case 9 : case 10 : case 12 : return "MALE";
 		default: return "FEMALE";
@@ -119,7 +119,7 @@ public class AnalyticsUtil {
 	 * @param index порядковый номер дома
 	 * @return код зоны
 	 */
-	public static String houseToInYan(int index) {
+	public static String houseToYinYang(int index) {
 		//по индексу трети определяем дом, в котором она находится
 		int i = CalcUtil.trunc((index + 2) / 3);
 		switch (i) {

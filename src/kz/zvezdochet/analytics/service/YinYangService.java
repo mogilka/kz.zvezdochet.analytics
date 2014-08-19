@@ -2,7 +2,7 @@ package kz.zvezdochet.analytics.service;
 
 import java.util.List;
 
-import kz.zvezdochet.analytics.bean.InYan;
+import kz.zvezdochet.analytics.bean.YinYang;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 
@@ -10,15 +10,15 @@ import kz.zvezdochet.core.service.DataAccessException;
  * Сервис Инь-Ян
  * @author Nataly Didenko
  */
-public class InYanService extends GenderTextDiagramService {
+public class YinYangService extends GenderTextDiagramService {
 
-	public InYanService() {
+	public YinYangService() {
 		tableName = "inyan";
 	}
 
 	@Override
 	public Model create() {
-		return new InYan();
+		return new YinYang();
 	}
 
 	@Override
