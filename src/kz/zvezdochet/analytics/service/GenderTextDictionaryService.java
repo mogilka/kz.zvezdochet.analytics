@@ -4,15 +4,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.TextGenderDictionary;
+import kz.zvezdochet.core.bean.Dictionary;
+import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.DictionaryService;
 import kz.zvezdochet.core.tool.Connector;
 
 /**
- * Прототип сервиса простого справочника
+ * Прототип сервиса гендерного справочника
  * @author Nataly Didenko
  */
 public abstract class GenderTextDictionaryService extends DictionaryService {
@@ -73,7 +74,8 @@ public abstract class GenderTextDictionaryService extends DictionaryService {
 	@Override
 	public TextGenderDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
 		TextGenderDictionary type = (model != null) ? (TextGenderDictionary)model : (TextGenderDictionary)create();
-		super.init(rs, model);
+		if (type instanceof Dictionary)
+			super.init(rs, model);
 		type.setText(rs.getString("Text"));
 		if (rs.getString("GenderID") != null) {
 			GenderText genderText = (GenderText)new GenderTextService().find(rs.getLong("GenderID"));

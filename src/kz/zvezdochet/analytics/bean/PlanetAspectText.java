@@ -1,14 +1,17 @@
 package kz.zvezdochet.analytics.bean;
 
+import kz.zvezdochet.analytics.service.PlanetAspectService;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.core.bean.TextGenderModel;
+import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование аспекта планет
  * @author Nataly Didenko
  *
  */
-public class PlanetAspectTextDictionary extends TextGenderDictionary {
+public class PlanetAspectText extends TextGenderModel {
 	private static final long serialVersionUID = -1987115320328881211L;
 
 	/**
@@ -48,5 +51,10 @@ public class PlanetAspectTextDictionary extends TextGenderDictionary {
 
 	public void setType(AspectType type) {
 		this.type = type;
+	}
+
+	@Override
+	public ModelService getService() {
+		return new PlanetAspectService();
 	}
 }

@@ -1,5 +1,7 @@
 package kz.zvezdochet.analytics.bean;
 
+import kz.zvezdochet.core.bean.TextGenderDictionary;
+
 /**
  * Вид космограммы
  * @author Nataly Didenko

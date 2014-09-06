@@ -1,14 +1,17 @@
 package kz.zvezdochet.analytics.bean;
 
+import kz.zvezdochet.analytics.service.SynastrySignService;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
+import kz.zvezdochet.core.bean.TextGenderModel;
+import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Прототип справочника синастрии по выбранной планете
  * @author Nataly Didenko
  *
  */
-public class SynastryTextDictionary extends TextGenderDictionary {
+public class SynastryText extends TextGenderModel {
 	private static final long serialVersionUID = -7027009322004688751L;
 
 	/**
@@ -48,5 +51,10 @@ public class SynastryTextDictionary extends TextGenderDictionary {
 
 	public void setSign2(Sign sign2) {
 		this.sign2 = sign2;
+	}
+
+	@Override
+	public ModelService getService() {
+		return new SynastrySignService();
 	}
 }

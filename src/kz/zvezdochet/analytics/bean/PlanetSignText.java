@@ -1,14 +1,17 @@
 package kz.zvezdochet.analytics.bean;
 
+import kz.zvezdochet.analytics.service.PlanetSignService;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
+import kz.zvezdochet.core.bean.TextGenderModel;
+import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование планеты в знаке Зодиака
  * @author Nataly Didenko
  *
  */
-public class PlanetSignTextDictionary extends TextGenderDictionary {
+public class PlanetSignText extends TextGenderModel {
 	private static final long serialVersionUID = 2671603240435126965L;
 
 	/**
@@ -48,5 +51,10 @@ public class PlanetSignTextDictionary extends TextGenderDictionary {
 
 	public void setSign(Sign sign) {
 		this.sign = sign;
+	}
+
+	@Override
+	public ModelService getService() {
+		return new PlanetSignService();
 	}
 }

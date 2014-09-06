@@ -4,40 +4,40 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import kz.zvezdochet.bean.TextDictionary;
+import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.bean.TextGenderDictionary;
+import kz.zvezdochet.core.bean.TextGenderModel;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.DictionaryService;
-import kz.zvezdochet.core.service.IDictionaryService;
+import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.tool.Connector;
 
 /**
- * Сервис справочников с расширенной текстовой информацией
+ * Сервис моделей с гендерной информацией
  * @author Nataly Didenko
  */
-public class TextDictionaryService extends DictionaryService implements IDictionaryService {
+public abstract class GenderTextModelService extends ModelService {
 
 	@Override
 	public Model save(Model model) throws DataAccessException {
-		TextDictionary dict = (TextDictionary)model;
+		TextGenderDictionary dict = (TextGenderDictionary)model;
 		int result = -1;
         PreparedStatement ps = null;
 		try {
 			String sql;
 			if (null == model.getId()) 
-				sql = "insert into " + tableName + "(code, name, description, text) values(?,?,?,?)";
+				sql = "insert into " + tableName + "(text, genderid) values(?,?)";
 			else
 				sql = "update " + tableName + " set " +
-					"code = ?, " +
-					"name = ?, " +
-					"description = ?, " +
+					"genderid = ?, " +
 					"text = ? " +
 					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setString(1, dict.getCode());
-			ps.setString(2, dict.getName());
-			ps.setString(3, dict.getDescription());
-			ps.setString(4, dict.getText());
+			if (dict.getGenderText() != null)
+				ps.setLong(1, dict.getGenderText().getId());
+			else
+				ps.setLong(1, java.sql.Types.NULL);
+			ps.setString(2, dict.getText());
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (null == model.getId()) { 
@@ -65,15 +65,14 @@ public class TextDictionaryService extends DictionaryService implements IDiction
 	}
 
 	@Override
-	public TextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		TextDictionary type = (model != null) ? (TextDictionary)model : (TextDictionary)create();
-		super.init(rs, type);
+	public TextGenderModel init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		TextGenderModel type = (model != null) ? (TextGenderModel)model : (TextGenderModel)create();
 		type.setText(rs.getString("Text"));
+		if (rs.getString("GenderID") != null) {
+			GenderText genderText = (GenderText)new GenderTextService().find(rs.getLong("GenderID"));
+			if (genderText != null)
+				type.setGenderText(genderText);
+		}
 		return type;
-	}
-
-	@Override
-	public Model create() {
-		return new TextDictionary();
 	}
 }

@@ -6,11 +6,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.PlanetHouseTextDictionary;
+import kz.zvezdochet.analytics.bean.PlanetHouseText;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
@@ -22,7 +22,7 @@ import kz.zvezdochet.service.PlanetService;
  * Сервис планет в астрологических домах
  * @author Nataly Didenko
  */
-public class PlanetHouseService extends GenderTextDictionaryService {
+public class PlanetHouseService extends GenderTextModelService {
 
 	public PlanetHouseService() {
 		tableName = "planethouses";
@@ -37,7 +37,7 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 	 * @throws DataAccessException
 	 */
 	public Model find(Planet planet, House house, AspectType aspectType) throws DataAccessException {
-        PlanetHouseTextDictionary dict = null;
+        PlanetHouseText dict = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
@@ -45,7 +45,7 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 		 //TODO доработать с учетом других признаков
 		AspectTypeService service = new AspectTypeService();
 		if (null == aspectType)
-			aspectType = (AspectType)service.find("NEUTRAL");
+			aspectType = (AspectType)service.find("POSITIVE");
 		if (planet.isDamaged())
 			aspectType = (AspectType)service.find("NEGATIVE");
 		
@@ -98,7 +98,7 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 
 	@Override
 	public Model save(Model model) throws DataAccessException {
-		PlanetHouseTextDictionary dict = (PlanetHouseTextDictionary)model;
+		PlanetHouseText dict = (PlanetHouseText)model;
 		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
@@ -106,15 +106,12 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 			String sql;
 			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
-					"(text, genderid, code, name, description, planetid, houseid, typeid) " +
+					"(text, genderid, planetid, houseid, typeid) " +
 					"values(?,?,?,?,?,?,?,?)";
 			else
 				sql = "update " + tableName + " set " +
 					"text = ?, " +
 					"genderid = ?, " +
-					"code = ?, " +
-					"name = ?, " +
-					"description = ?, " +
 					"planetid = ?, " +
 					"houseid = ?, " +
 					"typeid = ? " +
@@ -125,12 +122,9 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 				ps.setLong(2, dict.getGenderText().getId());
 			else
 				ps.setLong(2, java.sql.Types.NULL);
-			ps.setString(3, dict.getCode());
-			ps.setString(4, dict.getName());
-			ps.setString(5, dict.getDescription());
-			ps.setLong(6, dict.getPlanet().getId());
-			ps.setLong(7, dict.getHouse().getId());
-			ps.setLong(8, dict.getAspectType().getId());
+			ps.setLong(3, dict.getPlanet().getId());
+			ps.setLong(4, dict.getHouse().getId());
+			ps.setLong(5, dict.getAspectType().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (null == model.getId()) { 
@@ -157,9 +151,9 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 	}
 
 	@Override
-	public PlanetHouseTextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		PlanetHouseTextDictionary dict = (model != null) ? (PlanetHouseTextDictionary)model : (PlanetHouseTextDictionary)create();
-		super.init(rs, dict);
+	public PlanetHouseText init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		PlanetHouseText dict = (model != null) ? (PlanetHouseText)model : (PlanetHouseText)create();
+		dict = (PlanetHouseText)super.init(rs, model);
 		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
 		dict.setHouse((House)new HouseService().find(rs.getLong("HouseID")));
 		dict.setAspectType((AspectType)new AspectTypeService().find(rs.getLong("TypeID")));
@@ -168,6 +162,6 @@ public class PlanetHouseService extends GenderTextDictionaryService {
 
 	@Override
 	public Model create() {
-		return new PlanetHouseTextDictionary();
+		return new PlanetHouseText();
 	}
 }

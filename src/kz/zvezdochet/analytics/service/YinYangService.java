@@ -13,7 +13,7 @@ import kz.zvezdochet.core.service.DataAccessException;
 public class YinYangService extends GenderTextDiagramService {
 
 	public YinYangService() {
-		tableName = "inyan";
+		tableName = "yinyang";
 	}
 
 	@Override

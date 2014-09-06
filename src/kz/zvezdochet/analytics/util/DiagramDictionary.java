@@ -1,6 +1,6 @@
 package kz.zvezdochet.analytics.util;
 
-import kz.zvezdochet.analytics.bean.TextGenderDictionary;
+import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.util.IColorizedObject;
 import kz.zvezdochet.util.IDiagramObject;
 

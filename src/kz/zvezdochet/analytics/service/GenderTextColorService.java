@@ -4,9 +4,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.TextGenderDictionary;
+import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.CoreUtil;
@@ -16,8 +16,9 @@ import kz.zvezdochet.util.IDiagramObject;
 /**
  * Прототип сервиса модели, имеющей цвет
  * @author Nataly Didenko
+ * //TODO удалить класс??
  */
-public abstract class GenderTextColorService extends GenderTextDictionaryService { //TODO удалить класс??
+public abstract class GenderTextColorService extends GenderTextDictionaryService {
 
 	@Override
 	public TextGenderDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {

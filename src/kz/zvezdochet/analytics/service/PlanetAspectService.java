@@ -6,10 +6,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.PlanetAspectTextDictionary;
+import kz.zvezdochet.analytics.bean.PlanetAspectText;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
@@ -20,7 +20,7 @@ import kz.zvezdochet.service.PlanetService;
  * Сервис аспектов планет
  * @author Nataly Didenko
  */
-public class PlanetAspectService extends GenderTextDictionaryService {
+public class PlanetAspectService extends GenderTextModelService {
 
 	public PlanetAspectService() {
 		tableName = "planetaspects";
@@ -35,7 +35,7 @@ public class PlanetAspectService extends GenderTextDictionaryService {
 	 * @throws DataAccessException
 	 */
 	public Model find(Planet planet1, Planet planet2, AspectType aspectType) throws DataAccessException {
-        PlanetAspectTextDictionary dict = null;
+        PlanetAspectText dict = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
@@ -72,7 +72,7 @@ public class PlanetAspectService extends GenderTextDictionaryService {
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				PlanetAspectTextDictionary dict = init(rs, null);
+				PlanetAspectText dict = init(rs, null);
 				list.add(dict);
 			}
 		} catch (Exception e) {
@@ -90,7 +90,7 @@ public class PlanetAspectService extends GenderTextDictionaryService {
 
 	@Override
 	public Model save(Model model) throws DataAccessException {
-		PlanetAspectTextDictionary dict = (PlanetAspectTextDictionary)model;
+		PlanetAspectText dict = (PlanetAspectText)model;
 		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
@@ -98,15 +98,12 @@ public class PlanetAspectService extends GenderTextDictionaryService {
 			String sql;
 			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
-					"(text, genderid, code, name, description, planet1id, planet2id, typeid) " +
-					"values(?,?,?,?,?,?,?,?)";
+					"(text, genderid, planet1id, planet2id, typeid) " +
+					"values(?,?,?,?,?)";
 			else
 				sql = "update " + tableName + " set " +
 					"text = ?, " +
 					"genderid = ?, " +
-					"code = ?, " +
-					"name = ?, " +
-					"description = ?, " +
 					"planet1id = ?, " +
 					"planet2id = ?, " +
 					"typeid = ? " +
@@ -117,12 +114,9 @@ public class PlanetAspectService extends GenderTextDictionaryService {
 				ps.setLong(2, dict.getGenderText().getId());
 			else
 				ps.setLong(2, java.sql.Types.NULL);
-			ps.setString(3, dict.getCode());
-			ps.setString(4, dict.getName());
-			ps.setString(5, dict.getDescription());
-			ps.setLong(6, dict.getPlanet1().getId());
-			ps.setLong(7, dict.getPlanet2().getId());
-			ps.setLong(8, dict.getType().getId());
+			ps.setLong(3, dict.getPlanet1().getId());
+			ps.setLong(4, dict.getPlanet2().getId());
+			ps.setLong(5, dict.getType().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (null == model.getId()) { 
@@ -150,9 +144,9 @@ public class PlanetAspectService extends GenderTextDictionaryService {
 	}
 
 	@Override
-	public PlanetAspectTextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		PlanetAspectTextDictionary dict = (model != null) ? (PlanetAspectTextDictionary)model : (PlanetAspectTextDictionary)create();
-		super.init(rs, dict);
+	public PlanetAspectText init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		PlanetAspectText dict = (model != null) ? (PlanetAspectText)model : (PlanetAspectText)create();
+		dict = (PlanetAspectText)super.init(rs, model);
 		PlanetService service = new PlanetService();
 		dict.setPlanet1((Planet)service.find(rs.getLong("Planet1ID")));
 		dict.setPlanet2((Planet)service.find(rs.getLong("Planet2ID")));
@@ -162,6 +156,6 @@ public class PlanetAspectService extends GenderTextDictionaryService {
 
 	@Override
 	public Model create() {
-		return new PlanetAspectTextDictionary();
+		return new PlanetAspectText();
 	}
 }

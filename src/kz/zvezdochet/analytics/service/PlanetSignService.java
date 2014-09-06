@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kz.zvezdochet.analytics.bean.Category;
-import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.PlanetSignTextDictionary;
+import kz.zvezdochet.analytics.bean.PlanetSignText;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
+import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
@@ -21,7 +21,7 @@ import kz.zvezdochet.service.SignService;
  * Сервис планет в знаках Зодиака
  * @author Nataly Didenko
  */
-public class PlanetSignService extends GenderTextDictionaryService {
+public class PlanetSignService extends GenderTextModelService {
 
 	public PlanetSignService() {
 		tableName = "planetsigns";
@@ -54,7 +54,7 @@ public class PlanetSignService extends GenderTextDictionaryService {
 
 	@Override
 	public Model save(Model model) throws DataAccessException {
-		PlanetSignTextDictionary dict = (PlanetSignTextDictionary)model;
+		PlanetSignText dict = (PlanetSignText)model;
 		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
@@ -62,17 +62,14 @@ public class PlanetSignService extends GenderTextDictionaryService {
 			String sql;
 			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
-					"(signid, typeid, text, genderid, code, name, description) " +
+					"(signid, typeid, text, genderid) " +
 					"values(?,?,?,?,?,?,?)";
 			else
 				sql = "update " + tableName + " set " +
 					"signid = ?, " +
 					"typeid = ?, " +
 					"text = ?, " +
-					"genderid = ?, " +
-					"code = ?, " +
-					"name = ?, " +
-					"description = ? " +
+					"genderid = ? " +
 					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, dict.getSign().getId());
@@ -82,9 +79,6 @@ public class PlanetSignService extends GenderTextDictionaryService {
 				ps.setLong(4, dict.getGenderText().getId());
 			else
 				ps.setLong(4, java.sql.Types.NULL);
-			ps.setString(5, dict.getCode());
-			ps.setString(6, dict.getName());
-			ps.setString(7, dict.getDescription());
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (null == model.getId()) { 
@@ -112,9 +106,9 @@ public class PlanetSignService extends GenderTextDictionaryService {
 	}
 
 	@Override
-	public PlanetSignTextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		PlanetSignTextDictionary dict = (model != null) ? (PlanetSignTextDictionary)model : (PlanetSignTextDictionary)create();
-		super.init(rs, dict);
+	public PlanetSignText init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		PlanetSignText dict = (model != null) ? (PlanetSignText)model : (PlanetSignText)create();
+		dict = (PlanetSignText)super.init(rs, model);
 		dict.setSign((Sign)new SignService().find(rs.getLong("SignID")));
 		dict.setCategory((Category)new CategoryService().find(rs.getLong("TypeID")));
 		dict.setPlanet((Planet)new PlanetService().find(dict.getCategory().getObjectId()));
@@ -123,6 +117,6 @@ public class PlanetSignService extends GenderTextDictionaryService {
 
 	@Override
 	public Model create() {
-		return new PlanetSignTextDictionary();
+		return new PlanetSignText();
 	}
 }

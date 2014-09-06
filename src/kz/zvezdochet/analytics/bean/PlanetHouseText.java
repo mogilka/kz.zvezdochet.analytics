@@ -1,15 +1,18 @@
 package kz.zvezdochet.analytics.bean;
 
+import kz.zvezdochet.analytics.service.PlanetHouseService;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.core.bean.TextGenderModel;
+import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование планеты в астрологическом доме
  * @author Nataly Didenko
  *
  */
-public class PlanetHouseTextDictionary extends TextGenderDictionary {
+public class PlanetHouseText extends TextGenderModel {
 	private static final long serialVersionUID = 743166962242413913L;
 
 	/**
@@ -49,5 +52,10 @@ public class PlanetHouseTextDictionary extends TextGenderDictionary {
 
 	public void setAspectType(AspectType aspectType) {
 		this.aspectType = aspectType;
+	}
+
+	@Override
+	public ModelService getService() {
+		return new PlanetHouseService();
 	}
 }

@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import kz.zvezdochet.analytics.bean.GenderText;
+import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.IDictionaryService;
@@ -81,6 +81,7 @@ public class GenderTextService extends ModelService implements IDictionaryServic
 		genderText.setId(rs.getLong("ID"));
 		genderText.setMaletext(rs.getString("Male"));
 		genderText.setFemaletext(rs.getString("Female"));
+		//TODO child
 		return genderText;
 	}
 

@@ -6,12 +6,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import kz.zvezdochet.analytics.bean.GenderText;
-import kz.zvezdochet.analytics.bean.SynastryTextDictionary;
+import kz.zvezdochet.analytics.bean.SynastryText;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
+import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
+import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.PlanetService;
 import kz.zvezdochet.service.SignService;
@@ -20,18 +21,12 @@ import kz.zvezdochet.service.SignService;
  * Сервис синастрических планет
  * @author Nataly Didenko
  */
-public class SynastrySignService extends GenderTextDictionaryService {
+public class SynastrySignService extends ModelService {
 
 	public SynastrySignService() {
 		tableName = "synastrysigns";
 	}
 	
-	@Override
-	public Model find(String code) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public List<Model> getList() throws DataAccessException {
         List<Model> list = new ArrayList<Model>();
@@ -59,7 +54,7 @@ public class SynastrySignService extends GenderTextDictionaryService {
 
 	@Override
 	public Model save(Model model) throws DataAccessException {
-		SynastryTextDictionary dict = (SynastryTextDictionary)model;
+		SynastryText dict = (SynastryText)model;
 		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
 		int result = -1;
         PreparedStatement ps = null;
@@ -67,15 +62,12 @@ public class SynastrySignService extends GenderTextDictionaryService {
 			String sql;
 			if (null == model.getId()) 
 				sql = "insert into " + tableName + 
-					"(text, genderid, code, name, description, sign1id, sign2id, planetid) " +
-					"values(?,?,?,?,?,?,?,?)";
+					"(text, genderid, sign1id, sign2id, planetid) " +
+					"values(?,?,?,?,?)";
 			else
 				sql = "update " + tableName + " set " +
 					"text = ?, " +
 					"genderid = ?, " +
-					"code = ?, " +
-					"name = ?, " +
-					"description = ?, " +
 					"sign1id = ?, " +
 					"sign2id = ?, " +
 					"planetid = ? " +
@@ -86,12 +78,9 @@ public class SynastrySignService extends GenderTextDictionaryService {
 				ps.setLong(2, dict.getGenderText().getId());
 			else
 				ps.setLong(2, java.sql.Types.NULL);
-			ps.setString(3, dict.getCode());
-			ps.setString(4, dict.getName());
-			ps.setString(5, dict.getDescription());
-			ps.setLong(6, dict.getSign1().getId());
-			ps.setLong(7, dict.getSign2().getId());
-			ps.setLong(8, dict.getPlanet().getId());
+			ps.setLong(3, dict.getSign1().getId());
+			ps.setLong(4, dict.getSign2().getId());
+			ps.setLong(5, dict.getPlanet().getId());
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (null == model.getId()) { 
@@ -119,9 +108,8 @@ public class SynastrySignService extends GenderTextDictionaryService {
 	}
 
 	@Override
-	public SynastryTextDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
-		SynastryTextDictionary dict = (model != null) ? (SynastryTextDictionary)model : (SynastryTextDictionary)create();
-		super.init(rs, dict);
+	public SynastryText init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		SynastryText dict = (model != null) ? (SynastryText)model : (SynastryText)create();
 		SignService service = new SignService();
 		dict.setSign1((Sign)service.find(rs.getLong("Sign1ID")));
 		dict.setSign2((Sign)service.find(rs.getLong("Sign2ID")));
@@ -131,6 +119,6 @@ public class SynastrySignService extends GenderTextDictionaryService {
 
 	@Override
 	public Model create() {
-		return new SynastryTextDictionary();
+		return new SynastryText();
 	}
 }
