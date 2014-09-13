@@ -5,13 +5,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import kz.zvezdochet.core.bean.GenderText;
+import kz.zvezdochet.core.bean.IColorizedObject;
+import kz.zvezdochet.core.bean.IDiagramObject;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.service.DataAccessException;
+import kz.zvezdochet.core.service.GenderTextDictionaryService;
+import kz.zvezdochet.core.service.GenderTextService;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.CoreUtil;
-import kz.zvezdochet.util.IColorizedObject;
-import kz.zvezdochet.util.IDiagramObject;
 
 /**
  * Прототип сервиса модели, имеющей цвет

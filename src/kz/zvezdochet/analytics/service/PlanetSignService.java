@@ -13,6 +13,7 @@ import kz.zvezdochet.bean.Sign;
 import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
+import kz.zvezdochet.core.service.GenderTextService;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.PlanetService;
 import kz.zvezdochet.service.SignService;

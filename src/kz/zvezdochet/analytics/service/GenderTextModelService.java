@@ -9,6 +9,7 @@ import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.bean.TextGenderModel;
 import kz.zvezdochet.core.service.DataAccessException;
+import kz.zvezdochet.core.service.GenderTextService;
 import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.tool.Connector;
 
@@ -67,6 +68,7 @@ public abstract class GenderTextModelService extends ModelService {
 	@Override
 	public TextGenderModel init(ResultSet rs, Model model) throws DataAccessException, SQLException {
 		TextGenderModel type = (model != null) ? (TextGenderModel)model : (TextGenderModel)create();
+		type.setId(rs.getLong("ID"));
 		type.setText(rs.getString("Text"));
 		if (rs.getString("GenderID") != null) {
 			GenderText genderText = (GenderText)new GenderTextService().find(rs.getLong("GenderID"));

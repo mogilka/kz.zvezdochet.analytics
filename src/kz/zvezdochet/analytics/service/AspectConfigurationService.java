@@ -1,5 +1,7 @@
 package kz.zvezdochet.analytics.service;
 
+import kz.zvezdochet.core.service.GenderTextDictionaryService;
+
 /**
  * Сервис конфигурации аспектов
  * @author Nataly Didenko
