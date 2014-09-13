@@ -16,5 +16,4 @@ Import-Package: kz.zvezdochet.bean,
  kz.zvezdochet.service,
  kz.zvezdochet.util
 Export-Package: kz.zvezdochet.analytics.bean,
- kz.zvezdochet.analytics.service,
- kz.zvezdochet.analytics.util
+ kz.zvezdochet.analytics.service
