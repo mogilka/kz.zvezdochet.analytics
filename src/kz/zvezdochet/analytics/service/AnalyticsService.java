@@ -99,10 +99,7 @@ order by e.initialDate
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				Event event = new Event();
-				if (rs.getString("Callname") != null)
-					event.setName(rs.getString("Callname"));
-				if (rs.getString("Surname") != null)
-					event.setSurname(rs.getString("Surname"));
+				event.setName(rs.getString("name"));
 				event.setBirth(DateUtil.getDatabaseDateTime(rs.getString("initialdate")));
 				if (rs.getString("Comment") != null)
 					event.setDescription(rs.getString("Comment"));
