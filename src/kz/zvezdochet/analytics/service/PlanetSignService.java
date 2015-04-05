@@ -10,10 +10,8 @@ import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.analytics.bean.PlanetSignText;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
-import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.GenderTextService;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.PlanetService;
 import kz.zvezdochet.service.SignService;
@@ -56,7 +54,7 @@ public class PlanetSignService extends GenderTextModelService {
 	@Override
 	public Model save(Model model) throws DataAccessException {
 		PlanetSignText dict = (PlanetSignText)model;
-		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
+//		dict.setGenderText((TextGender)new TextGenderService().save(dict.getGenderTexts()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -76,10 +74,10 @@ public class PlanetSignService extends GenderTextModelService {
 			ps.setLong(1, dict.getSign().getId());
 			ps.setLong(2, dict.getCategory().getId());
 			ps.setString(3, dict.getText());
-			if (dict.getGenderText() != null)
-				ps.setLong(4, dict.getGenderText().getId());
-			else
-				ps.setLong(4, java.sql.Types.NULL);
+//			if (dict.getGenderTexts() != null)
+//				ps.setLong(4, dict.getGenderTexts().getId());
+//			else
+//				ps.setLong(4, java.sql.Types.NULL);
 			result = ps.executeUpdate();
 			if (result == 1) {
 				if (null == model.getId()) { 
@@ -119,5 +117,44 @@ public class PlanetSignService extends GenderTextModelService {
 	@Override
 	public Model create() {
 		return new PlanetSignText();
+	}
+
+	public List<PlanetSignText> find(Planet planet, Sign sign) throws DataAccessException {
+        List<PlanetSignText> list = new ArrayList<PlanetSignText>();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+		try {
+			String sql = "select * from " + tableName + " ps " +
+				"inner join " + new CategoryService().getTableName() + " c on ps.typeid = c.id " +
+				"where ps.signid = ? " +
+					"and c.objectid = ? " +
+				"order by c.priority";
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
+			ps.setLong(1, sign.getId());
+			ps.setLong(2, planet.getId());
+			rs = ps.executeQuery();
+			while (rs.next())
+				list.add(init(rs, null));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try { 
+				if (rs != null) rs.close();
+				if (ps != null) ps.close();
+			} catch (SQLException e) { 
+				e.printStackTrace(); 
+			}
+		}
+		return list;
+/*
+select categories.Name, categories.Code, 
+planetsigns.Text, textgender.Male, textgender.Female, textgender.child
+from planetsigns 
+inner join categories on planetsigns.TypeID = categories.id
+left join textgender on planetsigns.GenderID = textgender.id
+where planetsigns.SignID = 6
+and categories.ObjectID = 23
+order by categories.Priority
+*/
 	}
 }

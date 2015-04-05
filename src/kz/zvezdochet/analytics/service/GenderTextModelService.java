@@ -4,12 +4,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.bean.TextGenderModel;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.GenderTextService;
 import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.tool.Connector;
 
@@ -34,10 +32,10 @@ public abstract class GenderTextModelService extends ModelService {
 					"text = ? " +
 					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			if (dict.getGenderText() != null)
-				ps.setLong(1, dict.getGenderText().getId());
-			else
-				ps.setLong(1, java.sql.Types.NULL);
+//			if (dict.getGenderTexts() != null)
+//				ps.setLong(1, dict.getGenderTexts().getId());
+//			else
+//				ps.setLong(1, java.sql.Types.NULL);
 			ps.setString(2, dict.getText());
 			result = ps.executeUpdate();
 			if (result == 1) {
@@ -70,11 +68,11 @@ public abstract class GenderTextModelService extends ModelService {
 		TextGenderModel type = (model != null) ? (TextGenderModel)model : (TextGenderModel)create();
 		type.setId(rs.getLong("ID"));
 		type.setText(rs.getString("Text"));
-		if (rs.getString("GenderID") != null) {
-			GenderText genderText = (GenderText)new GenderTextService().find(rs.getLong("GenderID"));
-			if (genderText != null)
-				type.setGenderText(genderText);
-		}
+//		if (rs.getString("GenderID") != null) {
+//			TextGender genderText = (TextGender)new TextGenderService().find(rs.getLong("GenderID"));
+//			if (genderText != null)
+//				type.setGenderText(genderText);
+//		}
 		return type;
 	}
 }

@@ -4,14 +4,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.IColorizedObject;
 import kz.zvezdochet.core.bean.IDiagramObject;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.GenderTextDictionaryService;
-import kz.zvezdochet.core.service.GenderTextService;
+import kz.zvezdochet.core.service.TextGenderDictionaryService;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.CoreUtil;
 
@@ -20,7 +18,7 @@ import kz.zvezdochet.core.util.CoreUtil;
  * @author Nataly Didenko
  * //TODO удалить класс??
  */
-public abstract class GenderTextColorService extends GenderTextDictionaryService {
+public abstract class GenderTextColorService extends TextGenderDictionaryService {
 
 	@Override
 	public TextGenderDictionary init(ResultSet rs, Model model) throws DataAccessException, SQLException {
@@ -34,7 +32,7 @@ public abstract class GenderTextColorService extends GenderTextDictionaryService
 	@Override
 	public Model save(Model model) throws DataAccessException {
 		TextGenderDictionary dict = (TextGenderDictionary)model;
-		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
+//		dict.setGenderText((TextGender)new TextGenderService().save(dict.getGenderTexts()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -53,10 +51,10 @@ public abstract class GenderTextColorService extends GenderTextDictionaryService
 					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, dict.getText());
-			if (dict.getGenderText() != null)
-				ps.setLong(2, dict.getGenderText().getId());
-			else
-				ps.setLong(2, java.sql.Types.NULL);
+//			if (dict.getGenderTexts() != null)
+//				ps.setLong(2, dict.getGenderTexts().getId());
+//			else
+//				ps.setLong(2, java.sql.Types.NULL);
 			ps.setString(3, dict.getCode());
 			ps.setString(4, dict.getName());
 			ps.setString(5, dict.getDescription());

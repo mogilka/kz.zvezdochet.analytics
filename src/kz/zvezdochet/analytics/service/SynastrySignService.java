@@ -9,10 +9,8 @@ import java.util.List;
 import kz.zvezdochet.analytics.bean.SynastryText;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
-import kz.zvezdochet.core.bean.GenderText;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.GenderTextService;
 import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.PlanetService;
@@ -56,7 +54,7 @@ public class SynastrySignService extends ModelService {
 	@Override
 	public Model save(Model model) throws DataAccessException {
 		SynastryText dict = (SynastryText)model;
-		dict.setGenderText((GenderText)new GenderTextService().save(dict.getGenderText()));
+		//dict.setGenderText((TextGender)new TextGenderService().save(dict.getGenderTexts()));
 		int result = -1;
         PreparedStatement ps = null;
 		try {
@@ -75,10 +73,10 @@ public class SynastrySignService extends ModelService {
 					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setString(1, dict.getText());
-			if (dict.getGenderText() != null)
-				ps.setLong(2, dict.getGenderText().getId());
-			else
-				ps.setLong(2, java.sql.Types.NULL);
+//			if (dict.getGenderTexts() != null)
+//				ps.setLong(2, dict.getGenderTexts().getId());
+//			else
+//				ps.setLong(2, java.sql.Types.NULL);
 			ps.setLong(3, dict.getSign1().getId());
 			ps.setLong(4, dict.getSign2().getId());
 			ps.setLong(5, dict.getPlanet().getId());
