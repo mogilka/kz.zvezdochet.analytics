@@ -1,7 +1,9 @@
 package kz.zvezdochet.analytics.bean;
 
+import kz.zvezdochet.analytics.service.CategoryService;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Dictionary;
+import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Категория объектов
@@ -43,5 +45,9 @@ public class Category extends Dictionary {
 	}
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+	@Override
+	public ModelService getService() {
+		return new CategoryService();
 	}
 }

@@ -2,7 +2,9 @@ package kz.zvezdochet.analytics.bean;
 
 import java.util.Arrays;
 
+import kz.zvezdochet.analytics.service.DegreeService;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
+import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.util.CalcUtil;
 
 /**
@@ -32,5 +34,10 @@ public class Degree extends TextGenderDictionary {
 		int[] royals = {23, 73, 130, 181, 229, 289, 334};
 		int d = CalcUtil.trunc(coord);
 		return Arrays.asList(royals).contains(d); 
+	}
+
+	@Override
+	public ModelService getService() {
+		return new DegreeService();
 	}
 }
