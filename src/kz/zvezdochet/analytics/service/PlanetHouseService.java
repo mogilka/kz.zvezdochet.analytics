@@ -36,7 +36,6 @@ public class PlanetHouseService extends GenderTextModelService {
 	 * @throws DataAccessException
 	 */
 	public Model find(Planet planet, House house, AspectType aspectType) throws DataAccessException {
-        PlanetHouseText dict = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
@@ -45,7 +44,7 @@ public class PlanetHouseService extends GenderTextModelService {
 		AspectTypeService service = new AspectTypeService();
 		if (null == aspectType)
 			aspectType = (AspectType)service.find("POSITIVE");
-		if (planet.isDamaged())
+		if (planet.isDamaged() || planet.getCode().equals("Lilith"))
 			aspectType = (AspectType)service.find("NEGATIVE");
 		
 		try {
@@ -56,7 +55,7 @@ public class PlanetHouseService extends GenderTextModelService {
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			if (rs.next())
-				dict = init(rs, null);
+				return init(rs, create());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -67,7 +66,7 @@ public class PlanetHouseService extends GenderTextModelService {
 				e.printStackTrace(); 
 			}
 		}
-		return dict;
+		return null;
 	}
 
 	@Override
