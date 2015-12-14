@@ -32,7 +32,8 @@ public class AnalyticsService {
 					"select p.planetid from planetsignposition p " +
 					"inner join positiontype t on p.typeid = t.id " +
 					"where p.signid = ? " +
-					"and t.code like ?";
+					"and t.code like ? " +
+					"and p.day = 1";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, sign.getId());
 			ps.setString(2, type);
