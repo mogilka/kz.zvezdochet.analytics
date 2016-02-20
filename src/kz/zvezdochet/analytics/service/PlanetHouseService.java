@@ -40,12 +40,16 @@ public class PlanetHouseService extends GenderTextModelService {
         ResultSet rs = null;
 		String sql;
 
-		 //TODO доработать с учетом других признаков
 		AspectTypeService service = new AspectTypeService();
-		if (null == aspectType)
-			aspectType = (AspectType)service.find("POSITIVE");
-		if (planet.isDamaged() || planet.getCode().equals("Lilith"))
-			aspectType = (AspectType)service.find("NEGATIVE");
+		if (null == aspectType) {
+			if (planet.isDamaged() || planet.getCode().equals("Lilith"))
+				aspectType = (AspectType)service.find("NEGATIVE");
+			else
+				aspectType = (AspectType)service.find("POSITIVE");
+		} else {
+			if (planet.getCode().equals("Lilith") && aspectType.getCode().equals("NEUTRAL"))
+				aspectType = (AspectType)service.find("NEGATIVE");			
+		}
 		
 		try {
 			sql = "select * from " + tableName + 
