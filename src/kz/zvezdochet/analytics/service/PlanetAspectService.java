@@ -41,8 +41,10 @@ public class PlanetAspectService extends GenderTextModelService {
 		try {
 			sql = "select * from " + tableName + 
 				" where typeid = " + aspectType.getId() +
-				" and planet1id = " + planet1.getId() +
-				" and planet2id = " + planet2.getId();
+				" and ((planet1id = " + planet1.getId() +
+					" and planet2id = " + planet2.getId() + ") "
+				+ "or (planet1id = " + planet2.getId() +
+					" and planet2id = " + planet1.getId() + "))";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			rs = ps.executeQuery();
 			if (rs.next())
