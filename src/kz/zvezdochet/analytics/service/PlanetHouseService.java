@@ -57,7 +57,7 @@ public class PlanetHouseService extends GenderTextModelService {
 				" and planetid = " + planet.getId() +
 				" and houseid = " + house.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			//System.out.println(ps);
+//			System.out.println(planet + " " + house);
 			rs = ps.executeQuery();
 			if (rs.next())
 				return init(rs, create());
@@ -148,7 +148,7 @@ public class PlanetHouseService extends GenderTextModelService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			update();
+			afterSave();
 		}
 		return dict;
 	}

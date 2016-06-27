@@ -139,7 +139,7 @@ public class PlanetAspectService extends GenderTextModelService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			update();
+			afterSave();
 		}
 		return dict;
 	}

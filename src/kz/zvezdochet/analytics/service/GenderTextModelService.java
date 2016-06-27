@@ -58,7 +58,7 @@ public abstract class GenderTextModelService extends ModelService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			update();
+			afterSave();
 		}
 		return dict;
 	}

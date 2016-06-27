@@ -95,7 +95,7 @@ public class CategoryService extends DictionaryService {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			update();
+			afterSave();
 		}
 		return dict;
 	}

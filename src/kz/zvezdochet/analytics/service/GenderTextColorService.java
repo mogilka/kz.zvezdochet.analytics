@@ -81,7 +81,7 @@ public abstract class GenderTextColorService extends TextGenderDictionaryService
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			update();
+			afterSave();
 		}
 		return dict;
 	}
