@@ -1,19 +1,25 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Analytics
-Bundle-SymbolicName: kz.zvezdochet.analytics
+Bundle-SymbolicName: kz.zvezdochet.analytics;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: kz.zvezdochet.analytics.Activator
 Bundle-Vendor: Звездочёт
+Export-Package: kz.zvezdochet.analytics.bean,
+ kz.zvezdochet.analytics.service
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- kz.zvezdochet.core;bundle-version="1.0.0"
+ kz.zvezdochet.core;bundle-version="1.0.0",
+ org.eclipse.e4.ui.model.workbench;bundle-version="1.2.0.v20160229-1459",
+ kz.zvezdochet.export;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ActivationPolicy: lazy
 Import-Package: kz.zvezdochet.bean,
  kz.zvezdochet.core.bean,
  kz.zvezdochet.core.service,
+ kz.zvezdochet.part,
  kz.zvezdochet.service,
- kz.zvezdochet.util
-Export-Package: kz.zvezdochet.analytics.bean,
- kz.zvezdochet.analytics.service
+ kz.zvezdochet.util,
+ org.apache.xml.serialize;version="2.9.0",
+ org.eclipse.e4.core.contexts,
+ org.eclipse.e4.core.di.annotations
+Bundle-ActivationPolicy: lazy
