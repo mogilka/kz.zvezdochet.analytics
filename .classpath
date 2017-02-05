@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="/kz.zvezdochet.export/lib/jfreechart.jar"/>
 	<classpathentry kind="lib" path="/kz.zvezdochet.export/lib/jcommon.jar"/>
 	<classpathentry kind="lib" path="/kz.zvezdochet.export/lib/xerces.jar"/>
+	<classpathentry kind="lib" path="/kz.zvezdochet.export/lib/xmlworker.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

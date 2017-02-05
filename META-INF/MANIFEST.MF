@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.e4.ui.model.workbench;bundle-version="1.2.0.v20160229-1459",
  kz.zvezdochet.export;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: kz.zvezdochet.bean,
+Import-Package: kz.zvezdochet,
+ kz.zvezdochet.bean,
  kz.zvezdochet.core.bean,
  kz.zvezdochet.core.service,
  kz.zvezdochet.part,

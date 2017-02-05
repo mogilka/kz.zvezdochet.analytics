@@ -1,10 +1,7 @@
 package kz.zvezdochet.analytics.exporter;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -19,17 +16,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.StandardBarPainter;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
 
-import com.itextpdf.awt.DefaultFontMapper;
-import com.itextpdf.awt.PdfGraphics2D;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chapter;
 import com.itextpdf.text.ChapterAutoNumber;
@@ -39,10 +26,10 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Font.FontFamily;
+import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Section;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
@@ -50,25 +37,32 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfPageEvent;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
-import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.draw.LineSeparator;
 
+import kz.zvezdochet.analytics.Activator;
+import kz.zvezdochet.analytics.bean.CardKind;
+import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.analytics.bean.Degree;
+import kz.zvezdochet.analytics.bean.PlanetSignText;
+import kz.zvezdochet.analytics.service.CardKindService;
 import kz.zvezdochet.analytics.service.DegreeService;
+import kz.zvezdochet.analytics.service.PlanetSignService;
 import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Place;
+import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
 import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.bean.TextGender;
+import kz.zvezdochet.core.util.CalcUtil;
 import kz.zvezdochet.core.util.DateUtil;
 import kz.zvezdochet.core.util.PlatformUtil;
 import kz.zvezdochet.core.util.StringUtil;
-import kz.zvezdochet.export.Activator;
 import kz.zvezdochet.export.bean.Bar;
+import kz.zvezdochet.export.handler.PageEventHandler;
+import kz.zvezdochet.export.util.PDFUtil;
 import kz.zvezdochet.service.EventService;
 import kz.zvezdochet.service.SignService;
 import kz.zvezdochet.util.Cosmogram;
@@ -89,6 +83,10 @@ import kz.zvezdochet.util.Cosmogram;
  * http://developers.itextpdf.com/question/how-change-line-spacing-text
  * https://sourceforge.net/p/itext/sandbox/ci/c05c80778a0ea01b901b3027d433b77e68f595af/tree/src/sandbox/objects/FitTextInRectangle.java#l45
  * http://developers.itextpdf.com/frequently-asked-developer-questions?id=223
+ * http://developers.itextpdf.com/question/how-make-cyrillic-characters-display-properly-when-converting-html-pdf
+ * http://stackoverflow.com/questions/16669462/convert-html-to-pdf-and-add-it-to-a-paragraph
+ * http://demo.itextsupport.com/xmlworker/itextdoc/flatsite.html#itextdoc-menu-7
+ * http://developers.itextpdf.com/examples/xml-worker-itext5/xml-worker-examplesb
  */
 public class PDFExporter {
 	private boolean child = false;
@@ -99,10 +97,10 @@ public class PDFExporter {
 	public PDFExporter(Display display) {
 		this.display = display;
 		try {
-			baseFont = BaseFont.createFont("/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-			font = new Font(baseFont, 12, Font.NORMAL);
-			fonta = new Font(baseFont, 12, Font.UNDERLINE, new BaseColor(102, 102, 153));
-			fonth5 = new Font(baseFont, 14, Font.BOLD, new BaseColor(102, 102, 153));
+			baseFont = PDFUtil.getBaseFont();
+			font = PDFUtil.getRegularFont(baseFont);
+			fonta = PDFUtil.getLinkFont(baseFont);
+			fonth5 = PDFUtil.getHeaderFont(baseFont);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -123,12 +121,7 @@ public class PDFExporter {
 	        doc.open();
 
 	        //metadata
-	        doc.addTitle("Индивидуальный гороскоп");
-	        doc.addSubject("Астрологический сервис Звездочёт");
-	        doc.addKeywords("гороскоп, звездочёт, сидерическая астрология");
-	        doc.addAuthor("Наталья Диденко");
-	        doc.addCreator("Наталья Диденко");
-	        doc.addCreationDate();
+	        PDFUtil.getMetaData(doc, "Индивидуальный гороскоп");
 
 	        //раздел
 			Chapter chapter = new ChapterAutoNumber("Общая информация");
@@ -145,7 +138,7 @@ public class PDFExporter {
 				" " + place.getName() +
 				" " + place.getLatitude() + "°" +
 				", " + place.getLongitude() + "°";
-			printHeader(p, text);
+			PDFUtil.printHeader(p, text, baseFont);
 			chapter.add(p);
 
 			chapter.add(new Paragraph("Гороскоп описывает вашу личность как с позиции силы, так и с позиции слабости. "
@@ -161,30 +154,91 @@ public class PDFExporter {
 			printCelebrities(chapter, event.getBirth());
 			printSimilar(chapter, event);
 			chapter.add(Chunk.NEXTPAGE);
-			
-			//знаки
-			EventStatistics statistics = new EventStatistics(event.getConfiguration());
-			Map<String, Double> signMap = statistics.getPlanetSigns(true);
-			printSigns(writer, chapter, signMap);
-			statistics.initPlanetHouses();
 
 			//градус рождения
 			if (!child)
 				printDegree(chapter, event);
 
-			
-			
+			//знаки
+			EventStatistics statistics = new EventStatistics(event.getConfiguration());
+			Map<String, Double> signMap = statistics.getPlanetSigns(true);
+			printSigns(writer, chapter, signMap);
+			statistics.initPlanetHouses();
 			doc.add(chapter);
 
 
-			//изображение
-			String card = PlatformUtil.getPath(Activator.PLUGIN_ID, "/out/horoscope_files/card.png").getPath();
-			com.itextpdf.text.Image image2 = com.itextpdf.text.Image.getInstance(card);
-			image2.scaleAbsolute(120f, 120f);
-			Section section1 = chapter.addSection("section");
-			section1.add(image2);
-			      
-	        doc.add(printCopyright());
+			chapter = new ChapterAutoNumber("Характеристика личности");
+			chapter.setNumberDepth(0);
+
+			//планеты в знаках
+			printPlanetSign(chapter, event);
+			doc.add(chapter);
+
+
+			chapter = new ChapterAutoNumber("Анализ карты рождения");
+			chapter.setNumberDepth(0);
+
+			//вид космограммы
+			printCardKind(doc, writer, chapter, event);
+			doc.add(chapter);
+
+			//тип космограммы
+//			Map<String, Integer> signPlanetsMap = statistics.getSignPlanets();
+//			generateCardType(event, table, signPlanetsMap);
+//			
+//			//планеты
+//			generatePlanets(event, table);
+//			
+//			//аспекты
+//			generateAspectTypes(event, table);
+//			//позитивные аспекты
+//			generateAspects(event, table, "Позитивные сочетания", "POSITIVE");
+//			//негативные аспекты
+//			generateAspects(event, table, "Негативные сочетания", "NEGATIVE");
+//			//конфигурации аспектов
+//			generateAspectConfigurations(event, table);
+//
+//			//дома
+//			generateHouseChart(statistics, table);
+//
+//			//планеты в домах
+//			Map<String, Double> houseMap = statistics.getPlanetHouses();
+//			generatePlanetInHouses(event, table, houseMap);
+//
+//			//стихии
+//			statistics.initPlanetDivisions();
+//			statistics.initHouseDivisions();
+//			generateElements(event, table, statistics);
+//	
+//			//инь-ян
+//			generateYinYang(event, table, statistics);
+//			
+//			//полусферы
+//			generateHalfSpheres(event, table, statistics);
+//			
+//			//квадраты
+//			generateSquares(event, table, statistics, signMap);
+//			
+//			//кресты
+//			generateCrosses(event, table, statistics);
+//			
+//			//зоны
+//			generateZones(event, table, statistics);
+
+			
+			
+			
+			
+			
+			chapter = new ChapterAutoNumber("Диаграммы");
+			chapter.setNumberDepth(0);
+
+			//координаты планет
+			printCoords(chapter, event);
+			doc.add(chapter);
+
+			
+	        doc.add(PDFUtil.printCopyright(baseFont));
 	        doc.close();			
 		} catch(Exception e) {
 			MessageDialog.openError(Display.getDefault().getActiveShell(), "Ошибка", e.getMessage());
@@ -206,7 +260,7 @@ public class PDFExporter {
 			ImageLoader loader = new ImageLoader();
 		    loader.data = new ImageData[] {image.getImageData()};
 		    try {
-				String card = PlatformUtil.getPath(Activator.PLUGIN_ID, "/out/horoscope_files/card.png").getPath();
+				String card = PlatformUtil.getPath(Activator.PLUGIN_ID, "/out/card.png").getPath();
 			    loader.save(card, SWT.IMAGE_PNG);
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -215,28 +269,6 @@ public class PDFExporter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Отображение информации о копирайте
-	 * @return Paragraph абзац
-	 */
-	private Paragraph printCopyright() {
-        Paragraph p = new Paragraph();
-		try {
-			Font font = new Font(baseFont, 10, Font.NORMAL);
-			Font fonta = new Font(baseFont, 10, Font.UNDERLINE, new BaseColor(102, 102, 153));
-
-	        p.setAlignment(Element.ALIGN_CENTER);
-	        Chunk chunk = new Chunk("© 1998-" + Calendar.getInstance().get(Calendar.YEAR) + " Астрологический сервис ", font);
-	        p.add(chunk);
-	        chunk = new Chunk("Звездочёт", fonta);
-	        chunk.setAnchor("https://zvezdochet.guru");
-	        p.add(chunk);
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-        return p;
 	}
 
     public void watermarkText(String src, String dest) throws IOException, DocumentException {
@@ -286,126 +318,6 @@ public class PDFExporter {
 //    	pdfStamper.Close();
 	}
 
-    protected class PageEventHandler implements PdfPageEvent {
-        protected Document doc;
-
-        public PageEventHandler(Document doc) {
-            this.doc = doc;
-        }
-		
-		@Override
-		public void onStartPage(PdfWriter arg0, Document arg1) {
-			// TODO Auto-generated method stub
-		}
-		
-		@Override
-		public void onSectionEnd(PdfWriter arg0, Document arg1, float arg2) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onSection(PdfWriter arg0, Document arg1, float arg2, int arg3, Paragraph arg4) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onParagraphEnd(PdfWriter arg0, Document arg1, float arg2) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onParagraph(PdfWriter arg0, Document arg1, float arg2) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onOpenDocument(PdfWriter arg0, Document arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onGenericTag(PdfWriter arg0, Document arg1, Rectangle arg2, String arg3) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onEndPage(PdfWriter writer, Document doc) {
-			//колонтитулы
-			PdfContentByte cb = writer.getDirectContent();
-			Font fonth = new Font(baseFont, 10, Font.NORMAL, new BaseColor(153, 153, 153));
-			float y = (doc.right() - doc.left()) / 2 + doc.leftMargin();
-	        ColumnText.showTextAligned(cb, Element.ALIGN_CENTER, new Phrase("Астрологический сервис Звездочёт", fonth),
-	        	y, doc.top() + 10, 0);
-	        ColumnText.showTextAligned(cb, Element.ALIGN_CENTER, new Phrase(String.valueOf(writer.getPageNumber()), fonth),
-	        	y, doc.bottom(), 0);
-		}
-		
-		@Override
-		public void onCloseDocument(PdfWriter arg0, Document arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onChapterEnd(PdfWriter arg0, Document arg1, float arg2) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onChapter(PdfWriter arg0, Document arg1, float arg2, Paragraph arg3) {
-			// TODO Auto-generated method stub
-			
-		}
-    }
-
-    /**
-     * @param container
-     * @param text
-     * http://developers.itextpdf.com/examples/itext-action-second-edition/chapter-5#225-moviecountries1.java
-     */
-    private void printHeader(Paragraph container, String text) {
-		try {
-			Font fonth3w = new Font(baseFont, 10, Font.BOLD, new BaseColor(255, 255, 255));
-
-            PdfPTable table = new PdfPTable(1);
-            table.setWidthPercentage(100);
-            table.setSpacingBefore(1);
-//            table.setPadding(4);
-            // t.setSpacing(4);
-            // t.setBorderWidth(1);
-
-            PdfPCell cell = new PdfPCell(new Phrase(text, fonth3w));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            cell.setBackgroundColor(new BaseColor(153, 153, 204));
-            cell.setBorder(PdfPCell.NO_BORDER);
-            cell.setPadding(5);
-            table.addCell(cell);
-            container.add(table);
-			
-//	        Chunk chunk = new Chunk(text, fonth3w);
-//	        chunk.setBackground(new BaseColor(153, 153, 204));
-//	        chunk.setLineHeight(14);
-//	        Paragraph p = new Paragraph();
-//	        p.setAlignment(Element.ALIGN_CENTER);
-//	//        p.setSpacingBefore(1);
-//	//        p.setSpacingAfter(1);
-//	        p.setLeading(0, 4);
-//	        p.add(chunk);
-//	//        p.setIndentationLeft(5);
-//	//        p.setIndentationRight(5);
-//			doc.add(p);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * Генерация знаменитостей
 	 * @param date дата события
@@ -415,7 +327,7 @@ public class PDFExporter {
 		try {
 			List<Event> events = new EventService().findEphemeron(date);
 			if (events != null && events.size() > 0) {
-				Section section = printSection(chapter, "Однодневки");
+				Section section = PDFUtil.printSection(chapter, "Однодневки", baseFont);
 				section.add(new Paragraph("В один день с вами родились такие известные люди:", font));
 
 				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -442,19 +354,6 @@ public class PDFExporter {
 		}
 	}
 
-	private void printHr(Paragraph paragraph) {
-		paragraph.add(new Chunk(new LineSeparator(2, 100, new BaseColor(102, 102, 153), Element.ALIGN_CENTER, 0)));	
-	}
-
-	private Section printSection(Chapter chapter, String text) {
-		Font fonth3 = new Font(baseFont, 16, Font.BOLD, new BaseColor(102, 102, 153));
-		Paragraph p = new Paragraph(text, fonth3);
-		p.setSpacingBefore(10);
-		p.add(Chunk.NEWLINE);
-		printHr(p);
-		return chapter.addSection(p);
-	}
-
 	/**
 	 * Генерация похожих по характеру знаменитостей
 	 * @param date дата события
@@ -464,7 +363,7 @@ public class PDFExporter {
 		try {
 			List<Model> events = new EventService().findSimilar(event, 1);
 			if (events != null && events.size() > 0) {
-				Section section = printSection(chapter, "Близкие по духу");
+				Section section = PDFUtil.printSection(chapter, "Близкие по духу", baseFont);
 				section.add(new Paragraph("Известные люди, похожие на вас по характеру:", font));
 
 				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -499,7 +398,7 @@ public class PDFExporter {
 	private void printSigns(PdfWriter writer, Chapter chapter, Map<String, Double> signMap) {
 		try {
 			//выраженные знаки
-			Section section = printSection(chapter, "Знаки Зодиака");
+			Section section = PDFUtil.printSection(chapter, "Знаки Зодиака", baseFont);
 
 			int size = signMap.size();
 			Bar[] bars = new Bar[size];
@@ -507,9 +406,14 @@ public class PDFExporter {
 			Iterator<Map.Entry<String, Double>> iterator = signMap.entrySet().iterator();
 			int i = -1;
 			SignService service = new SignService();
+			double maxval = 0;
 		    while (iterator.hasNext()) {
 		    	i++;
 		    	Entry<String, Double> entry = iterator.next();
+		    	double val = entry.getValue();
+		    	if (val > maxval)
+		    		maxval = val;
+
 		    	Bar bar = new Bar();
 		    	Sign sign = (Sign)service.find(entry.getKey());
 		    	bar.setName(sign.getName());
@@ -523,120 +427,20 @@ public class PDFExporter {
 		    	bar.setColor(sign.getColor());
 		    	bar.setCategory("Кредо");
 		    	bars2[i] = bar;
+		    	
 		    }
-		    com.itextpdf.text.Image image = printPie(writer, "Выраженные знаки Зодиака", bars, 0, 0);
+		    com.itextpdf.text.Image image = PDFUtil.printPie(writer, "Выраженные знаки Зодиака", bars, 0, 0, false);
 			section.add(image);
 	
 			//кредо
-			section = printSection(chapter, "Кредо вашей жизни");
-		    image = printBar(writer, "Кредо вашей жизни", "Кредо", "хз", bars2, 0, 0);
-			section.add(image);
+			section = PDFUtil.printSection(chapter, "Кредо вашей жизни", baseFont);
+		    PdfPTable table = PDFUtil.printTableChart(writer, maxval, bars2, "Кредо вашей жизни", baseFont);
+			section.add(table);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * Генерация диаграмм знаков
-	 * @param cell тег-контейнер для вложенных тегов
-	 * @param signMap карта знаков
-	 */
-	private com.itextpdf.text.Image printPie(PdfWriter writer, String title, Bar[] bars, float width, float height) {
-		try {
-	        if (0 == width)
-	        	width = 320;
-	        if (0 == height)
-	        	height = 240;
-
-		    DefaultFontMapper mapper = new DefaultFontMapper();
-		    mapper.insertDirectory("/usr/share/fonts/truetype/ubuntu-font-family");
-		    DefaultFontMapper.BaseFontParameters pp = mapper.getBaseFontParameters("Ubuntu");
-		    if (pp != null)
-		        pp.encoding = BaseFont.IDENTITY_H;
-
-		    PdfContentByte cb = writer.getDirectContent();
-			PdfTemplate tpl = cb.createTemplate(width, height);
-			Graphics2D g2d = new PdfGraphics2D(tpl, width, height, mapper);
-			Rectangle2D r2d = new Rectangle2D.Double(0, 0, width, height);
-
-			DefaultPieDataset dataset = new DefaultPieDataset();
-			for (Bar bar : bars)
-				dataset.setValue(bar.getName(), bar.getValue());
-
-		    JFreeChart chart = ChartFactory.createPieChart(title, dataset, true, true, false);
-            java.awt.Font font = new java.awt.Font("Ubuntu", java.awt.Font.PLAIN, 12);
-            chart.getTitle().setFont(font);
-            PiePlot plot = (PiePlot)chart.getPlot();
-            plot.setBackgroundPaint(new java.awt.Color(204, 204, 255));
-            plot.setOutlineVisible(false);
-            java.awt.Font sfont = new java.awt.Font("Ubuntu", java.awt.Font.PLAIN, 10);
-            chart.getLegend().setItemFont(sfont);
-
-            for (Bar bar : bars) {
-            	Color color = bar.getColor();
-            	plot.setSectionPaint(bar.getName(), new java.awt.Color(color.getRed(), color.getGreen(), color.getBlue()));
-            	plot.setLabelFont(sfont);
-            }
-			chart.draw(g2d, r2d);
-			g2d.dispose();
-			return com.itextpdf.text.Image.getInstance(tpl);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * Генерация диаграмм знаков
-	 * @param cell тег-контейнер для вложенных тегов
-	 * @param signMap карта знаков
-	 */
-	private com.itextpdf.text.Image printBar(PdfWriter writer, String title, String cattitle, String valtitle, Bar[] bars, float width, float height) {
-		try {
-	        if (0 == width)
-	        	width = 320;
-	        if (0 == height)
-	        	height = 240;
-
-		    DefaultFontMapper mapper = new DefaultFontMapper();
-		    mapper.insertDirectory("/usr/share/fonts/truetype/ubuntu-font-family");
-		    DefaultFontMapper.BaseFontParameters pp = mapper.getBaseFontParameters("Ubuntu");
-		    if (pp != null)
-		        pp.encoding = BaseFont.IDENTITY_H;
-
-		    PdfContentByte cb = writer.getDirectContent();
-			PdfTemplate tpl = cb.createTemplate(width, height);
-			Graphics2D g2d = new PdfGraphics2D(tpl, width, height, mapper);
-			Rectangle2D r2d = new Rectangle2D.Double(0, 0, width, height);
-
-			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-			for (Bar bar : bars)
-				dataset.setValue(bar.getValue(), bar.getCategory(), bar.getName());
-
-		    JFreeChart chart = ChartFactory.createBarChart(title, cattitle, valtitle, dataset);
-            java.awt.Font font = new java.awt.Font("Ubuntu", java.awt.Font.PLAIN, 12);
-            chart.getTitle().setFont(font);
-            CategoryPlot plot = (CategoryPlot)chart.getPlot();
-            plot.setBackgroundPaint(new java.awt.Color(204, 204, 255));
-            plot.setOutlineVisible(false);
-            java.awt.Font sfont = new java.awt.Font("Ubuntu", java.awt.Font.PLAIN, 10);
-            chart.getLegend().setItemFont(sfont);
-
-            ((BarRenderer)plot.getRenderer()).setBarPainter(new StandardBarPainter());
-            BarRenderer renderer = (BarRenderer)chart.getCategoryPlot().getRenderer();
-            int i = -1;
-            for (Bar bar : bars) {
-            	Color color = bar.getColor();
-            	renderer.setSeriesPaint(++i, new java.awt.Color(color.getRed(), color.getGreen(), color.getBlue()));
-            }
-			chart.draw(g2d, r2d);
-			g2d.dispose();
-			return com.itextpdf.text.Image.getInstance(tpl);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
 	/**
 	 * Генерация градуса рождения
@@ -645,7 +449,7 @@ public class PDFExporter {
 	 */
 	private void printDegree(Chapter chapter, Event event) {
 		try {
-			Section section = printSection(chapter, "Символ рождения");
+			Section section = PDFUtil.printSection(chapter, "Символ рождения", baseFont);
 
 			if (event.getConfiguration().getHouses() != null &&
 					event.getConfiguration().getHouses().size() > 0) {
@@ -672,9 +476,9 @@ public class PDFExporter {
 	 */
 	private void printCard(Document doc, Chapter chapter, Event event) {
 		try {
-			Section section = printSection(chapter, "Карта рождения");
+			Section section = PDFUtil.printSection(chapter, "Карта рождения", baseFont);
 
-			String filename = PlatformUtil.getPath(Activator.PLUGIN_ID, "/out/horoscope_files/card.png").getPath();
+			String filename = PlatformUtil.getPath(Activator.PLUGIN_ID, "/out/card.png").getPath();
 			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename);
 			float side = 300f;
 			image.scaleAbsolute(side, side);
@@ -699,56 +503,183 @@ public class PDFExporter {
 		        list.add(li);
 			}
 			section.add(list);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Генерация планет в знаках
+	 * @param chapter раздел
+	 * @param event событие
+	 */
+	private void printPlanetSign(Chapter chapter, Event event) {
+		try {
+			if (event.getConfiguration().getPlanets() != null) {
+				PlanetSignService service = new PlanetSignService();
+				for (Model model : event.getConfiguration().getPlanets()) {
+					Planet planet = (Planet)model;
+				    if (planet.isMain()) {
+				    	List<PlanetSignText> list = service.find(planet, planet.getSign());
+				    	if (list != null && list.size() > 0)
+				    		for (PlanetSignText object : list) {
+				    			Category category = object.getCategory();
+				    			Section section = PDFUtil.printSection(chapter, category.getName(), baseFont);
+				    			section.add(new Paragraph(StringUtil.removeTags(object.getText()), font));
+								
+								List<TextGender> genders = object.getGenderTexts(event.isFemale(), child);
+								for (TextGender gender : genders) {
+									Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
+									p.setSpacingBefore(10);
+									section.add(p);
+									section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
+								};
+				    		}
+				    }
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Генерация таблицы координат планет и домов
+	 * @param chapter раздел
+	 * @param event событие
+	 */
+	private void printCoords(Chapter chapter, Event event) {
+		try {
+			Section section = PDFUtil.printSection(chapter, "Координаты планет", baseFont);
+			float fontsize = 8;
+			Font font = new Font(baseFont, fontsize, Font.NORMAL, BaseColor.BLACK);
+			section.add(new Paragraph("Планеты в знаках Зодиака и астрологических домах:", font));
+
+	        String css = "p { font-family: Ubuntu; }";
+	        String filename = PDFUtil.FONTDIR + "/" + PDFUtil.FONTFILE;
+	        FontFactory.register(filename);
+	        BaseFont baseHtmlFont = BaseFont.createFont(filename, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+	        Font htmlfont = new Font(baseHtmlFont, fontsize, Font.NORMAL, BaseColor.BLACK);
+
+	        PdfPTable table = new PdfPTable(5);
+	        table.setSpacingBefore(10);
+			int i = -1;
+			for (Model model : event.getConfiguration().getPlanets()) {
+				BaseColor color = (++i % 2 > 0) ? new BaseColor(255, 255, 255) : new BaseColor(230, 230, 250);
+				Planet planet = (Planet)model;
+
+				PdfPCell cell = new PdfPCell(new Phrase(CalcUtil.roundTo(planet.getCoord(), 2) + "°", font));
+		        cell.setBorder(PdfPCell.NO_BORDER);
+		        cell.setBackgroundColor(color);
+				table.addCell(cell);
+
+				Color scolor = planet.getColor();
+//				cell = new PdfPCell();
+//				cell.addElement(new Phrase(planet.getSymbol(), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+//		        cell.setBorder(PdfPCell.NO_BORDER);
+//		        cell.setBackgroundColor(color);
+//		        table.addCell(cell);
+
+				cell = new PdfPCell();
+				cell.addElement(new Phrase(planet.getName(), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+		        cell.setBorder(PdfPCell.NO_BORDER);
+		        cell.setBackgroundColor(color);
+		        table.addCell(cell);
+
+//				cell = new PdfPCell(new Phrase(planet.getDescription(), font));
+//		        cell.setBorder(PdfPCell.NO_BORDER);
+//		        cell.setBackgroundColor(color);
+//				table.addCell(cell);
+
+				Sign sign = planet.getSign();
+				scolor = sign.getColor();
+//		        cell = new PdfPCell();
+//		        for (Element e : XMLWorkerHelper.parseToElementList(sign.getSymbol(), css))
+//		            cell.addElement(new Phrase(e.toString(), new Font(baseHtmlFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+//		        cell.setBorder(PdfPCell.NO_BORDER);
+//		        cell.setBackgroundColor(color);
+//				table.addCell(cell);
+				
+		        cell = new PdfPCell();
+				cell.addElement(new Phrase(sign.getName(), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+		        cell.setBorder(PdfPCell.NO_BORDER);
+		        cell.setBackgroundColor(color);
+				table.addCell(cell);
+
+				House house = planet.getHouse();
+				cell = new PdfPCell(new Phrase(CalcUtil.roundTo(house.getCoord(), 2) + "°", font));
+		        cell.setBorder(PdfPCell.NO_BORDER);
+		        cell.setBackgroundColor(color);
+				table.addCell(cell);
+
+//				cell = new PdfPCell();
+//				if (house.isMain()) {
+//					scolor = house.getColor();
+//					cell.addElement(new Phrase(house.getDesignation(), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+//				}
+//		        cell.setBorder(PdfPCell.NO_BORDER);
+//		        cell.setBackgroundColor(color);
+//				table.addCell(cell);
+
+				cell = new PdfPCell();
+				cell.addElement(new Phrase(house.getShortName(), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+		        cell.setBorder(PdfPCell.NO_BORDER);
+		        cell.setBackgroundColor(color);
+				table.addCell(cell);
+			}
+			section.add(table);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Генерация вида космограммы
+	 * @param event событие
+	 * @param cell тег-контейнер для вложенных тегов
+	 * TODO фиктивные планеты при определении вида космограмм не считаются!!!
+	 */
+	private void printCardKind(Document doc, PdfWriter writer, Chapter chapter, Event event) {
+		try {
+			Section section = PDFUtil.printSection(chapter, "Кармический потенциал", baseFont);
+			section.add(new Paragraph("Вид космограммы — это вид сверху на рисунок карты рождения. "
+				+ "Здесь важна общая картина, которая не в деталях, а глобально описывает ваше предназначение и кармический опыт прошлого. "
+				+ "Определите, на каком уровне вы находитесь. Отследите по трём уровням своё развитие.", font));
+
+			CardKind kind = (CardKind)new CardKindService().find(3L);
+			section.add(new Paragraph(kind.getName(), fonth5));
+			String html = kind.getText();
+			Phrase phrase = PDFUtil.html2pdf(html);
+			section.add(phrase);
 			
-//			p = new Tag("p");
-//			p.add("Планеты в знаках Зодиака и астрологических домах:");
-//			td.add(p);
-//			p = new Tag("table", "class=legend-list");
-//			int i = -1;
-//			for (Model model : event.getConfiguration().getPlanets()) {
-//				String trstyle = (++i % 2 > 0) ? "odd" : "";
-//				Planet planet = (Planet)model;
-//				Tag tr2 = new Tag("tr", "class=" + trstyle);
-//				Tag td2 = new Tag("td");
-//				Tag img = new Tag("img", "src=horoscope_files/planet/" + planet.getCode() + ".png");
-//				td2.add(img);
-//				td2.add(planet.getName());
-//				tr2.add(td2);
-//
-//				td2 = new Tag("td");
-//				td2.add(planet.getDescription());
-//				tr2.add(td2);
-//				
-//				td2 = new Tag("td");
-//				td2.add(CalcUtil.roundTo(planet.getCoord(), 2) + "&#176;");
-//				tr2.add(td2);
-//				
-//				Sign sign = planet.getSign();
-//				Color color = sign.getColor();
-//				String cattr = "rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");";
-//				td2 = new Tag("td");
-//				img = new Tag("b", "style=color:" + cattr);
-//				img.add(sign.getSymbol());
-//				td2.add(img);
-//				td2.add(sign.getName());
-//				tr2.add(td2);
-//
-//				House house = planet.getHouse();
-//				color = house.getColor();
-//				cattr = "rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ");";
-//				td2 = new Tag("td");
-//				img = new Tag("span", "style=color:" + cattr);
-//				img.add(house.getDesignation());
-//				td2.add(img);
-//				tr2.add(td2);
-//				td2 = new Tag("td");
-//				td2.add(house.getShortName());
-//				tr2.add(td2);
-//				p.add(tr2);
+//			CardKind type = null;
+//			//упорядочиваем массив планет по возрастанию
+//			List<Planet> planets = new ArrayList<Planet>();
+//			for (BaseEntity entity : event.getConfiguration().getPlanets())
+//				planets.add((Planet)entity);
+//			Collections.sort(planets, new SkyPointComparator());
+//			
+//			//расчет интервалов между планетами
+//			double max = 0.0;
+//			double[] cuts = new double[planets.size()]; 
+//			for (int i = 0; i < planets.size(); i++) {
+//				int n = (i == planets.size() - 1) ? 0 : i + 1;
+//				double value = CalcUtil.getDifference(planets.get(i).getCoord(), planets.get(n).getCoord());
+//				cuts[i] = value;
+//				if (value > max) max = value;
 //			}
-//			td.add(p);
-//			tr.add(td);
-//			cell.add(tr);
+//			
+//			if (type != null) {
+//				Tag p = new Tag("h5"); 
+//				p.add(type.getName());
+//				td.add(p);
+//				p = new Tag("p", "class=desc"); 
+//				p.add(type.getDescription());
+//				td.add(p);
+//				p = new Tag("p"); 
+//				p.add(type.getText());
+//				td.add(p);
+//			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
