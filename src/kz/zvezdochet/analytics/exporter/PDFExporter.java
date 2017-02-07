@@ -43,7 +43,6 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import html.Tag;
 import kz.zvezdochet.analytics.Activator;
 import kz.zvezdochet.analytics.bean.CardKind;
 import kz.zvezdochet.analytics.bean.Category;
@@ -320,7 +319,6 @@ public class PDFExporter {
 
     public void watermarkText(String src, String dest) throws IOException, DocumentException {
         PdfReader reader = new PdfReader(src);
-        int n = reader.getNumberOfPages();
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(dest));
         PdfContentByte under = stamper.getUnderContent(1);
         Font f = new Font(FontFamily.HELVETICA, 15);
@@ -1112,7 +1110,6 @@ public class PDFExporter {
 						planets.add(planet);
 				}
 				//Создаем информационный блок, только если дом не пуст
-				Tag tr = null; Tag td = null;
 				Section section = null;
 				if (planets.size() > 0) {
 					section = PDFUtil.printSection(chapter, house.getHeaderName(), baseFont);
@@ -1143,7 +1140,7 @@ public class PDFExporter {
 				Sign sign = SkyPoint.getSign(house.getCoord(), event.getBirthYear());
 				HouseSignText dict = (HouseSignText)new HouseSignService().find(house, sign);
 				if (dict != null) {
-					if (null == td)
+					if (null == section)
 						section = PDFUtil.printSection(chapter, house.getHeaderName(), baseFont);
 					section.add(new Paragraph(house.getShortName() + " + " + sign.getDescription(), fonth5));
 					section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
