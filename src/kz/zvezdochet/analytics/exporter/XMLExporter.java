@@ -9,6 +9,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import kz.zvezdochet.analytics.Activator;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
@@ -19,11 +24,6 @@ import kz.zvezdochet.core.util.CalcUtil;
 import kz.zvezdochet.core.util.PlatformUtil;
 import kz.zvezdochet.service.SignService;
 import kz.zvezdochet.util.Configuration;
-
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Генератор XML-файла для flash-изображения
