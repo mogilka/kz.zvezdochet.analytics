@@ -44,6 +44,7 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import kz.zvezdochet.analytics.Activator;
+import kz.zvezdochet.analytics.bean.AspectConfiguration;
 import kz.zvezdochet.analytics.bean.CardKind;
 import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.analytics.bean.CrossSign;
@@ -53,6 +54,8 @@ import kz.zvezdochet.analytics.bean.PlanetAspectText;
 import kz.zvezdochet.analytics.bean.PlanetHouseText;
 import kz.zvezdochet.analytics.bean.PlanetSignText;
 import kz.zvezdochet.analytics.bean.PlanetText;
+import kz.zvezdochet.analytics.bean.Rule;
+import kz.zvezdochet.analytics.service.AspectConfigurationService;
 import kz.zvezdochet.analytics.service.CardKindService;
 import kz.zvezdochet.analytics.service.CardTypeService;
 import kz.zvezdochet.analytics.service.CrossSignService;
@@ -75,6 +78,7 @@ import kz.zvezdochet.bean.SkyPointAspect;
 import kz.zvezdochet.bean.Square;
 import kz.zvezdochet.bean.YinYang;
 import kz.zvezdochet.bean.Zone;
+import kz.zvezdochet.core.bean.ITextGender;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.bean.TextGender;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
@@ -91,6 +95,7 @@ import kz.zvezdochet.service.ElementService;
 import kz.zvezdochet.service.EventService;
 import kz.zvezdochet.service.HalfsphereService;
 import kz.zvezdochet.service.HouseService;
+import kz.zvezdochet.service.PlanetService;
 import kz.zvezdochet.service.SignService;
 import kz.zvezdochet.service.SquareService;
 import kz.zvezdochet.service.YinYangService;
@@ -120,6 +125,7 @@ import kz.zvezdochet.util.Cosmogram;
  */
 public class PDFExporter {
 	private boolean child = false;
+	private boolean female = false;
 	private Display display;
 	private BaseFont baseFont;
 	private Font font, fonta, fonth5;
@@ -142,6 +148,8 @@ public class PDFExporter {
 	 */
 	public void generate(Event event) {
 		child = event.getAge() < event.MAX_TEEN_AGE;
+		female = event.isFemale();
+
 		saveCard(event);
 		Document doc = new Document();
 		try {
@@ -157,19 +165,42 @@ public class PDFExporter {
 			Chapter chapter = new ChapterAutoNumber("Общая информация");
 			chapter.setNumberDepth(0);
 
-			//дата события
+			//шапка
 			Paragraph p = new Paragraph();
+			PDFUtil.printHeader(p, "Индивидуальный гороскоп", baseFont);
+			chapter.add(p);
+
+			String text = DateUtil.fulldtf.format(event.getBirth());
+			p = new Paragraph(text, font);
+	        p.setAlignment(Element.ALIGN_CENTER);
+			chapter.add(p);
+
 			Place place = event.getPlace();
 			if (null == place)
 				place = new Place().getDefault();
-			String text = DateUtil.fulldtf.format(event.getBirth()) +
-				" " + (event.getZone() >= 0 ? "UTC+" : "") + event.getZone() +
-				" " + (event.getDst() >= 0 ? "DST+" : "") + event.getDst() + 
-				" " + place.getName() +
-				" " + place.getLatitude() + "°" +
-				", " + place.getLongitude() + "°";
-			PDFUtil.printHeader(p, text, baseFont);
+			text = (event.getZone() >= 0 ? "UTC+" : "") + event.getZone() +
+					" " + (event.getDst() >= 0 ? "DST+" : "") + event.getDst() + 
+					" " + place.getName() +
+					" " + place.getLatitude() + "°" +
+					", " + place.getLongitude() + "°";
+			p = new Paragraph(text, font);
+	        p.setAlignment(Element.ALIGN_CENTER);
 			chapter.add(p);
+
+			Font fontgray = new Font(baseFont, 10, Font.NORMAL, PDFUtil.FONTCOLORGRAY);
+			text = "Дата составления: " + DateUtil.fulldtf.format(new Date());
+			p = new Paragraph(text, fontgray);
+	        p.setAlignment(Element.ALIGN_CENTER);
+			chapter.add(p);
+
+			p = new Paragraph();
+	        p.setAlignment(Element.ALIGN_CENTER);
+			p.setSpacingAfter(20);
+	        p.add(new Chunk("Автор: ", fontgray));
+	        Chunk chunk = new Chunk(PDFUtil.AUTHOR, new Font(baseFont, 10, Font.UNDERLINE, PDFUtil.FONTCOLOR));
+	        chunk.setAnchor(PDFUtil.WEBSITE);
+	        p.add(chunk);
+	        chapter.add(p);
 
 			chapter.add(new Paragraph("Гороскоп описывает вашу личность как с позиции силы, так и с позиции слабости. "
 				+ "Психологи утверждают, что развивать слабые стороны бессмысленно, лучше акцентироваться на достоинствах, это более эффективно. "
@@ -189,16 +220,24 @@ public class PDFExporter {
 			if (!child)
 				printDegree(chapter, event);
 
-			//знаки
+			//дома
 			EventStatistics statistics = new EventStatistics(event.getConfiguration());
+			statistics.initPlanetHouses();
+			printHouses(writer, chapter, statistics);
+			chapter.add(Chunk.NEXTPAGE);
+
+			//знаки
 			Map<String, Double> signMap = statistics.getPlanetSigns(true);
 			printSigns(writer, chapter, signMap);
-			statistics.initPlanetHouses();
 			doc.add(chapter);
 
 
 			chapter = new ChapterAutoNumber("Характеристика личности");
 			chapter.setNumberDepth(0);
+
+			p = new Paragraph();
+			PDFUtil.printHeader(p, "Характеристика личности", baseFont);
+			chapter.add(p);
 
 			//планеты в знаках
 			printPlanetSign(chapter, event);
@@ -207,6 +246,10 @@ public class PDFExporter {
 
 			chapter = new ChapterAutoNumber("Анализ карты рождения");
 			chapter.setNumberDepth(0);
+
+			p = new Paragraph();
+			PDFUtil.printHeader(p, "Анализ карты рождения", baseFont);
+			chapter.add(p);
 
 			//вид космограммы
 			printCardKind(chapter, event);
@@ -234,6 +277,10 @@ public class PDFExporter {
 			chapter = new ChapterAutoNumber("Реализация личности");
 			chapter.setNumberDepth(0);
 
+			p = new Paragraph();
+			PDFUtil.printHeader(p, "Реализация личности", baseFont);
+			chapter.add(p);
+
 			//планеты в домах
 			Map<String, Double> houseMap = statistics.getPlanetHouses();
 			printPlanetHouses(chapter, event, houseMap);
@@ -243,16 +290,16 @@ public class PDFExporter {
 			chapter = new ChapterAutoNumber("Диаграммы");
 			chapter.setNumberDepth(0);
 
+			p = new Paragraph();
+			PDFUtil.printHeader(p, "Диаграммы", baseFont);
+			chapter.add(p);
+
 			//координаты планет
 			printCoords(chapter, event);
 			chapter.add(Chunk.NEXTPAGE);
 
 			//аспекты
 			printAspectTypes(writer, chapter, event);
-			chapter.add(Chunk.NEXTPAGE);
-
-			//дома
-			printHouses(writer, chapter, statistics);
 			chapter.add(Chunk.NEXTPAGE);
 
 			//стихии
@@ -278,7 +325,7 @@ public class PDFExporter {
 			chapter.add(Chunk.NEXTPAGE);
 			
 			//зоны
-			generateZones(writer, chapter, event, statistics);
+			printZones(writer, chapter, event, statistics);
 
 			doc.add(chapter);
 
@@ -505,7 +552,7 @@ public class PDFExporter {
 			    if (model != null) {
 			    	Degree degree = (Degree)model;
 					section.add(new Paragraph(degree.getId() + "° " + degree.getCode(), fonth5));
-					section.add(new Paragraph(degree.getDescription(), new Font(baseFont, 12, Font.ITALIC, new BaseColor(102, 102, 102))));
+					section.add(new Paragraph(degree.getDescription(), new Font(baseFont, 12, Font.ITALIC, PDFUtil.FONTCOLORGRAY)));
 					section.add(new Paragraph(StringUtil.removeTags(degree.getText()), font));
 			    }
 			}
@@ -570,15 +617,8 @@ public class PDFExporter {
 				    		for (PlanetSignText object : list) {
 				    			Category category = object.getCategory();
 				    			Section section = PDFUtil.printSection(chapter, category.getName(), baseFont);
-				    			section.add(new Paragraph(StringUtil.removeTags(object.getText()), font));
-								
-								List<TextGender> genders = object.getGenderTexts(event.isFemale(), child);
-								for (TextGender gender : genders) {
-									Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-									p.setSpacingBefore(10);
-									section.add(p);
-									section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-								};
+				    			section.add(PDFUtil.html2pdf(object.getText()));
+				    			printGender(section, object);
 				    		}
 				    }
 				}
@@ -596,9 +636,9 @@ public class PDFExporter {
 	private void printCoords(Chapter chapter, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Координаты планет", baseFont);
-			float fontsize = 8;
+			float fontsize = 10;
 			Font font = new Font(baseFont, fontsize, Font.NORMAL, BaseColor.BLACK);
-			section.add(new Paragraph("Планеты в знаках Зодиака и астрологических домах:", font));
+			section.add(new Paragraph("Планеты в знаках Зодиака и астрологических домах:", this.font));
 
 	        String css = "p { font-family: Ubuntu; }";
 	        String filename = PDFUtil.FONTDIR + "/" + PDFUtil.FONTFILE;
@@ -773,7 +813,7 @@ public class PDFExporter {
 				    if (model != null) {
 				    	TextGenderDictionary cardType = (TextGenderDictionary)model;
 						Section section = PDFUtil.printSection(chapter, "Самораскрытие", baseFont);
-						section.add(new Paragraph("Тип космограммы: " + cardType.getName(), fonth5));
+						section.add(new Paragraph(cardType.getName(), fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(cardType.getText()), font));
 				    }
 				}
@@ -792,7 +832,8 @@ public class PDFExporter {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Сильные и слабые стороны", baseFont);
 			PlanetTextService service = new PlanetTextService();
-			for (Model model : event.getConfiguration().getPlanets()) {
+			List<Model> planets = event.getConfiguration().getPlanets();
+			for (Model model : planets) {
 				Planet planet = (Planet)model;
 				PlanetText planetText = null;
 				if (planet.isSword()) {
@@ -800,12 +841,19 @@ public class PDFExporter {
 					if (planetText != null) {
 						section.add(new Paragraph(planet.getShortName() + "-меч", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(planetText.getText()), font));
+
+						Rule rule = EventRules.rulePlanetSword(planet);
+						if (rule != null)
+							section.add(PDFUtil.html2pdf(rule.getText()));
+
+						printGender(section, planetText);
 					}
 				} else if (planet.isShield()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "shield");
 					if (planetText != null) {
 						section.add(new Paragraph(planet.getShortName() + "-щит", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(planetText.getText()), font));
+						printGender(section, planetText);
 					}
 				}
 				if (planet.inMine()) {
@@ -814,11 +862,16 @@ public class PDFExporter {
 						section.add(new Paragraph(planet.getShortName() + " в шахте", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(planetText.getText()), font));
 
-//						<p>В этом вам поможет сфера жизни, определяемая диспозитором:
-//							<ul>
-//							<li><b>Луна</b> - материнский инстинкт, способность заботиться и воспитывать, любовь к дому и семейным ценностям, склонность к домашним занятиям</li>
-//							</ul>
-//							</p>
+						PlanetService planetService = new PlanetService();
+						Planet ruler = planetService.getRuler(planet.getSign(), true);
+						if (ruler != null) {
+							planetText = (PlanetText)service.findByPlanet(ruler.getId(), "positive");
+							if (planetText != null) {
+								section.add(new Paragraph("В этом вам помогут следующие сферы жизни:", font));
+								section.add(PDFUtil.html2pdf(planetText.getText()));
+							}
+						}
+						printGender(section, planetText);
 					}
 				}
 				if (planet.isDamaged()) {
@@ -826,12 +879,14 @@ public class PDFExporter {
 					if (planetText != null) {
 						section.add(new Paragraph(planet.getShortName() + "-дисгармония", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(planetText.getText()), font));
+						printGender(section, planetText);
 					}
 				} else if (planet.isPerfect()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "perfect");
 					if (planetText != null) {
 						section.add(new Paragraph(planet.getShortName() + "-гармония", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(planetText.getText()), font));
+						printGender(section, planetText);
 					}
 				}
 				if (planet.isRetrograde()) {
@@ -839,16 +894,8 @@ public class PDFExporter {
 					if (planetText != null) {
 						section.add(new Paragraph(planet.getShortName() + "-ретроград", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(planetText.getText()), font));
+						printGender(section, planetText);
 					}
-				}
-				if (planetText != null) {
-					List<TextGender> genders = planetText.getGenderTexts(event.isFemale(), child);
-					for (TextGender gender : genders) {
-						Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-						p.setSpacingBefore(10);
-						section.add(p);
-						section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-					};
 				}
 			}
 		} catch(Exception e) {
@@ -1000,20 +1047,16 @@ public class PDFExporter {
 					match = true;
 
 				if (match) {
-					PlanetAspectText dict = (PlanetAspectText)service.find(planet1, planet2, type);
-					if (dict != null) {
-						section.add(new Paragraph(dict.getPlanet1().getShortName() + " " + 
-							type.getSymbol() + " " + 
-							dict.getPlanet2().getShortName(), fonth5));
-						section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
-
-						List<TextGender> genders = dict.getGenderTexts(event.isFemale(), child);
-						for (TextGender gender : genders) {
-							Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-							p.setSpacingBefore(10);
-							section.add(p);
-							section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-						};
+					List<Model> dicts = service.finds(planet1, planet2, aspect.getAspect());
+					for (Model model : dicts) {
+						PlanetAspectText dict = (PlanetAspectText)model;
+						if (dict != null) {
+							section.add(new Paragraph(dict.getPlanet1().getShortName() + " " + 
+								type.getSymbol() + " " + 
+								dict.getPlanet2().getShortName(), fonth5));
+							section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
+							printGender(section, dict);
+						}
 					}
 				}
 			}
@@ -1031,11 +1074,122 @@ public class PDFExporter {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Комплексный анализ личности", baseFont);
 
-			String descr = "Описание";
-			String text = "Текст";
-			section.add(new Paragraph("Наименование", fonth5));
-			section.add(new Paragraph(descr, font));
-			section.add(new Paragraph(text, font));
+			List<Model> confs = new AspectConfigurationService().getList();
+			String[] codes = {
+				"stellium",		//0° 0° 0° 0°
+//				"semivehicle",	//60° 180° 120°
+				"cross",		//90° 90° 90° 90°
+//				"taucross",		//90° 180° 90°
+				"dagger",		//135° 45° 45° 135°
+				"poleaxe",		//135° 90° 135°
+				"javelin",		//45° 90° 45°
+				"davidstar",	//60° 60° 60° 60° 60° 60°
+				"trapezoid",	//60° 60° 60° 180°
+//				"sail",			//120° 60° 60° 120°
+				"triangle",		//120° 120° 120°
+				"bisextile",	//60° 120° 60°
+				"boomerang",	//150° 30° 30° 150°
+//				"pitchfork",	//150° 60° 150°
+//				"vehicle",		//60° 120° 60° 120°
+				"roof",			//30° 60° 30°
+				"railing",		//150° 30° 150° 30°
+				"cage",			//40° 40° 40° 40° 40° 40° 40° 40° 40°
+				"box",			//20° 40° 100° 40°
+				"lock",			//20° 40° 20°
+				"lasso",		//40° 80° 40°
+				"stretcher",	//100° 80° 100° 80°
+				"wreath",		//72° 72° 72° 72° 72°
+				"ship",			//72° 144° 72°
+				"palm",			//144° 72° 144°
+				"pyramid",		//150° 72° 135°
+				"envelope",		//108° 72° 108° 72°
+				"compass",		//108° 180° 72°
+				"boat",			//36° 72° 36°
+				"bilasso"		//80° 80° 160°
+			};
+			PlanetTextService service = new PlanetTextService();
+			PlanetText text = null;
+
+			for (Model model : confs) {
+				AspectConfiguration conf = (AspectConfiguration)model;
+				String code = conf.getCode();
+		    	if (Arrays.asList(codes).contains(code))
+		    		continue;
+
+				String filename = PlatformUtil.getPath(Activator.PLUGIN_ID, "/icons/conf/" + conf.getCode() + ".gif").getPath();
+				com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename);
+				section.add(image);
+
+				section.add(new Paragraph(conf.getName(), fonth5));
+				section.add(new Paragraph(StringUtil.removeTags(conf.getText()), font));
+
+				if (code.equals("semivehicle")) {
+					com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+					ListItem li = new ListItem();
+			        li.add(new Chunk("11 лет - становление мужчины, зрелость, осознание необходимости следовать правилам и дисциплине", font));
+				    list.add(li);
+
+				    li = new ListItem();
+			        li.add(new Chunk("16 лет - материальная обеспеченность - главный жизненный фактор", font));
+				    list.add(li);
+
+				    li = new ListItem();
+			        li.add(new Chunk("17 лет - раскрытие чувств, появление любви и важной женщины в жизни", font));
+				    list.add(li);
+
+				    li = new ListItem();
+			        li.add(new Chunk("29 лет - физические данные играют важную роль в жизни, появляются новые привычки", font));
+				    list.add(li);
+
+				    li = new ListItem();
+				    li.add(new Chunk("42 года - собственные возможности и способности в приоритете", font));
+				    list.add(li);
+
+				    li = new ListItem();
+				    li.add(new Chunk("55 лет - время личных перемен, изменение модели поведения", font));
+				    list.add(li);
+				    section.add(list);
+
+				} else if (code.equals("taucross")) {
+					text = (PlanetText)service.findByPlanet(20L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(27L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					Cross cross = (Cross)new CrossService().find(1L);
+					if (cross != null) {
+						section.add(new Paragraph(cross.getName(), fonth5));
+						section.add(new Paragraph(StringUtil.removeTags(cross.getTau()), font));
+					}
+
+				} else if (code.equals("sail")) {
+					text = (PlanetText)service.findByPlanet(21L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+				} else if (code.equals("pitchfork")) {
+					text = (PlanetText)service.findByPlanet(28L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+				} else if (code.equals("vehicle")) {
+					text = (PlanetText)service.findByPlanet(25L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(29L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(32L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+				}
+				section.add(Chunk.NEWLINE);
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -1121,14 +1275,7 @@ public class PDFExporter {
 							String sign = planet.isDamaged() || planet.isLilithed() ? "-" : "+";
 							section.add(new Paragraph(planet.getShortName() + " " + sign + " " + house.getShortName(), fonth5));
 							section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
-
-							List<TextGender> genders = dict.getGenderTexts(event.isFemale(), child);
-							for (TextGender gender : genders) {
-								Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-								p.setSpacingBefore(10);
-								section.add(p);
-								section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-							};
+							printGender(section, dict);
 						}
 					}
 				}
@@ -1144,14 +1291,7 @@ public class PDFExporter {
 						section = PDFUtil.printSection(chapter, house.getHeaderName(), baseFont);
 					section.add(new Paragraph(house.getShortName() + " + " + sign.getDescription(), fonth5));
 					section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
-					
-					List<TextGender> genders = dict.getGenderTexts(event.isFemale(), child);
-					for (TextGender gender : genders) {
-						Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-						p.setSpacingBefore(10);
-						section.add(p);
-						section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-					};
+					printGender(section, dict);
 				}
 			}
 		} catch(Exception e) {
@@ -1212,25 +1352,18 @@ public class PDFExporter {
 		    if (element != null) {
 		    	section.add(new Paragraph(element.getName() + " (" + element.getTemperament() + ")", fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(element.getText()), font));
-
-				List<TextGender> genders = element.getGenderTexts(event.isFemale(), child);
-				for (TextGender gender : genders) {
-					Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-					p.setSpacingBefore(10);
-					section.add(p);
-					section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-				};
+		    	printGender(section, element);
 		    }
 
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
-	        li.add(new Chunk("Диаграмма \"Темперамент в сознании\" показывает вашу идеальную модель: "
+	        li.add(new Chunk("Категория \"Темперамент в сознании\" показывает вашу идеальную модель: "
 					+ "на чём мысленно вы сконцентрированы, какие проявления для вас важны, необходимы и естественны.", font));
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Диаграмма \"Темперамент в поступках\" показывает, "
-					+ "как меняются ваши приоритеты на событийном уровне, в социуме по сравнению с предыдущей моделью:", font));
+	        li.add(new Chunk("Категория \"Темперамент в поступках\" показывает, "
+					+ "как меняются ваши приоритеты на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
 	        list.add(li);
 	        section.add(list);
 
@@ -1292,25 +1425,18 @@ public class PDFExporter {
 		    if (yinyang != null) {
 		    	section.add(new Paragraph(yinyang.getDescription(), fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(yinyang.getText()), font));
-				
-				List<TextGender> genders = yinyang.getGenderTexts(event.isFemale(), child);
-				for (TextGender gender : genders) {
-					Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-					p.setSpacingBefore(10);
-					section.add(p);
-					section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-				};
+		    	printGender(section, yinyang);
 		    }
 
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
-	        li.add(new Chunk("Диаграмма \"Мужское и женское в сознании\" показывает, "
-			    	+ "насколько активны ваши намерения, когда вы мыслите, принимаете решения, находясь наедине с самим собой.", font));
+	        li.add(new Chunk("Категория \"Мужское и женское в сознании\" показывает, "
+			    	+ "насколько вы активны в мыслях и принятии решений наедине с самим собой.", font));
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Диаграмма \"Мужское и женское в поступках\" показывает, "
-					+ "как меняется активность ваших намерений и проявлений на событийном уровне, в социуме по сравнению с предыдущей моделью:", font));
+	        li.add(new Chunk("Категория \"Мужское и женское в поступках\" показывает, "
+					+ "как меняется ваша активность на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
 	        list.add(li);
 			section.add(list);
 
@@ -1371,23 +1497,10 @@ public class PDFExporter {
 		    }
 		    if (sphere != null) {
 		    	section.add(new Paragraph(sphere.getName(), fonth5));
-		    	section.add(new Paragraph(sphere.getDescription(), new Font(baseFont, 12, Font.ITALIC, new BaseColor(102, 102, 102))));
+		    	section.add(new Paragraph(sphere.getDescription(), new Font(baseFont, 12, Font.ITALIC, PDFUtil.FONTCOLORGRAY)));
 		    	section.add(new Paragraph(StringUtil.removeTags(sphere.getText()), font));
-				
-				List<TextGender> genders = sphere.getGenderTexts(event.isFemale(), child);
-				for (TextGender gender : genders) {
-					Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-					p.setSpacingBefore(10);
-					section.add(p);
-					section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-				};
+		    	printGender(section, sphere);
 		    }
-
-		    Paragraph p = new Paragraph("Диаграмма показывает баланс открытости и закрытости ваших мыслей наедине с самим собой. "
-	        	+ "И как этот баланс меняется при поведении в социуме:", font);
-		    p.setSpacingBefore(10);
-		    p.setSpacingAfter(10);
-	    	section.add(p);
 
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
@@ -1395,7 +1508,7 @@ public class PDFExporter {
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Закрытость выражается в духовности и материализме", font));
+	        li.add(new Chunk("Закрытость – в духовности и материализме", font));
 	        list.add(li);
 			section.add(list);
 
@@ -1443,7 +1556,7 @@ public class PDFExporter {
 		    	Entry<String, Double> entry = iterator.next();
 		    	Bar bar = new Bar();
 		    	Square element = (Square)service.find(entry.getKey());
-		    	bar.setName(element.getName());
+		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue() * (-1));
 		    	bar.setColor(element.getColor());
 		    	bar.setCategory("Зрелость в сознании");
@@ -1460,7 +1573,7 @@ public class PDFExporter {
 		    	Entry<String, Double> entry = iterator.next();
 		    	Bar bar = new Bar();
 		    	Square element = (Square)service.find(entry.getKey());
-		    	bar.setName(element.getName());
+		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(element.getColor());
 		    	bar.setCategory("Зрелость в поступках");
@@ -1469,14 +1582,7 @@ public class PDFExporter {
 		    if (square != null) {
 		    	section.add(new Paragraph(square.getDescription(), fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(square.getText()), font));
-				
-				List<TextGender> genders = square.getGenderTexts(event.isFemale(), child);
-				for (TextGender gender : genders) {
-					Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-					p.setSpacingBefore(10);
-					section.add(p);
-					section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-				};
+		    	printGender(section, square);
 		    }
 		    Paragraph p = new Paragraph("Диаграмма показывает, как в ваших мыслях и поступках выражены качества разных возрастных групп:", font);
 		    p.setSpacingBefore(10);
@@ -1577,19 +1683,12 @@ public class PDFExporter {
 		    	bars[++i] = bar;
 		    }
 		    if (cross != null) {
-		    	section.add(new Paragraph(cross.getDescription(), fonth5));
+		    	section.add(new Paragraph(cross.getName() + ": " + cross.getDescription(), fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(cross.getText()), font));
-				
-				List<TextGender> genders = cross.getGenderTexts(event.isFemale(), child);
-				for (TextGender gender : genders) {
-					Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-					p.setSpacingBefore(10);
-					section.add(p);
-					section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-				};
+		    	printGender(section, cross);
 		    }
-		    Paragraph p = new Paragraph("Диаграмма показывает, какой тип стратегии наиболее присущ вам в мыслях. " +
-				"И как ваша стратегия меняется при принятии решений в действии (на событийном уровне, в социуме):", font);
+		    Paragraph p = new Paragraph("Диаграмма показывает, какой тип стратегии присущ вашим мыслям. " +
+				"И как эта стратегия меняется при принятии решений в действии (на событийном уровне, в социуме):", font);
 		    p.setSpacingBefore(10);
 	    	section.add(p);
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Стратегия", "Аспекты", "Баллы", bars, 500, 0, true);
@@ -1647,7 +1746,7 @@ public class PDFExporter {
 	 * @param event событие
 	 * @param statistics объект статистики
 	 */
-	private void generateZones(PdfWriter writer, Chapter chapter, Event event, EventStatistics statistics) {
+	private void printZones(PdfWriter writer, Chapter chapter, Event event, EventStatistics statistics) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Развитие духа", baseFont);
 			
@@ -1689,23 +1788,34 @@ public class PDFExporter {
 		    if (zone != null) {
 		    	section.add(new Paragraph(zone.getDescription(), fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(zone.getText()), font));
-				
-				List<TextGender> genders = zone.getGenderTexts(event.isFemale(), child);
-				for (TextGender gender : genders) {
-					Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
-					p.setSpacingBefore(10);
-					section.add(p);
-					section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
-				};
+		    	printGender(section, zone);
 		    }
-		    Paragraph p = new Paragraph("Диаграмма показывает, какие приоритеты вы ставите в своём развитии. " +
-				"И как на событийном уровне (в действии) меняются ваши приоритеты:", font);
+		    Paragraph p = new Paragraph("Диаграмма показывает, какие приоритеты вы ставите для своего развития. " +
+				"И как на событийном уровне (в действии) они меняются:", font);
 		    p.setSpacingBefore(10);
 	    	section.add(p);
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Развитие духа", "Аспекты", "Баллы", bars, 500, 0, true);
 			section.add(image);
 		} catch(Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Генерация гендерного толкования
+	 * @param section подраздел
+	 * @param dict справочник
+	 */
+	private void printGender(Section section, ITextGender dict) {
+		if (dict != null) {
+			List<TextGender> genders = dict.getGenderTexts(female, child);
+			for (TextGender gender : genders) {
+				Paragraph p = new Paragraph(PDFUtil.getGenderHeader(gender.getType()), fonth5);
+				p.setSpacingBefore(10);
+				section.add(p);
+				section.add(new Paragraph(StringUtil.removeTags(gender.getText()), font));
+			};
+			section.add(Chunk.NEWLINE);
 		}
 	}
 }

@@ -593,7 +593,7 @@ public class HTMLExporter {
 					match = true;
 
 				if (match) {
-					PlanetAspectText dict = (PlanetAspectText)service.find(planet1, planet2, type);
+					PlanetAspectText dict = (PlanetAspectText)service.find(planet1, planet2, aspect.getAspect());
 					if (dict != null) {
 						Tag tag = util.getBoldTaggedString(
 							dict.getPlanet1().getShortName() + " " + 
