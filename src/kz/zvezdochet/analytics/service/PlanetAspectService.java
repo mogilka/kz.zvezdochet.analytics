@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kz.zvezdochet.analytics.bean.PlanetAspectText;
+import kz.zvezdochet.bean.Aspect;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
+import kz.zvezdochet.service.AspectService;
 import kz.zvezdochet.service.AspectTypeService;
 import kz.zvezdochet.service.PlanetService;
 
@@ -29,23 +31,29 @@ public class PlanetAspectService extends GenderTextModelService {
 	 * Поиск толкования аспекта
 	 * @param planet1 первая планета
 	 * @param planet2 вторая планета
-	 * @param aspectType тип аспекта
+	 * @param aspect аспект
 	 * @return аспект между планетами
 	 * @throws DataAccessException
 	 */
-	public Model find(Planet planet1, Planet planet2, AspectType aspectType) throws DataAccessException {
+	public Model find(Planet planet1, Planet planet2, Aspect aspect) throws DataAccessException {
         PlanetAspectText dict = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
 		try {
 			sql = "select * from " + tableName + 
-				" where typeid = " + aspectType.getId() +
-				" and ((planet1id = " + planet1.getId() +
-					" and planet2id = " + planet2.getId() + ") "
-				+ "or (planet1id = " + planet2.getId() +
-					" and planet2id = " + planet1.getId() + "))";
+				" where typeid = ?" +
+					" and ((planet1id = ? and planet2id = ?)" +
+						" or (planet1id = ? and planet2id = ?))" +
+					" and (aspectid is null" +
+						" or aspectid = ?)";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
+			ps.setLong(1, aspect.getTypeid());
+			ps.setLong(2, planet1.getId());
+			ps.setLong(3, planet2.getId());
+			ps.setLong(4, planet2.getId());
+			ps.setLong(5, planet1.getId());
+			ps.setLong(6, aspect.getId());
 			rs = ps.executeQuery();
 			if (rs.next())
 				dict = init(rs, null);
@@ -152,11 +160,57 @@ public class PlanetAspectService extends GenderTextModelService {
 		dict.setPlanet1((Planet)service.find(rs.getLong("Planet1ID")));
 		dict.setPlanet2((Planet)service.find(rs.getLong("Planet2ID")));
 		dict.setType((AspectType)new AspectTypeService().find(rs.getLong("TypeID")));
+		dict.setAspect((Aspect)new AspectService().find(rs.getLong("aspectID")));
 		return dict;
 	}
 
 	@Override
 	public Model create() {
 		return new PlanetAspectText();
+	}
+
+	/**
+	 * Поиск толкования аспекта
+	 * @param planet1 первая планета
+	 * @param planet2 вторая планета
+	 * @param aspect аспект
+	 * @return аспект между планетами
+	 * @throws DataAccessException
+	 */
+	public List<Model> finds(Planet planet1, Planet planet2, Aspect aspect) throws DataAccessException {
+        List<Model> list = new ArrayList<Model>();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+		String sql;
+		try {
+			sql = "select * from " + tableName + 
+				" where typeid = ?" +
+					" and ((planet1id = ? and planet2id = ?)" +
+						" or (planet1id = ? and planet2id = ?))" +
+					" and (aspectid is null" +
+						" or aspectid = ?)";
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
+			ps.setLong(1, aspect.getTypeid());
+			ps.setLong(2, planet1.getId());
+			ps.setLong(3, planet2.getId());
+			ps.setLong(4, planet2.getId());
+			ps.setLong(5, planet1.getId());
+			ps.setLong(6, aspect.getId());
+			rs = ps.executeQuery();
+			if (rs.next()) {
+		        PlanetAspectText dict = init(rs, null);
+		        list.add(dict);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try { 
+				if (rs != null) rs.close();
+				if (ps != null) ps.close();
+			} catch (SQLException e) { 
+				e.printStackTrace(); 
+			}
+		}
+		return list;
 	}
 }

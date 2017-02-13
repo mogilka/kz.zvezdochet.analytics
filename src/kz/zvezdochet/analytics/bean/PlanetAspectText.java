@@ -1,6 +1,7 @@
 package kz.zvezdochet.analytics.bean;
 
 import kz.zvezdochet.analytics.service.PlanetAspectService;
+import kz.zvezdochet.bean.Aspect;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.TextGenderModel;
@@ -18,16 +19,26 @@ public class PlanetAspectText extends TextGenderModel {
 	 * Первая планета
 	 */
     private Planet planet1;
-        
 	/**
 	 * Вторая планета
 	 */
     private Planet planet2;
-        
 	/**
-	 * Тип отношения
+	 * Тип аспекта
 	 */
     private AspectType type;
+	/**
+	 * Аспект
+	 */
+	private Aspect aspect;
+
+	public Aspect getAspect() {
+		return aspect;
+	}
+
+	public void setAspect(Aspect aspect) {
+		this.aspect = aspect;
+	}
 
 	public AspectType getType() {
 		return type;
