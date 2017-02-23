@@ -64,6 +64,7 @@ import kz.zvezdochet.analytics.service.PlanetAspectService;
 import kz.zvezdochet.analytics.service.PlanetHouseService;
 import kz.zvezdochet.analytics.service.PlanetSignService;
 import kz.zvezdochet.analytics.service.PlanetTextService;
+import kz.zvezdochet.analytics.service.RuleService;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Cross;
 import kz.zvezdochet.bean.Event;
@@ -695,13 +696,14 @@ public class PDFExporter {
 
 //				cell = new PdfPCell();
 //				if (house.isMain()) {
-//					scolor = house.getColor();
+
 //					cell.addElement(new Phrase(house.getDesignation(), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
 //				}
 //		        cell.setBorder(PdfPCell.NO_BORDER);
 //		        cell.setBackgroundColor(color);
 //				table.addCell(cell);
 
+				scolor = house.getColor();
 				cell = new PdfPCell();
 				cell.addElement(new Phrase(house.getShortName(), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
 		        cell.setBorder(PdfPCell.NO_BORDER);
@@ -869,15 +871,17 @@ public class PDFExporter {
 						}
 						PDFUtil.printGender(section, planetText, female, child);
 					}
-				}
-				if (planet.isDamaged()) {
+				} else if (planet.isDamaged()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "damaged");
 					if (planetText != null) {
 						section.add(new Paragraph(planet.getShortName() + "-дисгармония", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(planetText.getText()), font));
 						PDFUtil.printGender(section, planetText, female, child);
 					}
-				} else if (planet.isPerfect()) {
+				}
+				if (planet.isPerfect()) {
+					if (planet.inMine())
+						section.add(new Paragraph("Планета " + planet.getName() + " не вызывает напряжения, так что вы быстро проработаете недостатки, описанные в разделе «" + planet.getShortName() + " в шахте»", fonth5));
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "perfect");
 					if (planetText != null) {
 						section.add(new Paragraph(planet.getShortName() + "-гармония", fonth5));
@@ -1078,20 +1082,20 @@ public class PDFExporter {
 			List<Model> confs = new AspectConfigurationService().getList();
 			String[] codes = {
 				"stellium",		//0° 0° 0° 0°
-//				"semivehicle",	//60° 180° 120°
-				"cross",		//90° 90° 90° 90°
-//				"taucross",		//90° 180° 90°
+				"semivehicle",	//60° 180° 120°
+//				"cross",		//90° 90° 90° 90°
+				"taucross",		//90° 180° 90°
 				"dagger",		//135° 45° 45° 135°
 				"poleaxe",		//135° 90° 135°
-				"javelin",		//45° 90° 45°
+//				"javelin",		//45° 90° 45°
 				"davidstar",	//60° 60° 60° 60° 60° 60°
 				"trapezoid",	//60° 60° 60° 180°
 //				"sail",			//120° 60° 60° 120°
 				"triangle",		//120° 120° 120°
 				"bisextile",	//60° 120° 60°
 				"boomerang",	//150° 30° 30° 150°
-//				"pitchfork",	//150° 60° 150°
-//				"vehicle",		//60° 120° 60° 120°
+				"pitchfork",	//150° 60° 150°
+				"vehicle",		//60° 120° 60° 120°
 				"roof",			//30° 60° 30°
 				"railing",		//150° 30° 150° 30°
 				"cage",			//40° 40° 40° 40° 40° 40° 40° 40° 40°
@@ -1151,6 +1155,25 @@ public class PDFExporter {
 				    list.add(li);
 				    section.add(list);
 
+				} else if (code.equals("cross")) {
+					text = (PlanetText)service.findByPlanet(20L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(27L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(33L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					Cross cross = (Cross)new CrossService().find(1L);
+					if (cross != null) {
+						section.add(new Paragraph(cross.getName(), fonth5));
+						section.add(new Paragraph(StringUtil.removeTags(cross.getConfiguration()), font));
+					}
+
 				} else if (code.equals("taucross")) {
 					text = (PlanetText)service.findByPlanet(20L, "negative");
 					if (text != null)
@@ -1166,8 +1189,23 @@ public class PDFExporter {
 						section.add(new Paragraph(StringUtil.removeTags(cross.getTau()), font));
 					}
 
+				} else if (code.equals("javelin")) {
+					text = (PlanetText)service.findByPlanet(28L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					boolean many = false;
+					if (many) {
+						Rule rule = (Rule)new RuleService().find(11L);
+						section.add(PDFUtil.html2pdf(rule.getText()));
+					}
+
 				} else if (code.equals("sail")) {
-					text = (PlanetText)service.findByPlanet(21L, "positive");
+					text = (PlanetText)service.findByPlanet(26L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(30L, "positive");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
@@ -1277,6 +1315,10 @@ public class PDFExporter {
 							section.add(new Paragraph(planet.getShortName() + " " + sign + " " + house.getShortName(), fonth5));
 							section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
 							PDFUtil.printGender(section, dict, female, child);
+
+							Rule rule = EventRules.rulePlanetHouse(planet, house);
+							if (rule != null)
+								section.add(PDFUtil.html2pdf(rule.getText()));
 						}
 					}
 				}

@@ -54,4 +54,15 @@ public class EventRules {
 		}
 		return null;
 	}
+
+	public static Rule rulePlanetHouse(Planet planet, House house) throws DataAccessException {
+		RuleService service = new RuleService();
+		if (house.getCode().equals("I_3")) {
+			if (planet.getCode().equals("Sun")) {
+				if (planet.getSign().getCode().equals("Aquarius"))
+					return (Rule)service.find(26L);
+			}
+		}
+		return null;
+	}
 }
