@@ -15,9 +15,9 @@ import kz.zvezdochet.core.service.DataAccessException;
 public class EventRules {
 
 	/**
-	 * Вычисление выраженных знаков Зодиака
-	 * @param main признак того, что нужно учитывать только минорные планеты
-	 * @return карта приоритетных знаков
+	 * Планета-меч
+	 * @param planet планета
+	 * @return правило
 	 * @throws DataAccessException 
 	 */
 	public static Rule rulePlanetSword(Planet planet) throws DataAccessException {
@@ -30,6 +30,13 @@ public class EventRules {
 		return null;
 	}
 
+	/**
+	 * Дирекция планеты к дому
+	 * @param spa аспект
+	 * @param female true|false женский|мужской
+	 * @return правило
+	 * @throws DataAccessException
+	 */
 	public static Rule ruleHouseDirection(SkyPointAspect spa, boolean female) throws DataAccessException {
 		RuleService service = new RuleService();
 		Planet planet = (Planet)spa.getSkyPoint1();
@@ -42,6 +49,12 @@ public class EventRules {
 		return null;
 	}
 
+	/**
+	 * Аспект планет
+	 * @param spa аспект
+	 * @return правило
+	 * @throws DataAccessException
+	 */
 	public static Rule rulePlanetAspect(SkyPointAspect spa) throws DataAccessException {
 		RuleService service = new RuleService();
 		Planet planet = (Planet)spa.getSkyPoint1();
@@ -55,6 +68,13 @@ public class EventRules {
 		return null;
 	}
 
+	/**
+	 * Нахождение планеты в доме
+	 * @param planet планета
+	 * @param house дом
+	 * @return правило
+	 * @throws DataAccessException
+	 */
 	public static Rule rulePlanetHouse(Planet planet, House house) throws DataAccessException {
 		RuleService service = new RuleService();
 		if (house.getCode().equals("I_3")) {

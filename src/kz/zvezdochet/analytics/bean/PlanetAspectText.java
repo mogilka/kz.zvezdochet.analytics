@@ -68,4 +68,28 @@ public class PlanetAspectText extends TextGenderModel {
 	public ModelService getService() {
 		return new PlanetAspectService();
 	}
+
+	/**
+	 * Поиск знака силы аспекта
+	 * @param p1 первая планета
+	 * @param p2 вторая планета
+	 * @return знак силы
+	 */
+	public String getMark(Planet p1, Planet p2) {
+		String code = type.getCode();
+		if (p1.isStrong() && p2.isStrong())
+			return "\u2191";
+		else if (code.equals("NEGATIVE")) {
+			if (p1.isNegative() && p2.isNegative())
+				return "\u2191";
+			else if (p1.isPositive() && p2.isPositive())
+				return "\u2193";
+		} else {
+			if (p1.isPositive() && p2.isPositive())
+				return "\u2191";
+			else if (p1.isNegative() && p2.isNegative())
+				return "\u2193";
+		}
+		return "";
+	}
 }
