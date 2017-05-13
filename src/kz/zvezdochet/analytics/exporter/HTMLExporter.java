@@ -254,7 +254,7 @@ public class HTMLExporter {
 				//Создаем информационный блок, только если дом не пуст
 				Tag tr = null; Tag td = null;
 				if (planets.size() > 0) {
-					tr = util.getTaggedHeader(house.getHeaderName(), house.getLinkName());
+					tr = util.getTaggedHeader(house.getName(), house.getLinkName());
 					cell.add(tr);
 			
 					tr = new Tag("tr");
@@ -265,7 +265,7 @@ public class HTMLExporter {
 						if (dict != null) {
 							String sign = planet.isDamaged() || planet.isLilithed() ? "-" : "+";
 							td.add(util.getBoldTaggedString(
-								planet.getShortName() + " " + sign + " " + house.getShortName()));
+								planet.getShortName() + " " + sign + " " + house.getName()));
 							td.add(dict.getText());
 							
 							List<TextGender> genders = dict.getGenderTexts(event.isFemale(), child);
@@ -286,13 +286,13 @@ public class HTMLExporter {
 				HouseSignText dict = (HouseSignText)new HouseSignService().find(house, sign);
 				if (dict != null) {
 					if (null == td) {
-						tr = util.getTaggedHeader(house.getHeaderName(), house.getLinkName());
+						tr = util.getTaggedHeader(house.getName(), house.getLinkName());
 						cell.add(tr);
 						tr = new Tag("tr");
 						td = new Tag("td");
 					}
 					td.add(util.getBoldTaggedString(
-						house.getShortName() + " + " + sign.getDescription()));
+						house.getName() + " + " + sign.getDescription()));
 					td.add(dict.getText());
 					
 					List<TextGender> genders = dict.getGenderTexts(event.isFemale(), child);
@@ -1294,7 +1294,7 @@ public class HTMLExporter {
 				//Создаем информационный блок только если дом не пуст
 				if (planets.size() > 0 || house.isExportOnSign()) {
 					a = new Tag("a", "href=#" + house.getLinkName());
-					a.add(house.getHeaderName());
+					a.add(house.getName());
 					td.add(a);
 					td.add(new Tag("/br"));
 				}
@@ -1436,7 +1436,7 @@ public class HTMLExporter {
 		    	Entry<String, Double> entry = iterator.next();
 		    	Bar bar = new Bar();
 		    	House house = statistics.getHouse(entry.getKey());
-		    	bar.setName(house.getShortName());
+		    	bar.setName(house.getName());
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(house.getColor());
 		    	bars[++i] = bar;
@@ -1617,7 +1617,7 @@ public class HTMLExporter {
 				td2.add(img);
 				tr2.add(td2);
 				td2 = new Tag("td");
-				td2.add(house.getShortName());
+				td2.add(house.getName());
 				tr2.add(td2);
 				p.add(tr2);
 			}

@@ -59,10 +59,18 @@ public class EventRules {
 		RuleService service = new RuleService();
 		Planet planet = (Planet)spa.getSkyPoint1();
 		Planet planet2 = (Planet)spa.getSkyPoint2();
+		String code = spa.getAspect().getType().getCode();
+
 		if (planet.getCode().equals("Moon") && planet2.getCode().equals("Pluto")) {
-			if (spa.getAspect().getType().getCode().equals("NEGATIVE")) {
+			if (code.equals("NEGATIVE")) {
 				if (planet.isDamaged() || planet2.isDamaged())
 					return (Rule)service.find(10L);
+			}
+		}
+		if (planet.getCode().equals("Venus") && planet2.getCode().equals("Mars")) {
+			if (code.equals("NEUTRAL")) {
+				if (planet.isDamaged() || planet2.isDamaged())
+					return (Rule)service.find(37L);
 			}
 		}
 		return null;
