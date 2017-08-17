@@ -17,15 +17,21 @@ public class EventRules {
 	/**
 	 * Планета-меч
 	 * @param planet планета
+	 * @param female true|false женский|мужской
 	 * @return правило
 	 * @throws DataAccessException 
 	 */
-	public static Rule rulePlanetSword(Planet planet) throws DataAccessException {
+	public static Rule rulePlanetSword(Planet planet, boolean female) throws DataAccessException {
 		RuleService service = new RuleService();
 		if (planet.getCode().equals("Venus")) {
 			if (!planet.inMine() && !planet.isBroken() && !planet.isDamaged() && !planet.isRetrograde()
 					&& !planet.isBelt() && !planet.isSignExile() && !planet.isSignDeclined())
 				return (Rule)service.find(3L);
+		} else if (planet.getCode().equals("Mars")) {
+			if (planet.isNeutral()) {
+				long id = female ? 67L : 66L;
+				return (Rule)service.find(id);
+			}
 		}
 		return null;
 	}
@@ -41,11 +47,11 @@ public class EventRules {
 		RuleService service = new RuleService();
 		Planet planet = (Planet)spa.getSkyPoint1();
 		House house = (House)spa.getSkyPoint2();
-		if (planet.getCode().equals("Moon") && house.getCode().equals("VII")) {
-			if (spa.getAspect().getType().getCode().equals("NEGATIVE")) {
-				return female ? (Rule)service.find(8L) : (Rule)service.find(9L);
-			}
-		}
+//		if (planet.getCode().equals("Moon") && house.getCode().equals("VII")) {
+//			if (spa.getAspect().getType().getCode().equals("NEGATIVE")) {
+//				return female ? (Rule)service.find(8L) : (Rule)service.find(9L);
+//			}
+//		}
 		return null;
 	}
 

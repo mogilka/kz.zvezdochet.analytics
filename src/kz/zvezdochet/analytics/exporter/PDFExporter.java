@@ -246,6 +246,9 @@ public class PDFExporter {
 			//знаки
 			Map<String, Double> signMap = statistics.getPlanetSigns(true);
 			printSigns(writer, chapter, signMap);
+
+			//счастливые символы
+			printSign(chapter, event);
 			doc.add(chapter);
 
 
@@ -281,18 +284,21 @@ public class PDFExporter {
 			chapter.add(Chunk.NEXTPAGE);
 
 			//аспекты
-			if (term) {
-				chapter.add(new Paragraph("Сокращения:", font));
-				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-				ListItem li = new ListItem();
-		        li.add(new Chunk("\u2191 — усиленный аспект, проявляющийся ярче других аспектов указанных планет (хорошо для позитивных сочетаний, плохо для негативных)", font));
-		        list.add(li);
+			p = new Paragraph();
+			PDFUtil.printHeader(p, "Аспекты планет");
+			chapter.add(p);
 
-				li = new ListItem();
-		        li.add(new Chunk("\u2193 — ослабленный аспект, проявляющийся менее ярко по сравнению с другими аспектами указанных планет (плохо для позитивных сочетаний, хорошо для негативных)", font));
-		        list.add(li);
-		        chapter.add(list);
-			}
+			chapter.add(new Paragraph("Сокращения:", font));
+			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+			ListItem li = new ListItem();
+	        li.add(new Chunk("\u2191 — сильное сочетание (хорошо для позитивных аспектов, плохо для негативных)", font));
+	        list.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("\u2193 — слабое сочетание, (плохо для позитивных аспектов, хорошо для негативных)", font));
+	        list.add(li);
+	        chapter.add(list);
+
 			printAspects(chapter, event, "Позитивные сочетания", "POSITIVE");
 			printAspects(chapter, event, "Негативные сочетания", "NEGATIVE");
 			chapter.add(Chunk.NEXTPAGE);
@@ -358,7 +364,17 @@ public class PDFExporter {
 			
 			//зоны
 			printZones(writer, chapter, event, statistics);
+			doc.add(chapter);
 
+
+			chapter = new ChapterAutoNumber("Сокращения");
+			chapter.setNumberDepth(0);
+
+			p = new Paragraph();
+			PDFUtil.printHeader(p, "Сокращения");
+			chapter.add(p);
+
+			printAbbreviation(chapter);
 			doc.add(chapter);
 
 			doc.add(Chunk.NEWLINE);
@@ -549,8 +565,7 @@ public class PDFExporter {
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(sign.getColor());
 		    	bar.setCategory("Кредо");
-		    	bars2[i] = bar;
-		    	
+		    	bars2[i] = bar;		    	
 		    }
 		    com.itextpdf.text.Image image = PDFUtil.printPie(writer, "Выраженные знаки Зодиака", bars, 400, 0, false);
 			section.add(image);
@@ -628,6 +643,9 @@ public class PDFExporter {
 			section.add(list);
 
 			section.add(new Paragraph("Подробности в разделе «Координаты планет»", font));
+
+			Font fontgray = new Font(baseFont, 12, Font.NORMAL, PDFUtil.FONTCOLORGRAY);
+			section.add(new Paragraph("Сокращения и символы, использованные в тексте, описаны в конце документа", fontgray));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -640,42 +658,6 @@ public class PDFExporter {
 	 */
 	private void printPlanetSign(Chapter chapter, Event event) {
 		try {
-			if (term) {
-				chapter.add(new Paragraph("Сокращения:", font));
-				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-				ListItem li = new ListItem();
-		        li.add(new Chunk("\u2191 — сильная планета, адекватно проявляющая себя в знаке Зодиака", font));
-		        list.add(li);
-
-				li = new ListItem();
-		        li.add(new Chunk("\u2193 — ослабленная планета, чьё проявление связано с неуверенностью, стрессом и препятствиями", font));
-		        list.add(li);
-
-				li = new ListItem();
-		        li.add(new Chunk("R — ретроградная планета, проявление качеств которой неочевидно и неуверенно", font));
-		        list.add(li);
-
-				li = new ListItem();
-		        li.add(new Chunk("влд — владыка гороскопа, сильная планета, способная повысить значимость своих качеств и уравновесить слабые", font));
-		        list.add(li);
-
-				li = new ListItem();
-		        li.add(new Chunk("обт — указанный знак Зодиака является обителью планеты и позволяет ей естественно и свободно проявлять себя", font));
-		        list.add(li);
-
-				li = new ListItem();
-		        li.add(new Chunk("экз — указанный знак Зодиака является местом экзальтации планеты и позволяет ей максимально проявить себя", font));
-		        list.add(li);
-
-				li = new ListItem();
-		        li.add(new Chunk("пдн — указанный знак Зодиака является местом падения планеты, где она чувствует себя «не в своей тарелке»", font));
-		        list.add(li);
-
-				li = new ListItem();
-		        li.add(new Chunk("изг — указанный знак Зодиака является местом изгнания планеты и мешает проявлению её качеств", font));
-		        list.add(li);
-		        chapter.add(list);
-			}
 			if (event.getConfiguration().getPlanets() != null) {
 				PlanetSignService service = new PlanetSignService();
 				for (Model model : event.getConfiguration().getPlanets()) {
@@ -718,9 +700,6 @@ public class PDFExporter {
 			Font font = new Font(baseFont, fontsize, Font.NORMAL, BaseColor.BLACK);
 			section.add(new Paragraph("Планеты в знаках Зодиака и астрологических домах:", this.font));
 
-			boolean strong = false, belt = false, kernel = false, perfect = false, damaged = false, lilithed = false,
-				weak = false, retro = false, home = false, exalt = false, decline = false, exile = false;
-
 	        PdfPTable table = new PdfPTable(5);
 	        table.setSpacingBefore(10);
 
@@ -736,7 +715,7 @@ public class PDFExporter {
 	        cell.setBorder(PdfPCell.NO_BORDER);
 			table.addCell(cell);
 
-			cell = new PdfPCell(new Phrase("Гладус дома", font));
+			cell = new PdfPCell(new Phrase("Градус дома", font));
 	        cell.setBorder(PdfPCell.NO_BORDER);
 			table.addCell(cell);
 
@@ -757,39 +736,29 @@ public class PDFExporter {
 				Color scolor = planet.getColor();
 				cell = new PdfPCell();
 		        String descr = "";
-		        if (term) {
-					if (planet.isStrong()) {
-						descr += "влд ";
-						strong = true;
-					}
-					if (planet.isBelt()) {
-						descr += "пояс ";
-						belt = true;
-					} else if (planet.isKernel()) {
-						descr += "ядро ";
-						kernel = true;
-					}
-					if (planet.isPerfect()) {
-						descr += "грм ";
-						perfect = true;
-					} else if (planet.isDamaged()) {
-						descr += "прж ";
-						damaged = true;
-					}
-					if (planet.isLilithed()) {
-						descr += "сбз ";
-						lilithed = true;
-					}
-					if (planet.isBroken() || planet.inMine()) {
-						descr += "слб ";
-						weak = true;
-					}
-					if (planet.isRetrograde()) {
-						descr += "R";
-						retro = true;
-					}
-		        }
-				cell.addElement(new Phrase(planet.getName() + (term && descr.length() > 0 ? " (" + descr + ")" : ""), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+				if (planet.isLord())
+					descr += "влд ";
+
+				if (planet.isBelt())
+					descr += "пояс ";
+				else if (planet.isKernel())
+					descr += "ядро ";
+
+				if (planet.isPerfect())
+					descr += "грм ";
+				else if (planet.isDamaged())
+					descr += "прж ";
+
+				if (planet.isLilithed())
+					descr += "сбз ";
+
+				if (planet.isBroken() || planet.inMine())
+					descr += "слб ";
+
+				if (planet.isRetrograde())
+					descr += "R";
+
+				cell.addElement(new Phrase(planet.getName() + (descr.length() > 0 ? " (" + descr + ")" : ""), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
 		        cell.setBorder(PdfPCell.NO_BORDER);
 		        cell.setBackgroundColor(color);
 		        table.addCell(cell);
@@ -798,22 +767,16 @@ public class PDFExporter {
 				scolor = sign.getElement().getDimColor();
 		        cell = new PdfPCell();
 		        descr = "";
-		        if (term) {
-					if (planet.isSignHome()) {
-						descr = "(обт)";
-						home = true;
-					} else if (planet.isSignExaltated()) {
-						descr = "(экз)";
-						exalt = true;
-					} else if (planet.isSignDeclined()) {
-						descr = "(пдн)";
-						decline = true;
-					} else if (planet.isSignExile()) {
-						descr = "(изг)";
-						exile = true;
-					}
-		        }
-				cell.addElement(new Phrase(sign.getName() + (term ? " " + descr : ""), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+				if (planet.isSignHome())
+					descr = "(обт)";
+				else if (planet.isSignExaltated())
+					descr = "(экз)";
+				else if (planet.isSignDeclined())
+					descr = "(пдн)";
+				else if (planet.isSignExile())
+					descr = "(изг)";
+
+				cell.addElement(new Phrase(sign.getName() + " " + descr, new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
 		        cell.setBorder(PdfPCell.NO_BORDER);
 		        cell.setBackgroundColor(color);
 				table.addCell(cell);
@@ -827,93 +790,21 @@ public class PDFExporter {
 				scolor = house.getElement().getDimColor();
 				cell = new PdfPCell();
 		        descr = "";
-		        if (term) {
-					if (planet.isHouseHome()) {
-						descr = "(обт)";
-						home = true;
-					} else if (planet.isHouseExaltated()) {
-						descr = "(экз)";
-						exalt = true;
-					} else if (planet.isHouseDeclined()) {
-						descr = "(пдн)";
-						decline = true;
-					} else if (planet.isHouseExile()) {
-						descr = "(изг)";
-						exile = true;
-					}
-		        }
-				cell.addElement(new Phrase((term ? house.getName() : house.getName()) + (term ? " " + descr : ""), new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
+				if (planet.isHouseHome())
+					descr = "(обт)";
+				else if (planet.isHouseExaltated())
+					descr = "(экз)";
+				else if (planet.isHouseDeclined())
+					descr = "(пдн)";
+				else if (planet.isHouseExile())
+					descr = "(изг)";
+
+				cell.addElement(new Phrase(house.getName() + " " + descr, new Font(baseFont, fontsize, Font.NORMAL, new BaseColor(scolor.getRed(), scolor.getGreen(), scolor.getBlue()))));
 		        cell.setBorder(PdfPCell.NO_BORDER);
 		        cell.setBackgroundColor(color);
 				table.addCell(cell);
 			}
 			section.add(table);
-
-			if (term) {
-				section.add(new Paragraph("Сокращения:", this.font));
-				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-				ListItem li = new ListItem();
-				if (strong) {
-			        li.add(new Chunk("влд — владыка гороскопа (самая сильная планета)", font));
-			        list.add(li);
-				}
-				if (belt) {
-					li = new ListItem();
-			        li.add(new Chunk("пояс — ущербная планета, чьи качества слабо развиты", font));
-			        list.add(li);
-				}
-				if (kernel) {
-					li = new ListItem();
-			        li.add(new Chunk("ядро — планета-источник неистощимой энергии", font));
-			        list.add(li);
-				}
-				if (perfect) {
-					li = new ListItem();
-			        li.add(new Chunk("грм — гармоничная планета, способная преодолеть негатив", font));
-			        list.add(li);
-				}
-				if (damaged) {
-					li = new ListItem();
-			        li.add(new Chunk("прж — поражённая планета, несущая стресс и препятствия", font));
-			        list.add(li);
-				}
-				if (lilithed) {
-					li = new ListItem();
-			        li.add(new Chunk("сбз — планета-источник порока и соблазна", font));
-			        list.add(li);
-				}
-				if (weak) {
-					li = new ListItem();
-			        li.add(new Chunk("слб — слабая планета, проявление качеств которой заторможено и затруднено", font));
-			        list.add(li);
-				}
-				if (retro) {
-					li = new ListItem();
-			        li.add(new Chunk("R — ретроградная планета, проявление качеств которой неочевидно и неуверенно", font));
-			        list.add(li);
-				}
-				if (home) {
-					li = new ListItem();
-			        li.add(new Chunk("обт — обитель планеты, позволяющая ей естественно и свободно проявлять свои качества", font));
-			        list.add(li);
-				}
-				if (exalt) {
-					li = new ListItem();
-			        li.add(new Chunk("экз — экзальтация планеты, позволяющая ей максимально проявить себя", font));
-			        list.add(li);
-				}
-				if (decline) {
-					li = new ListItem();
-			        li.add(new Chunk("пдн — падение планеты (место, где она чувствует себя «не в своей тарелке»)", font));
-			        list.add(li);
-				}
-				if (exile) {
-					li = new ListItem();
-			        li.add(new Chunk("изг — изгнание планеты (место, мешающее проявлению её качеств)", font));
-			        list.add(li);
-				}
-		        section.add(list);
-			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -928,11 +819,11 @@ public class PDFExporter {
 	private void printCardKind(Chapter chapter, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Кармический потенциал");
-			section.add(new Paragraph("Вид космограммы — это вид сверху на рисунок карты рождения. "
-				+ "Здесь важна общая картина, которая не в деталях, а глобально описывает ваше предназначение и кармический опыт прошлого. "
-				+ "Определите, на каком уровне вы находитесь. Отследите по трём уровням своё развитие.", font));
+			section.add(new Paragraph("Рисунок космограммы показывает общую картину, "
+				+ "которая не в деталях, а глобально описывает ваше предназначение и кармический опыт прошлого. "
+				+ "Определите, на каком уровне вы находитесь. Отследите по трём уровням своё развитие", font));
 
-			long id = 1L;
+			long id = 7L;
 			CardKind kind = (CardKind)new CardKindService().find(id);
 			section.add(new Paragraph(kind.getName(), fonth5));
 			if (term)
@@ -943,11 +834,11 @@ public class PDFExporter {
 
 			if (1 == id) {
 				PlanetTextService service = new PlanetTextService();
-				PlanetText planetText = (PlanetText)service.findByPlanet(22L, "positive");
+				PlanetText planetText = (PlanetText)service.findByPlanet(30L, "positive");
 				if (planetText != null)
 					section.add(PDFUtil.html2pdf(planetText.getText()));
 
-				planetText = (PlanetText)service.findByPlanet(32L, "positive");
+				planetText = (PlanetText)service.findByPlanet(26L, "positive");
 				if (planetText != null)
 					section.add(PDFUtil.html2pdf(planetText.getText()));
 			}
@@ -1016,7 +907,8 @@ public class PDFExporter {
 						int max = 0;
 						for (Iterator<Integer> iterator = signMap.values().iterator(); iterator.hasNext();) {
 							int value = iterator.next();
-							if (max < value) max = value;
+							if (max < value)
+								max = value;
 						}
 						type = (max > 2) ? "planetary" : "scattered";
 					}
@@ -1027,9 +919,10 @@ public class PDFExporter {
 				    if (model != null) {
 				    	TextGenderDictionary cardType = (TextGenderDictionary)model;
 						Section section = PDFUtil.printSection(chapter, "Самораскрытие");
-						section.add(new Paragraph(cardType.getName(), fonth5));
-						if (term)
+						if (term) {
+							section.add(new Paragraph(cardType.getName(), fonth5));
 							section.add(new Paragraph(cardType.getDescription(), new Font(baseFont, 12, Font.ITALIC, PDFUtil.FONTCOLORGRAY)));
+						}
 						section.add(new Paragraph(StringUtil.removeTags(cardType.getText()), font));
 				    }
 				}
@@ -1043,6 +936,7 @@ public class PDFExporter {
 	 * Генерация планет
 	 * @param chapter раздел
 	 * @param event событие
+	 * TODO разделить сильные и слабые
 	 */
 	private void printPlanets(Chapter chapter, Event event) {
 		try {
@@ -1059,7 +953,7 @@ public class PDFExporter {
 						section.add(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-меч", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(planetText.getText()), font));
 
-						Rule rule = EventRules.rulePlanetSword(planet);
+						Rule rule = EventRules.rulePlanetSword(planet, female);
 						if (rule != null)
 							section.add(PDFUtil.html2pdf(rule.getText()));
 
@@ -1271,29 +1165,27 @@ public class PDFExporter {
 					for (Model model : dicts) {
 						PlanetAspectText dict = (PlanetAspectText)model;
 						if (dict != null) {
-			    			if (term) {
-			    				List<Model> planets = conf.getPlanets();
-			    				int pindex = planets.indexOf(planet1);
-			    				Planet aspl1 = (Planet)planets.get(pindex);
-			    				pindex = planets.indexOf(planet2);
-			    				Planet aspl2 = (Planet)planets.get(pindex);
+		    				List<Model> planets = conf.getPlanets();
+		    				int pindex = planets.indexOf(planet1);
+		    				Planet aspl1 = (Planet)planets.get(pindex);
+		    				pindex = planets.indexOf(planet2);
+		    				Planet aspl2 = (Planet)planets.get(pindex);
 
-			    				section.add(new Chunk(dict.getMark(aspl1, aspl2), fonth5));
-			    				section.add(new Chunk(planet1.getSymbol(), PDFUtil.getHeaderAstroFont()));
-			    				section.add(new Chunk(" " + planet1.getName() + " ", fonth5));
+		    				section.add(new Chunk(dict.getMark(aspl1, aspl2), fonth5));
+							section.add(new Chunk(dict.getPlanet1().getShortName() + " " + 
+								type.getSymbol() + " " + 
+								dict.getPlanet2().getShortName(), fonth5));
 
+							if (term) {
+								section.add(new Chunk(" " + planet1.getSymbol(), PDFUtil.getHeaderAstroFont()));
+	
 			    				if (aspect.getAspect().getCode().equals("CONJUNCTION") || aspect.getAspect().getCode().equals("OPPOSITION"))
 			    					section.add(new Chunk(aspect.getAspect().getSymbol(), PDFUtil.getHeaderAstroFont()));
 			    				else
 			    					section.add(new Chunk(type.getSymbol(), fonth5));
-
-			    				section.add(new Chunk(" " + planet2.getName() + " ", fonth5));
+	
 			    				section.add(new Chunk(planet2.getSymbol(), PDFUtil.getHeaderAstroFont()));
-			    				section.add(Chunk.NEWLINE);
-			    			} else
-								section.add(new Paragraph(dict.getPlanet1().getShortName() + " " + 
-									type.getSymbol() + " " + 
-									dict.getPlanet2().getShortName(), fonth5));
+							}
 							section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
 
 							Rule rule = EventRules.rulePlanetAspect(aspect);
@@ -1319,6 +1211,11 @@ public class PDFExporter {
 	private void printConfigurations(Chapter chapter, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Комплексный анализ личности");
+		    Paragraph p = new Paragraph("Рисунок вашего гороскопа состоит из геометрических фигур, "
+		    	+ "которые отражают взаимосвязи планет между собой. У всех людей они разные. "
+		    	+ "Каждая фигура обобщает ваши сильные и слабые стороны, показывает главные источники роста и напряжения.", font);
+		    p.setSpacingAfter(10);
+		    section.add(p);
 
 			List<Model> confs = new AspectConfigurationService().getList();
 			String[] codes = {
@@ -1333,9 +1230,9 @@ public class PDFExporter {
 				"trapezoid",	//60° 60° 60° 180°
 				"sail",			//120° 60° 60° 120°
 				"triangle",		//120° 120° 120°
-//				"bisextile",	//60° 120° 60°
-				"boomerang",	//150° 30° 30° 150°
-				"pitchfork",	//150° 60° 150°
+				"bisextile",	//60° 120° 60°
+//				"boomerang",	//150° 30° 30° 150°
+//				"pitchfork",	//150° 60° 150°
 				"vehicle",		//60° 120° 60° 120°
 				"roof",			//30° 60° 30°
 				"railing",		//150° 30° 150° 30°
@@ -1377,99 +1274,92 @@ public class PDFExporter {
 					com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 					ListItem li = new ListItem();
 
+					//планеты
+				    text = (PlanetText)service.findByPlanet(19L, "stage");
+					if (text != null) {
+					    li = new ListItem();
+						li.add(new Chunk("5 лет - " + text.getText(), font));
+						list.add(li);
+					}
 					//дома
-					housetext = (House)houseService.find(169L);
-					if (housetext != null && housetext.getStage() != null) {
-						li.add(new Chunk("10 лет - " + housetext.getStage(), font));
-						list.add(li);
-					}
-
-					housetext = (House)houseService.find(168L);
+					housetext = (House)houseService.find(143L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk("17 лет - " + housetext.getStage(), font));
+						li.add(new Chunk("12 лет - " + housetext.getStage(), font));
 						list.add(li);
 					}
-
-					housetext = (House)houseService.find(167L);
+					housetext = (House)houseService.find(172L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk("24 года - " + housetext.getStage(), font));
+						li.add(new Chunk("15 лет - " + housetext.getStage(), font));
 						list.add(li);
 					}
-
-					housetext = (House)houseService.find(166L);
+				    text = (PlanetText)service.findByPlanet(29L, "stage");
+					if (text != null) {
+					    li = new ListItem();
+						li.add(new Chunk("16 лет - " + text.getText(), font));
+						list.add(li);
+					}
+					housetext = (House)houseService.find(144L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk("31 год - " + housetext.getStage(), font));
+						li.add(new Chunk("21 год - " + housetext.getStage(), font));
 						list.add(li);
 					}
-
-					housetext = (House)houseService.find(165L);
+				    text = (PlanetText)service.findByPlanet(23L, "stage");
+					if (text != null) {
+					    li = new ListItem();
+						li.add(new Chunk("22 года - " + text.getText(), font));
+						list.add(li);
+					}
+				    text = (PlanetText)service.findByPlanet(34L, "stage");
+					if (text != null) {
+					    li = new ListItem();
+						li.add(new Chunk("26 лет - " + text.getText(), font));
+						list.add(li);
+					}
+					housetext = (House)houseService.find(171L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk("37 лет - " + housetext.getStage(), font));
+						li.add(new Chunk("26 лет - " + housetext.getStage(), font));
 						list.add(li);
 					}
-
-					housetext = (House)houseService.find(164L);
+				    text = (PlanetText)service.findByPlanet(33L, "stage");
+					if (text != null) {
+					    li = new ListItem();
+						li.add(new Chunk("28 лет - " + text.getText(), font));
+						list.add(li);
+					}
+					housetext = (House)houseService.find(142L);
+					if (housetext != null && housetext.getStage() != null) {
+					    li = new ListItem();
+						li.add(new Chunk("30 лет - " + housetext.getStage(), font));
+						list.add(li);
+					}
+					housetext = (House)houseService.find(177L);
+					if (housetext != null && housetext.getStage() != null) {
+					    li = new ListItem();
+						li.add(new Chunk("36 лет - " + housetext.getStage(), font));
+						list.add(li);
+					}
+				    text = (PlanetText)service.findByPlanet(24L, "stage");
+					if (text != null) {
+					    li = new ListItem();
+						li.add(new Chunk("38 лет - " + text.getText(), font));
+						list.add(li);
+					}
+					housetext = (House)houseService.find(170L);
+					if (housetext != null && housetext.getStage() != null) {
+					    li = new ListItem();
+						li.add(new Chunk("38 лет - " + housetext.getStage(), font));
+						list.add(li);
+					}
+					housetext = (House)houseService.find(176L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
 						li.add(new Chunk("42 года - " + housetext.getStage(), font));
 						list.add(li);
 					}
-
-					housetext = (House)houseService.find(163L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk("47 лет - " + housetext.getStage(), font));
-						list.add(li);
-					}
-
-					housetext = (House)houseService.find(162L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk("52 года - " + housetext.getStage(), font));
-						list.add(li);
-					}
-
-					housetext = (House)houseService.find(161L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk("57 лет - " + housetext.getStage(), font));
-						list.add(li);
-					}
-
-					housetext = (House)houseService.find(160L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk("62 года - " + housetext.getStage(), font));
-						list.add(li);
-					}
-
-					housetext = (House)houseService.find(159L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk("77 лет - " + housetext.getStage(), font));
-						list.add(li);
-					}
-
-					//--------------------------------------------------------------------------------------------------
-
-					//планеты
-//				    text = (PlanetText)service.findByPlanet(29L, "stage");
-//					if (text != null) {
-//					    li = new ListItem();
-//						li.add(new Chunk("17 лет - " + text.getText(), font));
-//						list.add(li);
-//					}
-//
-//					text = (PlanetText)service.findByPlanet(27L, "stage");
-//					if (text != null) {
-//					    li = new ListItem();
-//						li.add(new Chunk("25 лет - " + text.getText(), font));
-//						list.add(li);
-//					}
 				    section.add(list);
 
 				} else if (code.equals("cross")) {
@@ -1496,24 +1386,33 @@ public class PDFExporter {
 					}
 
 				} else if (code.equals("taucross")) {
-					text = (PlanetText)service.findByPlanet(29L, "negative");
+					text = (PlanetText)service.findByPlanet(32L, "negative");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
-					Cross cross = (Cross)new CrossService().find(1L);
+					Cross cross = (Cross)new CrossService().find(3L);
 					if (cross != null) {
-						section.add(new Paragraph(cross.getName(), fonth5));
+						String str = "Ваша реакция на вышеперечисленные ситуации";
+						if (term)
+							str += " (" + cross.getName() + ")";
+						section.add(new Paragraph(str + ":", fonth5));
 						section.add(new Paragraph(StringUtil.removeTags(cross.getTau()), font));
 					}
 					section.add(Chunk.NEWLINE);
 
-//					text = (PlanetText)service.findByPlanet(28L, "negative");
-//					if (text != null)
-//						section.add(PDFUtil.html2pdf(text.getText()));
-//					cross = (Cross)new CrossService().find(2L);
-//					if (cross != null) {
-//						section.add(new Paragraph(cross.getName(), fonth5));
-//						section.add(new Paragraph(StringUtil.removeTags(cross.getTau()), font));
-//					}
+					text = (PlanetText)service.findByPlanet(19L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+					text = (PlanetText)service.findByPlanet(26L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+					cross = (Cross)new CrossService().find(2L);
+					if (cross != null) {
+						String str = "Ваша реакция на вышеперечисленные ситуации";
+						if (term)
+							str += " (" + cross.getName() + ")";
+						section.add(new Paragraph(str + ":", fonth5));
+						section.add(new Paragraph(StringUtil.removeTags(cross.getTau()), font));
+					}
 
 				} else if (code.equals("javelin")) {
 					text = (PlanetText)service.findByPlanet(24L, "negative");
@@ -1527,11 +1426,7 @@ public class PDFExporter {
 //					}
 
 				} else if (code.equals("sail")) {
-					text = (PlanetText)service.findByPlanet(26L, "positive");
-					if (text != null)
-						section.add(PDFUtil.html2pdf(text.getText()));
-
-					text = (PlanetText)service.findByPlanet(30L, "positive");
+					text = (PlanetText)service.findByPlanet(22L, "positive");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
@@ -1547,7 +1442,15 @@ public class PDFExporter {
 						section.add(PDFUtil.html2pdf(rule.getText()));
 
 				} else if (code.equals("pitchfork")) {
-					text = (PlanetText)service.findByPlanet(28L, "positive");
+					text = (PlanetText)service.findByPlanet(33L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(34L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(21L, "positive");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
@@ -1578,6 +1481,19 @@ public class PDFExporter {
 					text = (PlanetText)service.findByPlanet(22L, "positive");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
+
+				} else if (code.equals("boomerang")) {
+					//цель
+					text = (PlanetText)service.findByPlanet(21L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					//источник
+					text = (PlanetText)service.findByPlanet(22L, "negative");
+					if (text != null) {
+						section.add(new Paragraph("Бумеранг прилетит отсюда:", fonth5));
+						section.add(PDFUtil.html2pdf(text.getText()));
+					}
 				}
 				section.add(Chunk.NEWLINE);
 			}
@@ -1633,42 +1549,10 @@ public class PDFExporter {
 	 * @param houseMap карта домов
 	 */
 	private void printPlanetHouses(Chapter chapter, Event event, Map<String, Double> houseMap) {
-		if (term) {
-			chapter.add(new Paragraph("Сокращения:", font));
-			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-			ListItem li = new ListItem();
-	        li.add(new Chunk("\u2191 — сильная планета, адекватно проявляющая себя в астрологическом доме", font));
-	        list.add(li);
-
-			li = new ListItem();
-	        li.add(new Chunk("\u2193 — ослабленная планета, источник неуверенности, стресса и препятствий", font));
-	        list.add(li);
-
-			li = new ListItem();
-	        li.add(new Chunk("R — ретроградная планета, проявляющая себя в астрологическом доме неуверенно и менее очевидно", font));
-	        list.add(li);
-
-			li = new ListItem();
-	        li.add(new Chunk("влд — владыка гороскопа, сильная планета, повышающая значимость астрологического дома", font));
-	        list.add(li);
-
-			li = new ListItem();
-	        li.add(new Chunk("обт — указанный астрологический дом является обителью планеты и облегчает ей естественное и свободное проявление", font));
-	        list.add(li);
-
-			li = new ListItem();
-	        li.add(new Chunk("экз — указанный астрологический дом является местом экзальтации планеты, усиливая её проявления и уравновешивая слабые качества", font));
-	        list.add(li);
-
-			li = new ListItem();
-	        li.add(new Chunk("пдн — указанный астрологический дом является местом падения планеты, где она чувствует себя «не в своей тарелке»", font));
-	        list.add(li);
-
-			li = new ListItem();
-	        li.add(new Chunk("изг — указанный астрологический дом является местом изгнания планеты, ослабляя её проявления и усиливает негатив", font));
-	        list.add(li);
-	        chapter.add(list);
-		}
+	    Paragraph p = new Paragraph("Этот раздел в меньшей степени рассказывает о вашем характере и в большей степени говорит о том, "
+	    	+ "что произойдёт в реальности, и как вы к этому отнесётесь. Здесь описаны важные для вас сферы жизни", font);
+	    p.setSpacingAfter(10);
+    	chapter.add(p);
 
 		List<Model> houses = event.getConfiguration().getHouses();
 		List<Model> cplanets = event.getConfiguration().getPlanets();
@@ -1701,13 +1585,17 @@ public class PDFExporter {
 					PlanetHouseService service = new PlanetHouseService();
 					for (Planet planet : planets) {
 						String sign = planet.isDamaged() || planet.isLilithed() ? "-" : "+";
+
+						String mark = planet.getMark("house");
+						if (mark.length() > 0) {
+		    				section.add(new Chunk(mark, fonth5));
+		    				section.add(new Chunk(planet.getSymbol() + " ", PDFUtil.getHeaderAstroFont()));
+						}
 		    			if (term) {
-		    				section.add(new Chunk(planet.getMark("house"), fonth5));
-		    				section.add(new Chunk(planet.getSymbol(), PDFUtil.getHeaderAstroFont()));
 		    				section.add(new Chunk(" " + planet.getName() + " в " + house.getDesignation() + " доме", fonth5));
 		    				section.add(Chunk.NEWLINE);
 		    			} else
-		    				section.add(new Paragraph(planet.getShortName() + " " + sign + " " + house.getName(), fonth5));
+		    				section.add(new Chunk(planet.getShortName() + " " + sign + " " + house.getName(), fonth5));
 
 						PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, null);
 						if (dict != null) {
@@ -1794,7 +1682,10 @@ public class PDFExporter {
 		    	}
 		    }
 		    if (element != null) {
-		    	section.add(new Paragraph(element.getName() + " (" + element.getTemperament() + ")", fonth5));
+		    	String text = element.getTemperament();
+		    	if (term)
+		    		text += " (" + element.getName() + ")";
+		    	section.add(new Paragraph(text, fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(element.getText()), font));
 		    	PDFUtil.printGender(section, element, female, child);
 		    }
@@ -1867,7 +1758,8 @@ public class PDFExporter {
 		    	}
 		    }
 		    if (yinyang != null) {
-		    	section.add(new Paragraph(yinyang.getDescription(), fonth5));
+		    	if (term)
+		    		section.add(new Paragraph(yinyang.getDescription(), fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(yinyang.getText()), font));
 		    	PDFUtil.printGender(section, yinyang, female, child);
 		    }
@@ -1913,7 +1805,7 @@ public class PDFExporter {
 	 */
 	private void printHalfSpheres(PdfWriter writer, Chapter chapter, Event event, EventStatistics statistics) {
 		try {
-			Section section = PDFUtil.printSection(chapter, "Экстраверт и интроверт");
+			Section section = PDFUtil.printSection(chapter, "Тип личности");
 			
 			Map<String, Double> planetMap = statistics.getPlanetHalfspheres();
 			Map<String, Double> houseMap = statistics.getHouseHalfspheres();
@@ -1941,7 +1833,8 @@ public class PDFExporter {
 		    }
 		    if (sphere != null) {
 		    	section.add(new Paragraph(sphere.getName(), fonth5));
-		    	section.add(new Paragraph(sphere.getDescription(), new Font(baseFont, 12, Font.ITALIC, PDFUtil.FONTCOLORGRAY)));
+		    	if (term)
+		    		section.add(new Paragraph(sphere.getDescription(), new Font(baseFont, 12, Font.ITALIC, PDFUtil.FONTCOLORGRAY)));
 		    	section.add(new Paragraph(StringUtil.removeTags(sphere.getText()), font));
 		    	PDFUtil.printGender(section, sphere, female, child);
 		    }
@@ -2024,7 +1917,8 @@ public class PDFExporter {
 		    	bars[++i] = bar;
 		    }
 		    if (square != null) {
-		    	section.add(new Paragraph(square.getDescription(), fonth5));
+		    	if (term)
+		    		section.add(new Paragraph(square.getDescription(), fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(square.getText()), font));
 		    	PDFUtil.printGender(section, square, female, child);
 		    }
@@ -2127,7 +2021,8 @@ public class PDFExporter {
 		    	bars[++i] = bar;
 		    }
 		    if (cross != null) {
-		    	section.add(new Paragraph(cross.getName() + ": " + cross.getDescription(), fonth5));
+		    	if (term)
+		    		section.add(new Paragraph(cross.getName() + ": " + cross.getDescription(), fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(cross.getText()), font));
 		    	PDFUtil.printGender(section, cross, female, child);
 		    }
@@ -2230,7 +2125,8 @@ public class PDFExporter {
 		    	bars[++i] = bar;
 		    }
 		    if (zone != null) {
-		    	section.add(new Paragraph(zone.getDescription(), fonth5));
+		    	if (term)
+		    		section.add(new Paragraph(zone.getDescription(), fonth5));
 		    	section.add(new Paragraph(StringUtil.removeTags(zone.getText()), font));
 		    	PDFUtil.printGender(section, zone, female, child);
 		    }
@@ -2266,9 +2162,207 @@ public class PDFExporter {
 				bars[++i] = (bar);
 		    }
 		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "", "Планеты", "Баллы", bars, 500, 500, false, false);
-			Section section = PDFUtil.printSection(chapter, "Соотношение силы планет");
-	    	section.add(new Paragraph("Чем выше значение, тем легче и активнее планета выражает свои качества", font));
+		    String text = term ? "Соотношение силы планет" : "Соотношение силы качеств";
+			Section section = PDFUtil.printSection(chapter, text);
+		    text = term ? "Чем выше значение, тем легче и активнее планета выражает свои качества" : "Чем выше значение, тем легче и активнее проявляются качества";
+	    	section.add(new Paragraph(text, font));
 			section.add(image);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Генерация планет в знаках
+	 * @param chapter раздел
+	 */
+	private void printAbbreviation(Chapter chapter) {
+		try {
+			chapter.add(new Paragraph("Сокращения:", font));
+			com.itextpdf.text.List ilist = new com.itextpdf.text.List(false, false, 10);
+			ListItem li = new ListItem();
+	        li.add(new Chunk("\u2191 — сильная планета, адекватно проявляющая себя в гороскопе", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("\u2193 — ослабленная планета, чьё проявление связано с неуверенностью, стрессом и препятствиями", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("R — ретроградная планета, проявление качеств которой неочевидно и неуверенно", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("влд — владыка гороскопа, самая сильная планета", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("грм — гармоничная планета, способная преодолеть негатив", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("изг — планета в изгнании, что-то мешает проявлению её качеств", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("обт — планета в обители, проявляющая себя естественно и свободно", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("пдн — планета в падении (чувствует себя «не в своей тарелке»)", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("пояс — ущербная планета, чьи качества подавлены", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("прж — поражённая планета, несущая стресс и препятствия", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("сбз — планета-источник порока и соблазна", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("слб — слабо развитая планета", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("экз — планета в экзальтации, способная максимально проявить себя", font));
+	        ilist.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("ядро — планета-источник потенциала", font));
+	        ilist.add(li);
+	        chapter.add(ilist);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Генерация символы знака Солнца
+	 * @param chapter раздел
+	 * @param event событие
+	 */
+	private void printSign(Chapter chapter, Event event) {
+		try {
+			if (event.getConfiguration().getPlanets() != null) {
+		    	Sign sign = null;
+				Font bold = PDFUtil.getSubheaderFont();
+
+				Section section = PDFUtil.printSection(chapter, "Предназначение");
+				com.itextpdf.text.List ilist = new com.itextpdf.text.List(false, false, 10);
+				for (Model model : event.getConfiguration().getPlanets()) {
+					Planet planet = (Planet)model;
+				    if (planet.getCode().equals("Sun")) {
+				    	sign = planet.getSign();
+
+						ListItem li = new ListItem();
+				        li.add(new Chunk("Предназначение Духа: ", bold));
+				        li.add(new Chunk(sign.getSlogan(), font));
+				        ilist.add(li);
+				    } else if (planet.getCode().equals("Moon")) {
+						ListItem li = new ListItem();
+				        li.add(new Chunk("Предназначение Души: ", bold));
+				        li.add(new Chunk(planet.getSign().getSlogan(), font));
+				        ilist.add(li);
+				    } else if (planet.getCode().equals("Mercury")) {
+						ListItem li = new ListItem();
+				        li.add(new Chunk("Предназначение Ума: ", bold));
+				        li.add(new Chunk(planet.getSign().getSlogan(), font));
+				        ilist.add(li);
+				    } else if (planet.getCode().equals("Venus")) {
+						ListItem li = new ListItem();
+				        li.add(new Chunk("Предназначение Любви: ", bold));
+				        li.add(new Chunk(planet.getSign().getSlogan(), font));
+				        ilist.add(li);
+				    } else if (planet.getCode().equals("Mars")) {
+						ListItem li = new ListItem();
+				        li.add(new Chunk("Предназначение Силы: ", bold));
+				        li.add(new Chunk(planet.getSign().getSlogan(), font));
+				        ilist.add(li);
+				    }
+				}
+		        section.add(ilist);
+
+		        if (sign != null) {
+					section = PDFUtil.printSection(chapter, "Символы удачи");
+					ilist = new com.itextpdf.text.List(false, false, 10);
+					ListItem li = new ListItem();
+					li.add(new Chunk("Счастливое число: ", bold));
+			        li.add(new Chunk(sign.getNumbers(), font));
+			        ilist.add(li);
+
+			        if (!StringUtil.isEmpty(sign.getYears())) {
+						li = new ListItem();
+				        li.add(new Chunk("Неблагоприятный возраст: ", bold));
+				        li.add(new Chunk(sign.getYears(), font));
+				        ilist.add(li);
+			        }
+
+			        if (!StringUtil.isEmpty(sign.getColors())) {
+						li = new ListItem();
+				        li.add(new Chunk("Благоприятные цвета: ", bold));
+				        li.add(new Chunk(sign.getColors(), font));
+				        ilist.add(li);
+			        }
+
+			        if (!StringUtil.isEmpty(sign.getAnticolors())) {
+						li = new ListItem();
+				        li.add(new Chunk("Неблагоприятные цвета: ", bold));
+				        li.add(new Chunk(sign.getAnticolors(), font));
+				        ilist.add(li);
+			        }
+
+			        if (!StringUtil.isEmpty(sign.getWeekdays())) {
+						li = new ListItem();
+				        li.add(new Chunk("Благоприятный день недели: ", bold));
+				        li.add(new Chunk(sign.getWeekdays(), font));
+				        ilist.add(li);
+			        }
+
+					li = new ListItem();
+			        li.add(new Chunk("Талисман: ", bold));
+			        li.add(new Chunk(sign.getTalisman(), font));
+			        ilist.add(li);
+
+			        if (!StringUtil.isEmpty(sign.getAmulet())) {
+						li = new ListItem();
+				        li.add(new Chunk("Амулет: ", bold));
+				        li.add(new Chunk(sign.getAmulet(), font));
+				        ilist.add(li);
+			        }
+
+					li = new ListItem();
+			        li.add(new Chunk("Благоприятные камни: ", bold));
+			        li.add(new Chunk(sign.getJewel(), font));
+			        ilist.add(li);
+
+			        if (!StringUtil.isEmpty(sign.getMineral())) {
+						li = new ListItem();
+				        li.add(new Chunk("Благоприятные минералы: ", bold));
+				        li.add(new Chunk(sign.getMineral(), font));
+				        ilist.add(li);
+			        }
+
+			        if (!StringUtil.isEmpty(sign.getMetal())) {
+						li = new ListItem();
+				        li.add(new Chunk("Благоприятные металлы: ", bold));
+				        li.add(new Chunk(sign.getMetal(), font));
+				        ilist.add(li);
+			        }
+
+			        if (!StringUtil.isEmpty(sign.getFlowers())) {
+						li = new ListItem();
+				        li.add(new Chunk("Благоприятные растения: ", bold));
+				        li.add(new Chunk(sign.getFlowers(), font));
+				        ilist.add(li);
+			        }
+			        section.add(ilist);
+				}
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

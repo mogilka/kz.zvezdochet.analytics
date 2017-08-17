@@ -41,6 +41,24 @@ public class PlanetAspectService extends GenderTextModelService {
         ResultSet rs = null;
 		String sql;
 		try {
+			AspectTypeService service = new AspectTypeService();
+			String pcode = planet1.getCode();
+			AspectType aspectType = aspect.getType();
+			if (null == aspectType) {
+				if (planet1.isDamaged() || planet1.isLilithed() || pcode.equals("Lilith"))
+					aspectType = (AspectType)service.find("NEGATIVE");
+				else
+					aspectType = (AspectType)service.find("NEUTRAL");
+			}
+			if (aspectType.getCode().equals("NEUTRAL")) {
+				if (pcode.equals("Lilith") || pcode.equals("Kethu"))
+					aspectType = (AspectType)service.find("NEGATIVE");
+				else if (pcode.equals("Selena") || pcode.equals("Sun")
+						|| pcode.equals("Moon") || pcode.equals("Rakhu")
+						|| pcode.equals("Mercury") || pcode.equals("Venus")
+						|| pcode.equals("Jupiter") || pcode.equals("Proserpina"))
+					aspectType = (AspectType)service.find("POSITIVE");
+			}
 			sql = "select * from " + tableName + 
 				" where typeid = ?" +
 					" and ((planet1id = ? and planet2id = ?)" +
@@ -48,7 +66,7 @@ public class PlanetAspectService extends GenderTextModelService {
 					" and (aspectid is null" +
 						" or aspectid = ?)";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setLong(1, aspect.getTypeid());
+			ps.setLong(1, aspectType.getId());
 			ps.setLong(2, planet1.getId());
 			ps.setLong(3, planet2.getId());
 			ps.setLong(4, planet2.getId());
