@@ -385,7 +385,7 @@ public class HTMLExporter {
 						td.add(planetText.getText());
 					}
 				}
-				if (planet.isStrong()) {
+				if (planet.isLord()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "strong");
 					if (planetText != null) {
 						td.add(util.getBoldTaggedString(planet.getShortName() + "-сила"));

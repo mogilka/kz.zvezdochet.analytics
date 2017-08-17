@@ -77,7 +77,7 @@ public class PlanetAspectText extends TextGenderModel {
 	 */
 	public String getMark(Planet p1, Planet p2) {
 		String code = type.getCode();
-		if (p1.isStrong() && p2.isStrong())
+		if (p1.isLord() && p2.isLord())
 			return "\u2191";
 		else if (code.equals("NEGATIVE")) {
 			if (p1.isNegative() && p2.isNegative())
