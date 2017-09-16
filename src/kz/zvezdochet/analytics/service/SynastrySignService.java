@@ -113,11 +113,49 @@ public class SynastrySignService extends ModelService {
 		dict.setSign1((Sign)service.find(rs.getLong("Sign1ID")));
 		dict.setSign2((Sign)service.find(rs.getLong("Sign2ID")));
 		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
+		dict.setText(rs.getString("Text"));
 		return dict;
 	}
 
 	@Override
 	public Model create() {
 		return new SynastryText();
+	}
+
+	/**
+	 * Поиск толкования синастрии по планетам в знаках
+	 * @param planet планета
+	 * @param sign знак первого партнёра
+	 * @param sign2 знак второго партнёра
+	 * @return толкование
+	 * @throws DataAccessException
+	 */
+	public SynastryText find(Planet planet, Sign sign, Sign sign2) throws DataAccessException {
+        SynastryText model = new SynastryText();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+		try {
+			String sql = "select * from " + tableName +
+				" where planetid = ? " +
+					"and sign1id = ? " +
+					"and sign2id = ?";
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
+			ps.setLong(1, planet.getId());
+			ps.setLong(2, sign.getId());
+			ps.setLong(3, sign2.getId());
+			rs = ps.executeQuery();
+			if (rs.next()) 
+				init(rs, model);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try { 
+				if (rs != null) rs.close();
+				if (ps != null) ps.close();
+			} catch (SQLException e) { 
+				e.printStackTrace(); 
+			}
+		}
+		return model;
 	}
 }

@@ -195,7 +195,7 @@ public class PlanetAspectService extends GenderTextModelService {
 	 * @return аспект между планетами
 	 * @throws DataAccessException
 	 */
-	public List<Model> finds(Planet planet1, Planet planet2, Aspect aspect) throws DataAccessException {
+	public List<Model> finds(Planet planet1, Planet planet2, Aspect aspect, AspectType type) throws DataAccessException {
         List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -208,17 +208,16 @@ public class PlanetAspectService extends GenderTextModelService {
 					" and (aspectid is null" +
 						" or aspectid = ?)";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setLong(1, aspect.getTypeid());
+			ps.setLong(1, type.getId());
 			ps.setLong(2, planet1.getId());
 			ps.setLong(3, planet2.getId());
 			ps.setLong(4, planet2.getId());
 			ps.setLong(5, planet1.getId());
 			ps.setLong(6, aspect.getId());
+//			System.out.println(ps);
 			rs = ps.executeQuery();
-			if (rs.next()) {
-		        PlanetAspectText dict = init(rs, null);
-		        list.add(dict);
-			}
+			while (rs.next())
+		        list.add(init(rs, null));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -230,5 +229,11 @@ public class PlanetAspectService extends GenderTextModelService {
 			}
 		}
 		return list;
+/*
+select * from synastryaspects
+where typeid = 2
+and ((planet1id = 19 and planet2id = 33) or (planet1id = 33 and planet2id = 19))
+and (aspectid is null or aspectid = 4)
+ */
 	}
 }
