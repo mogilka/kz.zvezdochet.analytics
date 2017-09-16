@@ -95,7 +95,7 @@ public class HTMLExporter {
 	 * @param event событие
 	 */
 	public void generate(Event event) {
-		child = event.getAge() < event.MAX_TEEN_AGE;
+		child = event.isChild();
 		saveCard(event);
 		try {
 			Tag html = new Tag("html");
