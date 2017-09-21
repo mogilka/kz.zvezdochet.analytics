@@ -7,6 +7,7 @@ import kz.zvezdochet.analytics.service.RuleService;
 import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.bean.Sign;
 import kz.zvezdochet.bean.SkyPointAspect;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
@@ -162,6 +163,75 @@ public class EventRules {
 						return (Rule)service.find(69L);
 				}
 			}
+		}
+		return null;
+	}
+
+	/**
+	 * Нахождение дома в знаке
+	 * @param house дом
+	 * @param sign знак
+	 * @return правило
+	 * @throws DataAccessException
+	 */
+	public static Rule ruleHouseSign(House house, Sign sign, Event event) throws DataAccessException {
+		RuleService service = new RuleService();
+		String hcode = house.getCode();
+		String scode = sign.getCode();
+		List<Model> planets = event.getConfiguration().getPlanets();
+
+		if (hcode.equals("I")) {
+			if (scode.equals("Sagittarius")) {
+				for (Model model : planets) {
+					Planet planet = (Planet)model;
+					if (planet.getCode().equals("Jupiter")) {
+						String code = planet.getSign().getCode();
+						if (code.equals("Aries"))
+							return (Rule)service.find(71L);
+						else if (code.equals("Taurus"))
+							return (Rule)service.find(72L);
+						else if (code.equals("Gemini"))
+							return (Rule)service.find(73L);
+						else if (code.equals("Cancer"))
+							return (Rule)service.find(74L);
+						else if (code.equals("Leo"))
+							return (Rule)service.find(75L);
+						else if (code.equals("Virgo"))
+							return (Rule)service.find(76L);
+						else if (code.equals("Libra"))
+							return (Rule)service.find(77L);
+						else if (code.equals("Scorpio"))
+							return (Rule)service.find(78L);
+						else if (code.equals("Ophiuchus"))
+							return (Rule)service.find(79L);
+						else if (code.equals("Sagittarius"))
+							return (Rule)service.find(83L);
+						else if (code.equals("Capricornus"))
+							return (Rule)service.find(80L);
+						else if (code.equals("Aquarius"))
+							return (Rule)service.find(81L);
+						else if (code.equals("Pisces"))
+							return (Rule)service.find(82L);
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Вид космограммы
+	 * @param planet планета
+	 * @return правило
+	 * @throws DataAccessException 
+	 */
+	public static Rule ruleCardKind(Planet planet) throws DataAccessException {
+		RuleService service = new RuleService();
+		if (planet.getCode().equals("Chiron")) {
+			if (planet.isNegative())
+				return (Rule)service.find(84L);
+			else
+				return (Rule)service.find(85L);
 		}
 		return null;
 	}

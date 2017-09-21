@@ -73,7 +73,8 @@ public class EventStatistics {
 			signPlanets = new HashMap<String, Integer>();
 			for (Model model : conf.getPlanets()) {
 				Planet planet = (Planet)model;
-				if (main && !planet.isMain()) continue;
+				if (main && !planet.isMain())
+					continue;
 				double value = 0.0;
 				Object object = planetSigns.get(planet.getSign().getCode());
 				if (object != null)
