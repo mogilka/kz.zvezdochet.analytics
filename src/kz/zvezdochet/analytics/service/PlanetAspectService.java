@@ -51,7 +51,9 @@ public class PlanetAspectService extends GenderTextModelService {
 					aspectType = (AspectType)service.find("NEUTRAL");
 			}
 			if (aspectType.getCode().equals("NEUTRAL")) {
-				if (pcode.equals("Lilith") || pcode.equals("Kethu"))
+				String pcode2 = planet2.getCode();
+				if (pcode.equals("Lilith") || pcode.equals("Kethu") ||
+						pcode2.equals("Lilith") || pcode2.equals("Kethu"))
 					aspectType = (AspectType)service.find("NEGATIVE");
 				else if (pcode.equals("Selena") || pcode.equals("Sun")
 						|| pcode.equals("Moon") || pcode.equals("Rakhu")
