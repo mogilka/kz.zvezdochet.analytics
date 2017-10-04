@@ -616,7 +616,6 @@ public class PDFExporter {
 					com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename);
 					if (image != null)
 						section.add(image);
-
 			    }
 			}
 			Paragraph p = new Paragraph("Такую иллюстрацию можно нарисовать и повесить в месте вашего вдохновения", font);
@@ -1214,12 +1213,7 @@ public class PDFExporter {
 				if (planet1.getNumber() > planet2.getNumber())
 					continue;
 
-				AspectType type = aspect.getAspect().getType();
-				if (type.getCode().equals("NEUTRAL")
-						&& (planet1.isLilithed() || planet2.isLilithed()
-							|| planet1.isKethued() || planet2.isKethued()))
-					type = damaged;
-
+				AspectType type = aspect.checkType(true);
 				boolean match = false;
 				//аспект соответствует заявленному (негативному или позитивному)
 				if (type.getCode().equals(aspectType))
@@ -1232,21 +1226,9 @@ public class PDFExporter {
 				else if (aspectType.equals("NEGATIVE") &&
 						type.getCode().equals("NEGATIVE_BELT"))
 					match = true;
-				//в позитивные добавляем соединения без Лилит и Кету
-				else if	(aspectType.equals("POSITIVE") &&
-						!planet2.getCode().equals("Lilith") &&
-						!planet2.getCode().equals("Kethu") &&
-						type.getCode().equals("NEUTRAL"))
-					match = true;
-				//в негативные добавляем соединения с Лилит и Кету
-				else if (aspectType.equals("NEGATIVE") &&
-						((planet2.getCode().equals("Lilith") ||
-						planet2.getCode().equals("Kethu")) &&
-						type.getCode().equals("NEUTRAL")))
-					match = true;
 
 				if (match) {
-					List<Model> dicts = service.finds(planet1, planet2, aspect.getAspect(), type);
+					List<Model> dicts = service.finds(aspect);
 					for (Model model : dicts) {
 						PlanetAspectText dict = (PlanetAspectText)model;
 						if (dict != null) {

@@ -10,6 +10,7 @@ import kz.zvezdochet.analytics.bean.PlanetAspectText;
 import kz.zvezdochet.bean.Aspect;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.bean.SkyPointAspect;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
@@ -29,38 +30,17 @@ public class PlanetAspectService extends GenderTextModelService {
 
 	/**
 	 * Поиск толкования аспекта
-	 * @param planet1 первая планета
-	 * @param planet2 вторая планета
 	 * @param aspect аспект
-	 * @return аспект между планетами
+	 * @return толкование аспекта между планетами
 	 * @throws DataAccessException
 	 */
-	public Model find(Planet planet1, Planet planet2, Aspect aspect) throws DataAccessException {
+	public Model find(SkyPointAspect aspect, boolean check) throws DataAccessException {
         PlanetAspectText dict = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
 		try {
-			AspectTypeService service = new AspectTypeService();
-			String pcode = planet1.getCode();
-			AspectType aspectType = aspect.getType();
-			if (null == aspectType) {
-				if (planet1.isDamaged() || planet1.isLilithed() || pcode.equals("Lilith"))
-					aspectType = (AspectType)service.find("NEGATIVE");
-				else
-					aspectType = (AspectType)service.find("NEUTRAL");
-			}
-			if (aspectType.getCode().equals("NEUTRAL")) {
-				String pcode2 = planet2.getCode();
-				if (pcode.equals("Lilith") || pcode.equals("Kethu") ||
-						pcode2.equals("Lilith") || pcode2.equals("Kethu"))
-					aspectType = (AspectType)service.find("NEGATIVE");
-				else if (pcode.equals("Selena") || pcode.equals("Sun")
-						|| pcode.equals("Moon") || pcode.equals("Rakhu")
-						|| pcode.equals("Mercury") || pcode.equals("Venus")
-						|| pcode.equals("Jupiter") || pcode.equals("Proserpina"))
-					aspectType = (AspectType)service.find("POSITIVE");
-			}
+			AspectType type = check ? aspect.checkType(false) : aspect.getAspect().getType();
 			sql = "select * from " + tableName + 
 				" where typeid = ?" +
 					" and ((planet1id = ? and planet2id = ?)" +
@@ -68,12 +48,14 @@ public class PlanetAspectService extends GenderTextModelService {
 					" and (aspectid is null" +
 						" or aspectid = ?)";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setLong(1, aspectType.getId());
-			ps.setLong(2, planet1.getId());
-			ps.setLong(3, planet2.getId());
-			ps.setLong(4, planet2.getId());
-			ps.setLong(5, planet1.getId());
-			ps.setLong(6, aspect.getId());
+			ps.setLong(1, type.getId());
+			long pid1 = aspect.getSkyPoint1().getId();
+			long pid2 = aspect.getSkyPoint2().getId();
+			ps.setLong(2, pid1);
+			ps.setLong(3, pid2);
+			ps.setLong(4, pid2);
+			ps.setLong(5, pid1);
+			ps.setLong(6, aspect.getAspect().getId());
 			rs = ps.executeQuery();
 			if (rs.next())
 				dict = init(rs, null);
@@ -191,18 +173,17 @@ public class PlanetAspectService extends GenderTextModelService {
 
 	/**
 	 * Поиск толкования аспекта
-	 * @param planet1 первая планета
-	 * @param planet2 вторая планета
 	 * @param aspect аспект
-	 * @return аспект между планетами
+	 * @return список толкований аспектов между планетами
 	 * @throws DataAccessException
 	 */
-	public List<Model> finds(Planet planet1, Planet planet2, Aspect aspect, AspectType type) throws DataAccessException {
+	public List<Model> finds(SkyPointAspect aspect) throws DataAccessException {
         List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
 		try {
+			AspectType type = aspect.checkType(false);
 			sql = "select * from " + tableName + 
 				" where typeid = ?" +
 					" and ((planet1id = ? and planet2id = ?)" +
@@ -211,11 +192,13 @@ public class PlanetAspectService extends GenderTextModelService {
 						" or aspectid = ?)";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, type.getId());
-			ps.setLong(2, planet1.getId());
-			ps.setLong(3, planet2.getId());
-			ps.setLong(4, planet2.getId());
-			ps.setLong(5, planet1.getId());
-			ps.setLong(6, aspect.getId());
+			long pid1 = aspect.getSkyPoint1().getId();
+			long pid2 = aspect.getSkyPoint2().getId();
+			ps.setLong(2, pid1);
+			ps.setLong(3, pid2);
+			ps.setLong(4, pid2);
+			ps.setLong(5, pid1);
+			ps.setLong(6, aspect.getAspect().getId());
 //			System.out.println(ps);
 			rs = ps.executeQuery();
 			while (rs.next())
@@ -237,5 +220,21 @@ where typeid = 2
 and ((planet1id = 19 and planet2id = 33) or (planet1id = 33 and planet2id = 19))
 and (aspectid is null or aspectid = 4)
  */
+	}
+
+	/**
+	 * Поиск толкования аспекта
+	 * @param planet1 первая планета
+	 * @param planet2 вторая планета
+	 * @param aspect аспект
+	 * @return толкование аспекта между планетами
+	 * @throws DataAccessException
+	 */
+	public Model find(Planet planet1, Planet planet2, Aspect aspect) throws DataAccessException {
+		SkyPointAspect a = new SkyPointAspect();
+		a.setSkyPoint1(planet1);
+		a.setSkyPoint2(planet2);
+		a.setAspect(aspect);
+		return find(a, false);
 	}
 }
