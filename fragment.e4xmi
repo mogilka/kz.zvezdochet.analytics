@@ -2,11 +2,14 @@
 <fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_ROCYcOlkEeaCS4O9hiLsMg">
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_UPn6IOlkEeaCS4O9hiLsMg" featurename="commands" parentElementId="org.eclipse.e4.ide.application">
     <elements xsi:type="commands:Command" xmi:id="_bRtc0OlkEeaCS4O9hiLsMg" elementId="kz.zvezdochet.analytics.command.export" commandName="exportCommand"/>
+    <elements xsi:type="commands:Command" xmi:id="_nHi7cKTqEeeLb_6iVhiuwA" elementId="kz.zvezdochet.analytics.command.html" commandName="htmlCommand"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_f0-MoOlkEeaCS4O9hiLsMg" featurename="handlers" parentElementId="org.eclipse.e4.ide.application">
     <elements xsi:type="commands:Handler" xmi:id="_nClC0OlkEeaCS4O9hiLsMg" elementId="kz.zvezdochet.analytics.handler.export" contributionURI="bundleclass://kz.zvezdochet.analytics/kz.zvezdochet.analytics.handler.ExportHandler" command="_bRtc0OlkEeaCS4O9hiLsMg"/>
+    <elements xsi:type="commands:Handler" xmi:id="_riqb4KTqEeeLb_6iVhiuwA" elementId="kz.zvezdochet.analytics.handler.html" contributionURI="bundleclass://kz.zvezdochet.analytics/kz.zvezdochet.analytics.handler.HtmlHandler" command="_nHi7cKTqEeeLb_6iVhiuwA"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_wU4UoOlkEeaCS4O9hiLsMg" featurename="children" parentElementId="kz.zvezdochet.toolbar.event">
     <elements xsi:type="menu:HandledToolItem" xmi:id="_0zGMYOlkEeaCS4O9hiLsMg" elementId="kz.zvezdochet.analytics.handledtoolitem.export" label="&#x42d;&#x43a;&#x441;&#x43f;&#x43e;&#x440;&#x442; &#x433;&#x43e;&#x440;&#x43e;&#x441;&#x43a;&#x43e;&#x43f;&#x430;" iconURI="platform:/plugin/kz.zvezdochet.export/icons/export.gif" tooltip="&#x42d;&#x43a;&#x441;&#x43f;&#x43e;&#x440;&#x442; &#x433;&#x43e;&#x440;&#x43e;&#x441;&#x43a;&#x43e;&#x43f;&#x430;" command="_bRtc0OlkEeaCS4O9hiLsMg"/>
+    <elements xsi:type="menu:HandledToolItem" xmi:id="_2xj9QKTqEeeLb_6iVhiuwA" elementId="kz.zvezdochet.analytics.handledtoolitem.html" label="HTML &#x43e;&#x442;&#x447;&#x451;&#x442;" iconURI="platform:/plugin/kz.zvezdochet.core/icons/discovery.gif" tooltip="HTML &#x43e;&#x442;&#x447;&#x451;&#x442;" command="_nHi7cKTqEeeLb_6iVhiuwA"/>
   </fragments>
 </fragment:ModelFragments>
