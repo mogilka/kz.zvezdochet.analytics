@@ -2,6 +2,7 @@ package kz.zvezdochet.analytics.exporter;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -50,6 +51,7 @@ import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.analytics.bean.CrossSign;
 import kz.zvezdochet.analytics.bean.Degree;
 import kz.zvezdochet.analytics.bean.HouseSignText;
+import kz.zvezdochet.analytics.bean.Numerology;
 import kz.zvezdochet.analytics.bean.PlanetAspectText;
 import kz.zvezdochet.analytics.bean.PlanetHouseText;
 import kz.zvezdochet.analytics.bean.PlanetSignText;
@@ -612,10 +614,12 @@ public class PDFExporter {
 			    		section.add(new Paragraph(degree.getId() + "° " + degree.getName() + ", " + degree.getCode(), fonth5));
 					section.add(new Paragraph(degree.getDescription(), new Font(baseFont, 12, Font.ITALIC, PDFUtil.FONTCOLORGRAY)));
 					section.add(new Paragraph(StringUtil.removeTags(degree.getText()), font));
-					String filename = PlatformUtil.getPath(Activator.PLUGIN_ID, "/icons/degree/" + model.getId() + ".jpg").getPath();
-					com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename);
-					if (image != null)
+					URL url = PlatformUtil.getPath(Activator.PLUGIN_ID, "/icons/degree/" + model.getId() + ".jpg");
+					if (url != null) {
+						String filename = url.getPath();
+						com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename);
 						section.add(image);
+					}
 			    }
 			}
 			Paragraph p = new Paragraph("Такую иллюстрацию можно нарисовать и повесить в месте вашего вдохновения", font);
@@ -845,7 +849,7 @@ public class PDFExporter {
 				+ "которая не в деталях, а глобально описывает ваше предназначение и кармический опыт прошлого. "
 				+ "Определите, на каком уровне вы находитесь. Отследите по трём уровням своё развитие", font));
 
-			long id = 8L;
+			long id = 4L;
 			CardKind kind = (CardKind)new CardKindService().find(id);
 			Paragraph p = new Paragraph(kind.getName(), fonth5);
 			p.setSpacingAfter(10);
@@ -1106,7 +1110,7 @@ public class PDFExporter {
 			//фильтрация списка типов аспектов
 			List<Model> types = new AspectTypeService().getList();
 			String[] codes = {
-				"NEUTRAL", "NEGATIVE", "POSITIVE", "CREATIVE", "KARMIC", "SPIRITUAL", "PROGRESSIVE"
+				"NEUTRAL", "NEGATIVE", "NEGATIVE_HIDDEN", "POSITIVE", "POSITIVE_HIDDEN", "CREATIVE", "KARMIC", "SPIRITUAL", "PROGRESSIVE"
 			};
 
 			List<Bar> items = new ArrayList<Bar>();
@@ -1115,9 +1119,11 @@ public class PDFExporter {
 		    	AspectType type = (AspectType)tmodel;
 		    	if (Arrays.asList(codes).contains(type.getCode())) {
 		    		mtype = type;
-		    	} else if (type.getParentType() != null
-		    			&& Arrays.asList(codes).contains(type.getParentType().getCode()))
-		    		mtype = type.getParentType();
+		    	} else {
+		    		AspectType ptype = type.getParentType();
+		    		if (ptype != null && Arrays.asList(codes).contains(ptype.getCode()))
+		    			mtype = type.getParentType();
+		    	}
 		    	if (null == mtype)
 		    		continue;
 
@@ -1146,11 +1152,11 @@ public class PDFExporter {
 
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
-	        li.add(new Chunk("Больше гармоничных аспектов — меньше препятствий", new Font(baseFont, 12, Font.NORMAL, BaseColor.RED)));
+	        li.add(new Chunk("Больше гармоничных аспектов — больше лёгкости", new Font(baseFont, 12, Font.NORMAL, BaseColor.RED)));
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Больше творческих — меньше ограничений", new Font(baseFont, 12, Font.NORMAL, new BaseColor(0, 102, 51))));
+	        li.add(new Chunk("Больше творческих — больше свободы", new Font(baseFont, 12, Font.NORMAL, new BaseColor(0, 102, 51))));
 	        list.add(li);
 
 			li = new ListItem();
@@ -1170,7 +1176,7 @@ public class PDFExporter {
 	        list.add(li);
 			
 			li = new ListItem();
-	        li.add(new Chunk("Больше прогрессивных — бо́льшим испытаниям вы подвергнуты", new Font(baseFont, 12, Font.NORMAL, new BaseColor(51, 153, 153))));
+	        li.add(new Chunk("Больше прогрессивных — больше испытаний", new Font(baseFont, 12, Font.NORMAL, new BaseColor(51, 153, 153))));
 	        list.add(li);
 			
 			li = new ListItem();
@@ -1294,12 +1300,12 @@ public class PDFExporter {
 				"poleaxe",		//135° 90° 135°
 				"javelin",		//45° 90° 45°
 				"davidstar",	//60° 60° 60° 60° 60° 60°
-				"trapezoid",	//60° 60° 60° 180°
+//				"trapezoid",	//60° 60° 60° 180°
 				"sail",			//120° 60° 60° 120°
 				"triangle",		//120° 120° 120°
 				"bisextile",	//60° 120° 60°
 				"boomerang",	//150° 30° 30° 150°
-//				"pitchfork",	//150° 60° 150°
+				"pitchfork",	//150° 60° 150°
 				"vehicle",		//60° 120° 60° 120°
 				"roof",			//30° 60° 30°
 				"railing",		//150° 30° 150° 30°
@@ -1309,13 +1315,13 @@ public class PDFExporter {
 				"lasso",		//40° 80° 40°
 				"stretcher",	//100° 80° 100° 80°
 				"wreath",		//72° 72° 72° 72° 72°
-				"ship",			//72° 144° 72°
+//				"ship",			//72° 144° 72°
 				"palm",			//144° 72° 144°
 				"pyramid",		//150° 72° 135°
 				"envelope",		//108° 72° 108° 72°
 				"compass",		//108° 180° 72°
 				"boat",			//36° 72° 36°
-				"bilasso"		//80° 80° 160°
+//				"bilasso"		//80° 80° 160°
 			};
 			PlanetTextService service = new PlanetTextService();
 			PlanetText text = null;
@@ -1362,58 +1368,64 @@ public class PDFExporter {
 //						list.add(li);
 //					}
 					//дома
-					housetext = (House)houseService.find(149L);
+					housetext = (House)houseService.find(156L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(10, housetext.getStage()), font));
+						li.add(new Chunk(printStage(3, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(149L);
+					housetext = (House)houseService.find(162L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(13, housetext.getStage()), font));
+						li.add(new Chunk(printStage(7, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(149L);
+					housetext = (House)houseService.find(155L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(15, housetext.getStage()), font));
+						li.add(new Chunk(printStage(11, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(148L);
+					housetext = (House)houseService.find(155L);
+					if (housetext != null && housetext.getStage() != null) {
+					    li = new ListItem();
+						li.add(new Chunk(printStage(12, housetext.getStage()), font));
+						list.add(li);
+					}
+					housetext = (House)houseService.find(161L);
+					if (housetext != null && housetext.getStage() != null) {
+					    li = new ListItem();
+						li.add(new Chunk(printStage(16, housetext.getStage()), font));
+						list.add(li);
+					}
+					housetext = (House)houseService.find(154L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
 						li.add(new Chunk(printStage(20, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(148L);
+					housetext = (House)houseService.find(154L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(23, housetext.getStage()), font));
+						li.add(new Chunk(printStage(22, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(148L);
+					housetext = (House)houseService.find(160L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(25, housetext.getStage()), font));
+						li.add(new Chunk(printStage(26, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(147L);
+					housetext = (House)houseService.find(153L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(37, housetext.getStage()), font));
+						li.add(new Chunk(printStage(32, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(147L);
+					housetext = (House)houseService.find(153L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(40, housetext.getStage()), font));
-						list.add(li);
-					}
-					housetext = (House)houseService.find(147L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk(printStage(42, housetext.getStage()), font));
+						li.add(new Chunk(printStage(33, housetext.getStage()), font));
 						list.add(li);
 					}
 				    section.add(list);
@@ -1559,11 +1571,11 @@ public class PDFExporter {
 					}
 
 				} else if (code.equals("trapezoid")) {
-					text = (PlanetText)service.findByPlanet(20L, "positive");
+					text = (PlanetText)service.findByPlanet(25L, "positive");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
-					text = (PlanetText)service.findByPlanet(26L, "positive");
+					text = (PlanetText)service.findByPlanet(33L, "positive");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
@@ -1585,6 +1597,16 @@ public class PDFExporter {
 						}
 					}
 					section.add(list);
+
+				} else if (code.equals("ship")) {
+					text = (PlanetText)service.findByPlanet(34L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+				} else if (code.equals("bilasso")) {
+					text = (PlanetText)service.findByPlanet(20L, "negative");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
 				}
 				section.add(Chunk.NEWLINE);
 			}
@@ -2335,7 +2357,7 @@ public class PDFExporter {
 	}
 
 	/**
-	 * Генерация символы знака Солнца
+	 * Генерация символов знака Солнца и др.
 	 * @param chapter раздел
 	 * @param event событие
 	 */
@@ -2347,32 +2369,34 @@ public class PDFExporter {
 
 				Section section = PDFUtil.printSection(chapter, "Предназначение");
 				com.itextpdf.text.List ilist = new com.itextpdf.text.List(false, false, 10);
+
+				ListItem li = new ListItem();
 				for (Model model : event.getConfiguration().getPlanets()) {
 					Planet planet = (Planet)model;
 				    if (planet.getCode().equals("Sun")) {
 				    	sign = planet.getSign();
 
-						ListItem li = new ListItem();
+						li = new ListItem();
 				        li.add(new Chunk("Предназначение Духа: ", bold));
 				        li.add(new Chunk(sign.getSlogan(), font));
 				        ilist.add(li);
 				    } else if (planet.getCode().equals("Moon")) {
-						ListItem li = new ListItem();
+						li = new ListItem();
 				        li.add(new Chunk("Предназначение Души: ", bold));
 				        li.add(new Chunk(planet.getSign().getSlogan(), font));
 				        ilist.add(li);
 				    } else if (planet.getCode().equals("Mercury")) {
-						ListItem li = new ListItem();
+						li = new ListItem();
 				        li.add(new Chunk("Предназначение Ума: ", bold));
 				        li.add(new Chunk(planet.getSign().getSlogan(), font));
 				        ilist.add(li);
 				    } else if (planet.getCode().equals("Venus")) {
-						ListItem li = new ListItem();
+						li = new ListItem();
 				        li.add(new Chunk("Предназначение Любви: ", bold));
 				        li.add(new Chunk(planet.getSign().getSlogan(), font));
 				        ilist.add(li);
 				    } else if (planet.getCode().equals("Mars")) {
-						ListItem li = new ListItem();
+						li = new ListItem();
 				        li.add(new Chunk("Предназначение Силы: ", bold));
 				        li.add(new Chunk(planet.getSign().getSlogan(), font));
 				        ilist.add(li);
@@ -2383,7 +2407,13 @@ public class PDFExporter {
 		        if (sign != null) {
 					section = PDFUtil.printSection(chapter, "Символы удачи");
 					ilist = new com.itextpdf.text.List(false, false, 10);
-					ListItem li = new ListItem();
+
+					li = new ListItem();
+			        li.add(new Chunk("Число рождения: ", bold));
+			        li.add(new Chunk(String.valueOf(Numerology.getNumber(event.getBirth())), font));
+			        ilist.add(li);
+
+					li = new ListItem();
 					li.add(new Chunk("Счастливое число: ", bold));
 			        li.add(new Chunk(sign.getNumbers(), font));
 			        ilist.add(li);

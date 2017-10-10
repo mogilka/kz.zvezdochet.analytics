@@ -1,8 +1,11 @@
 package kz.zvezdochet.analytics.bean;
 
+import java.util.Date;
+
 import kz.zvezdochet.analytics.service.DegreeService;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.ModelService;
+import kz.zvezdochet.core.util.DateUtil;
 
 /**
  * Нумерологическое толкование
@@ -60,5 +63,28 @@ public class Numerology extends Model {
 	@Override
 	public ModelService getService() {
 		return new DegreeService();
+	}
+
+	/**
+	 * Поиск числа рождения
+	 * @param date дата
+	 * @return число рождения
+	 */
+	public static int getNumber(Date date) {
+		String sdate = DateUtil.formatDate(date);
+		sdate = sdate
+			.replace(".", "")
+			.replace("0", "");
+		int number = Integer.valueOf(sdate);
+		while (number > 9) {
+			String s = String.valueOf(number);
+			number = 0;
+			String[] syms = s.split("");
+			for (int i = 0; i < syms.length; i++) {
+				int n = Integer.valueOf(syms[i]);
+				number += n;
+			}
+		}
+		return number;
 	}
 }
