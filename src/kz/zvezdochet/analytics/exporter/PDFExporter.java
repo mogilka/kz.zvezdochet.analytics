@@ -243,15 +243,16 @@ public class PDFExporter {
 			printSimilar(chapter, event);
 			chapter.add(Chunk.NEXTPAGE);
 
+			EventStatistics statistics = new EventStatistics(event.getConfiguration());
+			Map<String, Double> signMap = statistics.getPlanetSigns(true);
+
 			//градус рождения
 			if (!child) {
-				printDegree(chapter, event);
+				printDegree(chapter, event, signMap);
 				chapter.add(Chunk.NEXTPAGE);
 			}
 
 			//знаки
-			EventStatistics statistics = new EventStatistics(event.getConfiguration());
-			Map<String, Double> signMap = statistics.getPlanetSigns(true);
 			printSigns(writer, chapter, signMap);
 			chapter.add(Chunk.NEXTPAGE);
 
@@ -599,7 +600,7 @@ public class PDFExporter {
 	 * @param event событие
 	 * @param cell тег-контейнер для вложенных тегов
 	 */
-	private void printDegree(Chapter chapter, Event event) {
+	private void printDegree(Chapter chapter, Event event, Map<String, Double> signMap) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Символ рождения");
 			if (event.getConfiguration().getHouses() != null &&
@@ -849,7 +850,7 @@ public class PDFExporter {
 				+ "которая не в деталях, а глобально описывает ваше предназначение и кармический опыт прошлого. "
 				+ "Определите, на каком уровне вы находитесь. Отследите по трём уровням своё развитие", font));
 
-			long id = 4L;
+			long id = 9L;
 			CardKind kind = (CardKind)new CardKindService().find(id);
 			Paragraph p = new Paragraph(kind.getName(), fonth5);
 			p.setSpacingAfter(10);
@@ -1206,7 +1207,6 @@ public class PDFExporter {
 			PlanetAspectService service = new PlanetAspectService();
 			Configuration conf = event.getConfiguration();
 			List<SkyPointAspect> aspects = conf.getAspects();
-			AspectType damaged = (AspectType)new AspectTypeService().find("NEGATIVE");
 
 			for (SkyPointAspect aspect : aspects) {
 				Planet planet1 = (Planet)aspect.getSkyPoint1();
@@ -1221,12 +1221,13 @@ public class PDFExporter {
 
 				AspectType type = aspect.checkType(true);
 				boolean match = false;
+				String tcode = type.getCode();
 				//аспект соответствует заявленному (негативному или позитивному)
-				if (type.getCode().equals(aspectType))
+				if (tcode.equals(aspectType))
 					match = true;
 				//в позитивные добавляем ядро Солнца
 				else if	(aspectType.equals("POSITIVE") &&
-						type.getCode().equals("NEUTRAL_KERNEL"))
+						(tcode.equals("NEUTRAL_KERNEL") || tcode.equals("NEUTRAL")))
 					match = true;
 				//в негативные добавляем пояс Солнца
 				else if (aspectType.equals("NEGATIVE") &&
@@ -1295,12 +1296,12 @@ public class PDFExporter {
 				"stellium",		//0° 0° 0° 0°
 //				"semivehicle",	//60° 180° 120°
 				"cross",		//90° 90° 90° 90°
-				"taucross",		//90° 180° 90°
+//				"taucross",		//90° 180° 90°
 				"dagger",		//135° 45° 45° 135°
-				"poleaxe",		//135° 90° 135°
+//				"poleaxe",		//135° 90° 135°
 				"javelin",		//45° 90° 45°
 				"davidstar",	//60° 60° 60° 60° 60° 60°
-//				"trapezoid",	//60° 60° 60° 180°
+				"trapezoid",	//60° 60° 60° 180°
 				"sail",			//120° 60° 60° 120°
 				"triangle",		//120° 120° 120°
 				"bisextile",	//60° 120° 60°
@@ -1315,13 +1316,13 @@ public class PDFExporter {
 				"lasso",		//40° 80° 40°
 				"stretcher",	//100° 80° 100° 80°
 				"wreath",		//72° 72° 72° 72° 72°
-//				"ship",			//72° 144° 72°
+				"ship",			//72° 144° 72°
 				"palm",			//144° 72° 144°
 				"pyramid",		//150° 72° 135°
 				"envelope",		//108° 72° 108° 72°
 				"compass",		//108° 180° 72°
 				"boat",			//36° 72° 36°
-//				"bilasso"		//80° 80° 160°
+				"bilasso"		//80° 80° 160°
 			};
 			PlanetTextService service = new PlanetTextService();
 			PlanetText text = null;
@@ -1368,82 +1369,34 @@ public class PDFExporter {
 //						list.add(li);
 //					}
 					//дома
-					housetext = (House)houseService.find(156L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk(printStage(3, housetext.getStage()), font));
-						list.add(li);
-					}
-					housetext = (House)houseService.find(162L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk(printStage(7, housetext.getStage()), font));
-						list.add(li);
-					}
-					housetext = (House)houseService.find(155L);
+					housetext = (House)houseService.find(169L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
 						li.add(new Chunk(printStage(11, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(155L);
+					housetext = (House)houseService.find(168L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(12, housetext.getStage()), font));
+						li.add(new Chunk(printStage(23, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(161L);
+					housetext = (House)houseService.find(167L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(16, housetext.getStage()), font));
+						li.add(new Chunk(printStage(35, housetext.getStage()), font));
 						list.add(li);
 					}
-					housetext = (House)houseService.find(154L);
+					housetext = (House)houseService.find(166L);
 					if (housetext != null && housetext.getStage() != null) {
 					    li = new ListItem();
-						li.add(new Chunk(printStage(20, housetext.getStage()), font));
-						list.add(li);
-					}
-					housetext = (House)houseService.find(154L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk(printStage(22, housetext.getStage()), font));
-						list.add(li);
-					}
-					housetext = (House)houseService.find(160L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk(printStage(26, housetext.getStage()), font));
-						list.add(li);
-					}
-					housetext = (House)houseService.find(153L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk(printStage(32, housetext.getStage()), font));
-						list.add(li);
-					}
-					housetext = (House)houseService.find(153L);
-					if (housetext != null && housetext.getStage() != null) {
-					    li = new ListItem();
-						li.add(new Chunk(printStage(33, housetext.getStage()), font));
+						li.add(new Chunk(printStage(47, housetext.getStage()), font));
 						list.add(li);
 					}
 				    section.add(list);
 
 				} else if (code.equals("cross")) {
-					text = (PlanetText)service.findByPlanet(19L, "negative");
-					if (text != null)
-						section.add(PDFUtil.html2pdf(text.getText()));
-
-					text = (PlanetText)service.findByPlanet(31L, "negative");
-					if (text != null)
-						section.add(PDFUtil.html2pdf(text.getText()));
-
-					text = (PlanetText)service.findByPlanet(28L, "negative");
-					if (text != null)
-						section.add(PDFUtil.html2pdf(text.getText()));
-
-					text = (PlanetText)service.findByPlanet(30L, "negative");
+					text = (PlanetText)service.findByPlanet(24L, "negative");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
@@ -1468,11 +1421,7 @@ public class PDFExporter {
 					}
 					section.add(Chunk.NEWLINE);
 
-					text = (PlanetText)service.findByPlanet(19L, "negative");
-					if (text != null)
-						section.add(PDFUtil.html2pdf(text.getText()));
-
-					text = (PlanetText)service.findByPlanet(25L, "negative");
+					text = (PlanetText)service.findByPlanet(29L, "negative");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
@@ -1539,11 +1488,7 @@ public class PDFExporter {
 						section.add(PDFUtil.html2pdf(text.getText()));
 
 				} else if (code.equals("poleaxe")) {
-					text = (PlanetText)service.findByPlanet(25L, "negative");
-					if (text != null)
-						section.add(PDFUtil.html2pdf(text.getText()));
-
-					text = (PlanetText)service.findByPlanet(29L, "negative");
+					text = (PlanetText)service.findByPlanet(30L, "negative");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 

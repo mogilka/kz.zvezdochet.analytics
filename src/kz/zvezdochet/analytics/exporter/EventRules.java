@@ -1,7 +1,11 @@
 package kz.zvezdochet.analytics.exporter;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import kz.zvezdochet.analytics.bean.Degree;
 import kz.zvezdochet.analytics.bean.Rule;
 import kz.zvezdochet.analytics.service.RuleService;
 import kz.zvezdochet.bean.Event;
@@ -120,17 +124,13 @@ public class EventRules {
 	 * @throws DataAccessException 
 	 */
 	public static Rule rulePlanetShield(Planet planet, boolean female) throws DataAccessException {
-//		RuleService service = new RuleService();
-//		if (planet.getCode().equals("Venus")) {
-//			if (!planet.inMine() && !planet.isBroken() && !planet.isDamaged() && !planet.isRetrograde()
-//					&& !planet.isBelt() && !planet.isSignExile() && !planet.isSignDeclined())
-//				return (Rule)service.find(3L);
-//		} else if (planet.getCode().equals("Mars")) {
-//			if (planet.isNeutral()) {
-//				long id = female ? 67L : 66L;
-//				return (Rule)service.find(id);
-//			}
-//		}
+		RuleService service = new RuleService();
+		if (planet.getCode().equals("Neptune")) {
+			if (planet.isBroken() || planet.isKethued())
+				return (Rule)service.find(96L);
+			else if (planet.isDamaged())
+				return (Rule)service.find(97L);
+		}
 		return null;
 	}
 
@@ -232,6 +232,37 @@ public class EventRules {
 				return (Rule)service.find(84L);
 			else
 				return (Rule)service.find(85L);
+		}
+		return null;
+	}
+
+	/**
+	 * Градус рождения
+	 * @param planet планета
+	 * @return правило
+	 * @throws DataAccessException 
+	 */
+	public static Rule ruleDegree(Degree degree, Event event, Map<String, Double> signMap) throws DataAccessException {
+		RuleService service = new RuleService();
+		if (147 == degree.getId()) {
+			List<Model> planets = event.getConfiguration().getPlanets();
+			for (Model model : planets) {
+				Planet planet = (Planet)model;
+				String pcode = planet.getCode();
+				if (pcode.equals("Mars") || pcode.equals("Uranus")) {
+					if (planet.isLord() || planet.isRakhued())
+						return (Rule)service.find(95L);
+					else {
+						Iterator<Map.Entry<String, Double>> iterator = signMap.entrySet().iterator();
+					    while (iterator.hasNext()) {
+					    	Entry<String, Double> entry = iterator.next();
+					    	String scode = entry.getKey();
+					    	if (scode.equals("Scorpio") || scode.equals("Ophiuchus"))
+					    		return (Rule)service.find(95L);
+					    }
+					}
+				}				
+			}
 		}
 		return null;
 	}
