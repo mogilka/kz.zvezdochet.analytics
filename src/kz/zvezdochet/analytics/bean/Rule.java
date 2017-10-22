@@ -39,5 +39,6 @@ public class Rule extends Model {
 	public ModelService getService() {
 		return new RuleService();
 	}
-
+	@Override
+	public void init(boolean mode) {}
 }

@@ -87,4 +87,7 @@ public class Numerology extends Model {
 		}
 		return number;
 	}
+
+	@Override
+	public void init(boolean mode) {}
 }
