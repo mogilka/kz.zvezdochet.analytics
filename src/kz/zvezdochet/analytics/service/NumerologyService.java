@@ -40,6 +40,8 @@ public class NumerologyService extends ModelService {
 		type.setImage(rs.getString("image"));
 		type.setDescription(rs.getString("description"));
 		type.setZoroastrsyn(rs.getString("zoroastrsyn"));
+		type.setBirth(rs.getString("birth"));
+		type.setName(rs.getString("name"));
 		return type;
 	}
 

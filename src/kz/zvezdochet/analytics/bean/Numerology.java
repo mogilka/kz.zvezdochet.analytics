@@ -66,7 +66,7 @@ public class Numerology extends Model {
 	}
 
 	/**
-	 * Поиск числа рождения
+	 * Расчёт числа рождения
 	 * @param date дата
 	 * @return число рождения
 	 */
@@ -90,4 +90,29 @@ public class Numerology extends Model {
 
 	@Override
 	public void init(boolean mode) {}
+
+	/**
+	 * Толкование числа рождения
+	 */
+	public String birth;
+	/**
+	 * Толкование числа имени
+	 */
+	public String name;
+
+	public String getBirth() {
+		return birth;
+	}
+
+	public void setBirth(String birth) {
+		this.birth = birth;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }
