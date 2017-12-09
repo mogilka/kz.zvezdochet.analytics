@@ -34,7 +34,7 @@ public class HtmlHandler extends Handler {
     			@Override
     			public void run() {
     				String html = new HTMLExporter().generate(event);
-    				eventPart.onReport(html);
+//    				eventPart.onReport(html);
     			}
     		});
 			updateStatus("Экспорт завершён", false);
