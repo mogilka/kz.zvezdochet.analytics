@@ -61,7 +61,7 @@ public class NumerologyService extends ModelService {
 			ps.setLong(1, number);
 			rs = ps.executeQuery();
 			if (rs.next()) 
-				model = init(rs, model);
+				return init(rs, model);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -72,6 +72,6 @@ public class NumerologyService extends ModelService {
 				e.printStackTrace(); 
 			}
 		}
-		return model;
+		return null;
 	}
 }
