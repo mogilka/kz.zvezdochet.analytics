@@ -1,5 +1,6 @@
 package kz.zvezdochet.analytics.bean;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import kz.zvezdochet.analytics.service.DegreeService;
@@ -114,5 +115,29 @@ public class Numerology extends Model {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Вычисление разницы лет по Зороастрийскому календарю с учётом весеннего равноденствия
+	 * @param date дата
+	 * @return число рождения
+	 */
+	public static int getDifference(Date date, Date date2) {
+//		Calendar cal = Calendar.getInstance();
+//		cal.setTime(date);
+//		int y = cal.get(Calendar.YEAR);
+//		int m = cal.get(Calendar.MONTH);
+//		int d = cal.get(Calendar.DATE);
+//
+//		Calendar cal2 = Calendar.getInstance();
+//		cal2.setTime(date2);
+//		int y2 = cal2.get(Calendar.YEAR);
+//		int m2 = cal2.get(Calendar.MONTH);
+//		int d2 = cal2.get(Calendar.DATE);
+//
+//		if (y == y2) {
+//			if (m)
+//		}
+		return 0;
 	}
 }
