@@ -2570,4 +2570,87 @@ public class PDFExporter {
 	private String printStage(int age, String text) {
 		return CoreUtil.getAgeString(age) + " - " + text;
 	}
+
+	/**
+	 * Генерация лояльности
+	 * @param writer обработчик генерации документа
+	 * @param chapter раздел
+	 * @param statistics объект статистики
+	 */
+	private void printLoyalty(PdfWriter writer, Chapter chapter, EventStatistics statistics) {
+		try {
+			Section section = PDFUtil.printSection(chapter, "Лояльность");
+
+			Map<String, Double> planetMap = statistics.getPlanetElements();
+			Map<String, Double> houseMap = statistics.getHouseElements();
+
+			int loyalty = 0, flatness = 0;
+			Iterator<Map.Entry<String, Double>> iterator = planetMap.entrySet().iterator();
+			ElementService service = new ElementService();
+		    while (iterator.hasNext()) {
+		    	Entry<String, Double> entry = iterator.next();
+		    	kz.zvezdochet.bean.Element element = (kz.zvezdochet.bean.Element)service.find(entry.getKey());
+		    	if (element.isLoyalty())
+		    		loyalty++;
+		    	else
+		    		flatness++;
+		    }
+
+			//определение выраженной категории
+		    ште
+		    if (element != null) {
+		    	String text = element.getTemperament();
+		    	if (term)
+		    		text += " (" + element.getName() + ")";
+		    	section.add(new Paragraph(text, fonth5));
+		    	section.add(new Paragraph(StringUtil.removeTags(element.getText()), font));
+		    	PDFUtil.printGender(section, element, female, child, true);
+		    }
+
+
+			Bar[] bars = new Bar[4];
+	    	Bar bar = new Bar();
+	    	bar.setName("Лояльность");
+		    bar.setValue(loyalty);
+	    	bar.setCategory("Лояльность в сознании");
+	    	bars[0] = bar;
+
+	    	bar = new Bar();
+	    	bar.setName("Категоричность");
+		    bar.setValue(flatness);
+	    	bar.setCategory("Лояльность в сознании");
+	    	bars[1] = bar;
+
+
+			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+			ListItem li = new ListItem();
+	        li.add(new Chunk("Категория \"Лояльность в сознании\" показывает вашу идеальную модель: "
+					+ "на чём мысленно вы сконцентрированы, какие проявления для вас важны, необходимы и естественны.", font));
+	        list.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("Категория \"Лояльность в поступках\" показывает, "
+					+ "как меняются ваши приоритеты на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
+	        list.add(li);
+	        section.add(list);
+
+			iterator = houseMap.entrySet().iterator();
+			i = planetMap.size() - 1;
+		    while (iterator.hasNext()) {
+		    	i++;
+		    	Entry<String, Double> entry = iterator.next();
+		    	Bar bar = new Bar();
+		    	element = (kz.zvezdochet.bean.Element)service.find(entry.getKey());
+		    	bar.setName(element.getDiaName());
+		    	bar.setValue(entry.getValue());
+		    	bar.setColor(element.getColor());
+		    	bar.setCategory("Лояльность в поступках");
+		    	bars[i] = bar;
+		    }
+		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Сравнение лояльности", "Аспекты", "Баллы", bars, 500, 0, true);
+			section.add(image);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
