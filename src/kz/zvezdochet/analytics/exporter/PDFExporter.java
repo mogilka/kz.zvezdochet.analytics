@@ -365,7 +365,11 @@ public class PDFExporter {
 			statistics.initHouseDivisions();
 			printElements(writer, chapter, statistics);
 			chapter.add(Chunk.NEXTPAGE);
-	
+
+			//лояльность
+			printLoyalty(writer, chapter, event);
+			chapter.add(Chunk.NEXTPAGE);
+
 			//инь-ян
 			printYinYang(writer, chapter, statistics);
 			chapter.add(Chunk.NEXTPAGE);
@@ -1070,11 +1074,20 @@ public class PDFExporter {
 	 */
 	private void printPlanetWeak(Chapter chapter, Event event) {
 		try {
-			Section section = PDFUtil.printSection(chapter, "Слабые стороны");
-			PlanetTextService service = new PlanetTextService();
+			List<Planet> weaks = new ArrayList<>();
 			List<Model> planets = event.getConfiguration().getPlanets();
 			for (Model model : planets) {
 				Planet planet = (Planet)model;
+				if (planet.inMine()
+						|| (planet.isDamaged() && !planet.isBroken()))
+					weaks.add(planet);
+			}
+			if (weaks.isEmpty())
+				return;
+
+			Section section = PDFUtil.printSection(chapter, "Слабые стороны");
+			PlanetTextService service = new PlanetTextService();
+			for (Planet planet : weaks) {
 				PlanetText planetText = null;
 
 				if (planet.inMine()) {
@@ -1222,6 +1235,12 @@ public class PDFExporter {
 				Paragraph p = new Paragraph("В данном разделе описаны качества вашей личности, которые проявляются в критические моменты жизни:", font);
 				p.setSpacingAfter(10);
 				section.add(p);
+			} else {
+				Paragraph p = new Paragraph("Если в прогнозе упомянуты люди, которых нет в живых, "
+					+ "или вы никогда их не видела (родители, родственники), "
+					+ "значит речь идёт о людях, их заменяющих или похожих на них по характеру", font);
+				p.setSpacingBefore(10);
+				chapter.add(p);
 			}
 			PlanetAspectService service = new PlanetAspectService();
 			Configuration conf = event.getConfiguration();
@@ -1319,14 +1338,14 @@ public class PDFExporter {
 				"stellium",		//0° 0° 0° 0°
 				"semivehicle",	//60° 180° 120°
 				"cross",		//90° 90° 90° 90°
-				"taucross",		//90° 180° 90°
+//				"taucross",		//90° 180° 90°
 				"dagger",		//135° 45° 45° 135°
 				"poleaxe",		//135° 90° 135°
 				"javelin",		//45° 90° 45°
 				"davidstar",	//60° 60° 60° 60° 60° 60°
 				"trapezoid",	//60° 60° 60° 180°
 				"sail",			//120° 60° 60° 120°
-//				"triangle",		//120° 120° 120°
+				"triangle",		//120° 120° 120°
 				"bisextile",	//60° 120° 60°
 				"boomerang",	//150° 30° 30° 150°
 				"pitchfork",	//150° 60° 150°
@@ -1336,17 +1355,18 @@ public class PDFExporter {
 				"cage",			//40° 40° 40° 40° 40° 40° 40° 40° 40°
 				"box",			//20° 40° 100° 40°
 				"lock",			//20° 40° 20°
-//				"lasso",		//40° 80° 40°
-//				"stretcher",	//100° 80° 100° 80°
+				"lasso",		//40° 80° 40°
+				"stretcher",	//100° 80° 100° 80°
 				"wreath",		//72° 72° 72° 72° 72°
 				"ship",			//72° 144° 72°
-				"palm",			//144° 72° 144°
+//				"palm",			//144° 72° 144°
 				"pyramid",		//150° 72° 135°
 				"envelope",		//108° 72° 108° 72°
 				"compass",		//108° 180° 72°
 				"boat",			//36° 72° 36°
 				"bilasso",		//80° 80° 160°
-				"ram"			//130.55° 65.27° 65.27°
+				"ram",			//130.55° 65.27° 65.27°
+				"rocket"		//144° 36° 36° 144°
 			};
 			PlanetTextService service = new PlanetTextService();
 			PlanetText text = null;
@@ -1434,22 +1454,18 @@ public class PDFExporter {
 					}
 
 				} else if (code.equals("taucross")) {
-					text = (PlanetText)service.findByPlanet(23L, "negative");
+					text = (PlanetText)service.findByPlanet(34L, "negative");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
-					text = (PlanetText)service.findByPlanet(26L, "negative");
-					if (text != null)
-						section.add(PDFUtil.html2pdf(text.getText()));
-
-//					Cross cross = (Cross)new CrossService().find(3L);
-//					if (cross != null) {
-//						String str = "Ваша реакция на вышеперечисленные ситуации";
-//						if (term)
-//							str += " (" + cross.getName() + ")";
-//						section.add(new Paragraph(str + ":", fonth5));
-//						section.add(new Paragraph(StringUtil.removeTags(cross.getTau()), font));
-//					}
+					Cross cross = (Cross)new CrossService().find(3L);
+					if (cross != null) {
+						String str = "Ваша реакция на вышеперечисленные ситуации";
+						if (term)
+							str += " (" + cross.getName() + ")";
+						section.add(new Paragraph(str + ":", fonth5));
+						section.add(new Paragraph(StringUtil.removeTags(cross.getTau()), font));
+					}
 
 //					section.add(Chunk.NEWLINE);
 //					text = (PlanetText)service.findByPlanet(27L, "negative");
@@ -1525,7 +1541,11 @@ public class PDFExporter {
 						section.add(PDFUtil.html2pdf(text.getText()));
 
 				} else if (code.equals("palm")) {
-					text = (PlanetText)service.findByPlanet(30L, "positive");
+					text = (PlanetText)service.findByPlanet(20L, "positive");
+					if (text != null)
+						section.add(PDFUtil.html2pdf(text.getText()));
+
+					text = (PlanetText)service.findByPlanet(31L, "positive");
 					if (text != null)
 						section.add(PDFUtil.html2pdf(text.getText()));
 
@@ -2575,78 +2595,91 @@ public class PDFExporter {
 	 * Генерация лояльности
 	 * @param writer обработчик генерации документа
 	 * @param chapter раздел
-	 * @param statistics объект статистики
+	 * @param event событие
 	 */
-	private void printLoyalty(PdfWriter writer, Chapter chapter, EventStatistics statistics) {
+	private void printLoyalty(PdfWriter writer, Chapter chapter, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Лояльность");
 
-			Map<String, Double> planetMap = statistics.getPlanetElements();
-			Map<String, Double> houseMap = statistics.getHouseElements();
-
-			int loyalty = 0, flatness = 0;
-			Iterator<Map.Entry<String, Double>> iterator = planetMap.entrySet().iterator();
-			ElementService service = new ElementService();
-		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
-		    	kz.zvezdochet.bean.Element element = (kz.zvezdochet.bean.Element)service.find(entry.getKey());
-		    	if (element.isLoyalty())
-		    		loyalty++;
+			int loyalty = 0, flatness = 0, max = 5, loyalty2 = 0, flatness2 = 0;
+			for (Model model : event.getConfiguration().getPlanets()) {
+				Planet planet = (Planet)model;
+				boolean loyal2 = planet.getHouse().getElement().isLoyalty();
+		    	if (loyal2)
+		    		++loyalty2;
 		    	else
-		    		flatness++;
-		    }
+		    		++flatness2;
+
+		    	if (!planet.isMain())
+					continue;
+				boolean loyal = planet.getSign().getElement().isLoyalty();
+		    	if (loyal)
+		    		++loyalty;
+		    	else
+		    		++flatness;
+			}
 
 			//определение выраженной категории
-		    ште
-		    if (element != null) {
-		    	String text = element.getTemperament();
-		    	if (term)
-		    		text += " (" + element.getName() + ")";
-		    	section.add(new Paragraph(text, fonth5));
-		    	section.add(new Paragraph(StringUtil.removeTags(element.getText()), font));
-		    	PDFUtil.printGender(section, element, female, child, true);
+		    int diff = loyalty - flatness;
+		    String title = "";
+		    String text = "";
+		    if (diff > 0) {
+			    text = "Лояльность – это умение адаптироваться, быть гибким, понимающим и снисходительным. ";
+		    	if (diff > 2)
+		    		title = "Лояльный тип";
+		    	else
+		    		title = "Склонность больше к лояльности, чем к категоричности";
+	    		text += "У вас это качество преобладает в соотношении " + loyalty + "/" + max;
+		    } else {
+			    text = "Категоричность – это нежелание адаптироваться, занижать планку и быть снисходительным. ";
+			    diff = Math.abs(diff);
+		    	if (diff > 2)
+		    		title = "Категоричный тип";
+		    	else
+		    		title = "Склонность больше к категоричности, чем к лояльности";
+	    		text += "У вас это качество преобладает в соотношении " + flatness + "/" + max;
 		    }
+	    	section.add(new Paragraph(title, fonth5));
+	    	section.add(new Paragraph(text, font));
 
 
 			Bar[] bars = new Bar[4];
 	    	Bar bar = new Bar();
 	    	bar.setName("Лояльность");
-		    bar.setValue(loyalty);
-	    	bar.setCategory("Лояльность в сознании");
+		    bar.setValue(loyalty * (-1));
+	    	bar.setCategory("в сознании");
 	    	bars[0] = bar;
 
 	    	bar = new Bar();
 	    	bar.setName("Категоричность");
-		    bar.setValue(flatness);
-	    	bar.setCategory("Лояльность в сознании");
+		    bar.setValue(flatness * (-1));
+	    	bar.setCategory("в сознании");
 	    	bars[1] = bar;
 
+	    	bar = new Bar();
+	    	bar.setName("Лояльность");
+		    bar.setValue(loyalty2);
+	    	bar.setCategory("в поступках");
+	    	bars[2] = bar;
 
+	    	bar = new Bar();
+	    	bar.setName("Категоричность");
+		    bar.setValue(flatness2);
+	    	bar.setCategory("в поступках");
+	    	bars[3] = bar;
+
+	    	section.add(Chunk.NEWLINE);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
-	        li.add(new Chunk("Категория \"Лояльность в сознании\" показывает вашу идеальную модель: "
-					+ "на чём мысленно вы сконцентрированы, какие проявления для вас важны, необходимы и естественны.", font));
+	        li.add(new Chunk("Категория \"Лояльность в сознании\" показывает вашу привычную модель: насколько лояльно вы относитесь к миру.", font));
 	        list.add(li);
 
 			li = new ListItem();
 	        li.add(new Chunk("Категория \"Лояльность в поступках\" показывает, "
-					+ "как меняются ваши приоритеты на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
+        		+ "как уровень лояльности меняется на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
 	        list.add(li);
 	        section.add(list);
 
-			iterator = houseMap.entrySet().iterator();
-			i = planetMap.size() - 1;
-		    while (iterator.hasNext()) {
-		    	i++;
-		    	Entry<String, Double> entry = iterator.next();
-		    	Bar bar = new Bar();
-		    	element = (kz.zvezdochet.bean.Element)service.find(entry.getKey());
-		    	bar.setName(element.getDiaName());
-		    	bar.setValue(entry.getValue());
-		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Лояльность в поступках");
-		    	bars[i] = bar;
-		    }
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Сравнение лояльности", "Аспекты", "Баллы", bars, 500, 0, true);
 			section.add(image);
 		} catch(Exception e) {
