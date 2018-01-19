@@ -240,7 +240,6 @@ public class PDFExporter {
 			chapter.add(Chunk.NEXTPAGE);
 
 			//знаменитости
-			printCelebrities(chapter, event.getBirth());
 			printSimilar(chapter, event);
 			chapter.add(Chunk.NEXTPAGE);
 
@@ -248,7 +247,8 @@ public class PDFExporter {
 			Map<String, Double> signMap = statistics.getPlanetSigns(true);
 
 			//градус рождения
-			if (!child) {
+			boolean undefined = (3 == event.getRectification());
+			if (!child && !undefined) {
 				printDegree(chapter, event, signMap);
 				chapter.add(Chunk.NEXTPAGE);
 			}
@@ -292,8 +292,10 @@ public class PDFExporter {
 				+ "и чем отличаетесь от себе подобных", font));
 
 			//вид космограммы
-			printCardKind(chapter, event);
-			chapter.add(Chunk.NEXTPAGE);
+			if (!undefined) {
+				printCardKind(chapter, event);
+				chapter.add(Chunk.NEXTPAGE);
+			}
 
 			//тип космограммы
 			Map<String, Integer> signPlanetsMap = statistics.getSignPlanets();
@@ -325,9 +327,10 @@ public class PDFExporter {
 			chapter.add(Chunk.NEXTPAGE);
 
 			//конфигурации аспектов
-			printConfigurations(chapter, event);
-			doc.add(chapter);
+			if (!undefined)
+				printConfigurations(chapter, event);
 
+			doc.add(chapter);
 
 			chapter = new ChapterAutoNumber("Реализация личности");
 			chapter.setNumberDepth(0);
@@ -486,6 +489,7 @@ public class PDFExporter {
 	 * @param date дата события
 	 * @param cell тег-контейнер для вложенных тегов
 	 */
+	@SuppressWarnings("unused")
 	private void printCelebrities(Chapter chapter, Date date) {
 		try {
 			List<Event> events = new EventService().findEphemeron(date);
