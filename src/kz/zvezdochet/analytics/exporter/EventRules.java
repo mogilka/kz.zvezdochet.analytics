@@ -61,6 +61,14 @@ public class EventRules {
 //				return female ? (Rule)service.find(8L) : (Rule)service.find(9L);
 //			}
 //		}
+		if (planet.getCode().equals("Moon")) {
+			if (house.getCode().equals("II")) {
+				if (spa.getAspect().getType().getCode().equals("POSITIVE")) {
+					if (planet.getSign().getCode().equals("Taurus"))
+						return (Rule)service.find(105L);
+				}
+			}
+		}
 		return null;
 	}
 
