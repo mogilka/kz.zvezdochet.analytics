@@ -2,15 +2,13 @@ package kz.zvezdochet.analytics.bean;
 
 /**
  * Синастрический аспект
- * @author nataly
+ * @author Nataly Didenko
  *
  */
 public class SynastryAspectText extends PlanetAspectText {
 	private static final long serialVersionUID = -7872375252777326071L;
 
-	public SynastryAspectText() {
-		// TODO Auto-generated constructor stub
-	}
+	public SynastryAspectText() {}
 
 	/**
 	 * Роли
