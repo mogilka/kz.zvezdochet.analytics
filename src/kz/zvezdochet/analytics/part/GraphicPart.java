@@ -1,6 +1,7 @@
 package kz.zvezdochet.analytics.part;
 
 import java.awt.Frame;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -69,6 +70,7 @@ public class GraphicPart extends View implements IFilterable {
 		lb.setText("Начало");
 		final CDateTime dt = new CDateTime(grFilter, CDT.BORDER | CDT.COMPACT | CDT.DROP_DOWN | CDT.DATE_LONG | CDT.TIME_MEDIUM);
 		dt.setNullText(""); //$NON-NLS-1$
+//		dt.setSelection(selection);
 
 		lb = new Label(grFilter, SWT.NONE);
 		lb.setText("Конец");
@@ -95,7 +97,7 @@ public class GraphicPart extends View implements IFilterable {
 		GridLayoutFactory.swtDefaults().applyTo(grFilter);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(grFilter);
 
-		group = new Group(parent, SWT.NONE);
+		group = new Group(parent, SWT.EMBEDDED);
 		group.setText("Инфографика");
 		group.setLayout(new GridLayout());
 		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(group);
@@ -134,9 +136,10 @@ public class GraphicPart extends View implements IFilterable {
 					event.setCalculated(true);
 					service.save(event);
 					System.out.println("Новый добавлен: " + event.toLog() + "\n");
-				} else
+				} else {
 					event = events.get(0);
-				
+					event.init(false);
+				}
 				long time = date.getTime(); 
 				if (!dates.containsKey(time))
 					dates.put(time, event);
@@ -182,11 +185,11 @@ public class GraphicPart extends View implements IFilterable {
 	//                plot.setDirection(Rotation.CLOCKWISE);
 	//                plot.setForegroundAlpha(0.5f);
 	
-	       		Composite composite = new Composite(group, SWT.NONE);
-	       		Frame frame = SWT_AWT.new_Frame(composite);
-//	       		chartPanel.setLayout(/* some AWT/Swing layout manager like BoxLayout */);
-	       		ChartPanel chartPanel = new ChartPanel(chart);
-	       		frame.add(chartPanel);
+//	       		Composite composite = new Composite(group, SWT.NONE);
+	       		Frame frame = SWT_AWT.new_Frame(group.getShell());
+	       		frame.setLayout(new GridBagLayout());
+	       		ChartPanel panel = new ChartPanel(chart);
+	       		frame.add(panel);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
