@@ -1,5 +1,6 @@
 package kz.zvezdochet.analytics.part;
 
+import java.awt.Canvas;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -24,8 +25,10 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -186,10 +189,10 @@ public class GraphicPart extends View implements IFilterable {
 	//                plot.setForegroundAlpha(0.5f);
 	
 //	       		Composite composite = new Composite(group, SWT.NONE);
-	       		Frame frame = SWT_AWT.new_Frame(group.getShell());
-	       		frame.setLayout(new GridBagLayout());
+	       		java.awt.Canvas canvas = new Canvas();
+	       		Shell shell = SWT_AWT.new_Shell(Display.getCurrent(), canvas); 
 	       		ChartPanel panel = new ChartPanel(chart);
-	       		frame.add(panel);
+	       		shell.add(panel);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
