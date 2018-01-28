@@ -3,6 +3,7 @@ package kz.zvezdochet.analytics.part;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
+import java.awt.Panel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,13 +23,18 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
@@ -45,6 +51,8 @@ import kz.zvezdochet.core.ui.view.View;
 import kz.zvezdochet.core.util.DateUtil;
 import kz.zvezdochet.service.EventService;
 import kz.zvezdochet.service.PlanetService;
+
+import org.jfree.experimental.chart.swt.ChartComposite;
 
 /**
  * Представление графиков
@@ -100,10 +108,8 @@ public class GraphicPart extends View implements IFilterable {
 		GridLayoutFactory.swtDefaults().applyTo(grFilter);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(grFilter);
 
-		group = new Group(parent, SWT.EMBEDDED);
+		group = new Group(parent, SWT.NONE);
 		group.setText("Инфографика");
-		group.setLayout(new GridLayout());
-		group.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
 		GridLayoutFactory.swtDefaults().applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
 	}
@@ -116,6 +122,9 @@ public class GraphicPart extends View implements IFilterable {
 
 	protected void setData(Date initDate, Date finalDate) {
 		try {
+			for(Control control : group.getChildren())
+				if (!control.isDisposed())
+					control.dispose();
 			//разбивка дат по периоду
 			Calendar start = Calendar.getInstance();
 			start.setTime(initDate);
@@ -186,12 +195,27 @@ public class GraphicPart extends View implements IFilterable {
 	            XYPlot plot = (XYPlot)chart.getPlot();
 	            plot.setBackgroundPaint(new java.awt.Color(230, 230, 250));
 
-	       		Frame frame = SWT_AWT.new_Frame(group);
-	       		frame.setLayout(new GridBagLayout());
-	       		frame.setBackground(Color.GREEN);
-//	       		ChartPanel panel = new ChartPanel(chart);
-	       		ChartPanel panel = new ChartPanel(chart, 500, 500, 500, 500, 500, 500, true, true, true, true, false, true);
-	       		frame.add(panel);
+	            ChartComposite composite = new ChartComposite(group, SWT.NONE, chart, true);
+	            composite.setLayout(new FillLayout(SWT.VERTICAL));
+	            group.setSize(1800,1600);
+//	            composite.setLayout(new GridLayout(1, false));
+//	            composite.setLayoutData(new GridData(800,600));
+//	            Frame frame = SWT_AWT.new_Frame(group);
+//	            frame.setLayout(new GridBagLayout());
+//	            ChartPanel jfreeChartPanel = new ChartPanel(chart);
+//	            frame.add(jfreeChartPanel);
+//	    		GridLayoutFactory.swtDefaults().applyTo(composite);
+//	    		GridDataFactory.fillDefaults().grab(true, true).applyTo(composite);
+	            composite.pack();
+
+//	            frame.pack();
+
+
+//	       		Frame frame = SWT_AWT.new_Frame(group);
+//	       		frame.setLayout(new GridBagLayout());
+//	       		frame.setBackground(Color.GREEN);
+//	       		ChartPanel panel = new ChartPanel(chart, 500, 500, 500, 500, 500, 500, true, true, true, true, false, true);
+//	       		frame.add(panel);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
