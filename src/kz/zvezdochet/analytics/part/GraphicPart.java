@@ -1,6 +1,6 @@
 package kz.zvezdochet.analytics.part;
 
-import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -28,10 +28,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -103,7 +103,8 @@ public class GraphicPart extends View implements IFilterable {
 		group = new Group(parent, SWT.EMBEDDED);
 		group.setText("Инфографика");
 		group.setLayout(new GridLayout());
-		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(group);
+		group.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+		GridLayoutFactory.swtDefaults().applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
 	}
 
@@ -182,17 +183,15 @@ public class GraphicPart extends View implements IFilterable {
 	       	}
 	       	if (dataset.getSeriesCount() > 0) {
 	       		JFreeChart chart = ChartFactory.createTimeSeriesChart("Орбиты", "Даты", "Координаты", dataset, true, true, true);
-	
-	//            PiePlot3D plot = (PiePlot3D) chart.getPlot();
-	//              plot.setStartAngle(290);
-	//                plot.setDirection(Rotation.CLOCKWISE);
-	//                plot.setForegroundAlpha(0.5f);
-	
-//	       		Composite composite = new Composite(group, SWT.NONE);
-	       		java.awt.Canvas canvas = new Canvas();
-	       		Shell shell = SWT_AWT.new_Shell(Display.getCurrent(), canvas); 
-	       		ChartPanel panel = new ChartPanel(chart);
-	       		shell.add(panel);
+	            XYPlot plot = (XYPlot)chart.getPlot();
+	            plot.setBackgroundPaint(new java.awt.Color(230, 230, 250));
+
+	       		Frame frame = SWT_AWT.new_Frame(group);
+	       		frame.setLayout(new GridBagLayout());
+	       		frame.setBackground(Color.GREEN);
+//	       		ChartPanel panel = new ChartPanel(chart);
+	       		ChartPanel panel = new ChartPanel(chart, 500, 500, 500, 500, 500, 500, true, true, true, true, false, true);
+	       		frame.add(panel);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

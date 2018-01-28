@@ -21,7 +21,7 @@
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_rYo54ADDEeiGBMQIaNSirA" featurename="children" parentElementId="kz.zvezdochet.runner.perspectivestack.main">
     <elements xsi:type="advanced:Perspective" xmi:id="_uv_QMADDEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.perspective.graphics" label="&#x410;&#x43d;&#x430;&#x43b;&#x438;&#x442;&#x438;&#x43a;&#x430;" iconURI="platform:/plugin/kz.zvezdochet.analytics/icons/chart_bar.png" tooltip="&#x410;&#x43d;&#x430;&#x43b;&#x438;&#x442;&#x438;&#x43a;&#x430;">
-      <children xsi:type="basic:PartSashContainer" xmi:id="__B3GwADEEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.partsashcontainer.graphics">
+      <children xsi:type="basic:PartSashContainer" xmi:id="__B3GwADEEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.partsashcontainer.graphics" horizontal="true">
         <children xsi:type="basic:PartStack" xmi:id="_ENT38ADFEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.partstack.graphics">
           <children xsi:type="basic:Part" xmi:id="_K_R7AADFEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.part.graphics" contributionURI="bundleclass://kz.zvezdochet.analytics/kz.zvezdochet.analytics.part.GraphicPart" label="&#x418;&#x43d;&#x444;&#x43e;&#x433;&#x440;&#x430;&#x444;&#x438;&#x43a;&#x430;" iconURI="platform:/plugin/kz.zvezdochet.analytics/icons/chart_bar.png" tooltip="&#x418;&#x43d;&#x444;&#x43e;&#x433;&#x440;&#x430;&#x444;&#x438;&#x43a;&#x430;">
             <toolbar xmi:id="_9B0FIADFEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.toolbar.0"/>
