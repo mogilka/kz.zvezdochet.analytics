@@ -16,8 +16,10 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -47,7 +49,7 @@ import kz.zvezdochet.service.PlanetService;
 /**
  * Представление графиков
  * @author Nataly Didenko
- *
+ * @link https://www.eclipse.org/articles/article.php?file=Article-Understanding-Layouts/index.html
  */
 public class GraphicPart extends View implements IFilterable {
 
@@ -100,9 +102,7 @@ public class GraphicPart extends View implements IFilterable {
 
 		group = new Group(parent, SWT.NONE);
 		group.setText("Инфографика");
-		group.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
-//		group.setSize(600, 300);
-//		group.setLayout(new FillLayout());
+//		group.setLayout(new FillLayout(SWT.VERTICAL));
 		GridLayoutFactory.swtDefaults().applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
 	}
@@ -188,31 +188,39 @@ public class GraphicPart extends View implements IFilterable {
 	            XYPlot plot = (XYPlot)chart.getPlot();
 	            plot.setBackgroundPaint(new java.awt.Color(230, 230, 250));
 
-	            ChartComposite composite = new ChartComposite(group, SWT.FILL, chart, true);
+	            ScrolledComposite scrolled = new ScrolledComposite(group, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+	            scrolled.setExpandVertical(true);
+	            scrolled.setExpandHorizontal(true);
+	            scrolled.setAlwaysShowScrollBars(true);
+	    		scrolled.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+	            ChartComposite composite = new ChartComposite(scrolled, SWT.NONE, chart, true);
+//	            ChartComposite composite = new ChartComposite(group, SWT.NONE, chart,
+//	             500,
+//	             500,
+//	             500,
+//	             500,
+//	             600,
+//	             600,
+//	             true,
+//	             true,
+//	             true,
+//	             true,
+//	             true,
+//	             true);
 //	            composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-//	            composite.setLayout(new FillLayout(SWT.VERTICAL));
-//	            group.setSize(1800,1600);
-	            composite.setLayout(new GridLayout(1, false));
-	            GridData data = new GridData(GridData.FILL_BOTH);
-	            data.widthHint = 900;
-	            data.heightHint = 700;
-	            composite.setLayoutData(data);
-//	            Frame frame = SWT_AWT.new_Frame(group);
+	            composite.setLayout(new FillLayout(SWT.VERTICAL));
+//	            composite.setLayout(new FillLayout(1, false));
+//	            GridData data = new GridData(500,500);
+//	            data.widthHint = 500;
+//	            data.heightHint = 500;
+//	            composite.setLayoutData(data);
+	            scrolled.setContent(composite);
+	            scrolled.setMinSize(composite.computeSize( SWT.DEFAULT, SWT.DEFAULT));
 //	            frame.setLayout(new GridBagLayout());
-//	            ChartPanel jfreeChartPanel = new ChartPanel(chart);
-//	            frame.add(jfreeChartPanel);
 //	    		GridLayoutFactory.swtDefaults().applyTo(composite);
 //	    		GridDataFactory.fillDefaults().grab(true, true).applyTo(composite);
 	            composite.pack();
-
-//	            frame.pack();
-
-
-//	       		Frame frame = SWT_AWT.new_Frame(group);
-//	       		frame.setLayout(new GridBagLayout());
-//	       		frame.setBackground(Color.GREEN);
-//	       		ChartPanel panel = new ChartPanel(chart, 500, 500, 500, 500, 500, 500, true, true, true, true, false, true);
-//	       		frame.add(panel);
+	            scrolled.redraw();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
