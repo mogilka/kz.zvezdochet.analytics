@@ -1,6 +1,7 @@
 package kz.zvezdochet.analytics.part;
 
 import java.awt.BasicStroke;
+import java.awt.Stroke;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -199,10 +200,15 @@ public class GraphicPart extends View implements IFilterable {
                 axis.setVerticalTickLabels(true);
 
                 final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+                renderer.setBaseStroke(new BasicStroke(3));
+                Stroke dashed = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {3.0f}, 0.0f);
                 int scnt = dataset.getSeries().size();
-                for (int i = 0; i < scnt; i++)
-                	renderer.setSeriesStroke(i, new BasicStroke(3));
-
+                for (int i = 0; i < scnt; i++) {
+                	Stroke stroke = renderer.getBaseStroke();
+                	if (i % 2 > 0)
+						stroke = dashed;
+                	renderer.setSeriesStroke(i, stroke);
+                }
 	            final Display display = Display.getDefault();
 	            Shell shell = new Shell(display);
 	            Point point = DialogUtil.getScreenSize();
