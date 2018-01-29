@@ -1,5 +1,7 @@
 package kz.zvezdochet.analytics.part;
 
+import java.awt.BasicStroke;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,21 +18,22 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -40,6 +43,7 @@ import org.jfree.experimental.chart.swt.ChartComposite;
 import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.ui.util.DialogUtil;
 import kz.zvezdochet.core.ui.view.IFilterable;
 import kz.zvezdochet.core.ui.view.View;
 import kz.zvezdochet.core.util.DateUtil;
@@ -49,7 +53,7 @@ import kz.zvezdochet.service.PlanetService;
 /**
  * Представление графиков
  * @author Nataly Didenko
- * @link https://www.eclipse.org/articles/article.php?file=Article-Understanding-Layouts/index.html
+ *
  */
 public class GraphicPart extends View implements IFilterable {
 
@@ -100,11 +104,12 @@ public class GraphicPart extends View implements IFilterable {
 		GridLayoutFactory.swtDefaults().applyTo(grFilter);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(grFilter);
 
-		group = new Group(parent, SWT.NONE);
+		group = new Group(parent, SWT.EMBEDDED);
 		group.setText("Инфографика");
-//		group.setLayout(new FillLayout(SWT.VERTICAL));
+//		group.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
 		GridLayoutFactory.swtDefaults().applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
+//		setData(new Date(1517206791), new Date(1517293190));
 	}
 
 	@Override
@@ -115,9 +120,9 @@ public class GraphicPart extends View implements IFilterable {
 
 	protected void setData(Date initDate, Date finalDate) {
 		try {
-			for(Control control : group.getChildren())
-				if (!control.isDisposed())
-					control.dispose();
+//			for(Control control : group.getChildren())
+//				if (!control.isDisposed())
+//					control.dispose();
 			//разбивка дат по периоду
 			Calendar start = Calendar.getInstance();
 			start.setTime(initDate);
@@ -146,7 +151,7 @@ public class GraphicPart extends View implements IFilterable {
 					event = events.get(0);
 					event.init(false);
 				}
-				long time = date.getTime(); 
+				long time = event.getBirth().getTime(); 
 				if (!dates.containsKey(time))
 					dates.put(time, event);
 			}
@@ -188,39 +193,37 @@ public class GraphicPart extends View implements IFilterable {
 	            XYPlot plot = (XYPlot)chart.getPlot();
 	            plot.setBackgroundPaint(new java.awt.Color(230, 230, 250));
 
-	            ScrolledComposite scrolled = new ScrolledComposite(group, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-	            scrolled.setExpandVertical(true);
-	            scrolled.setExpandHorizontal(true);
-	            scrolled.setAlwaysShowScrollBars(true);
-	    		scrolled.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
-	            ChartComposite composite = new ChartComposite(scrolled, SWT.NONE, chart, true);
-//	            ChartComposite composite = new ChartComposite(group, SWT.NONE, chart,
-//	             500,
-//	             500,
-//	             500,
-//	             500,
-//	             600,
-//	             600,
-//	             true,
-//	             true,
-//	             true,
-//	             true,
-//	             true,
-//	             true);
-//	            composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-	            composite.setLayout(new FillLayout(SWT.VERTICAL));
-//	            composite.setLayout(new FillLayout(1, false));
-//	            GridData data = new GridData(500,500);
-//	            data.widthHint = 500;
-//	            data.heightHint = 500;
-//	            composite.setLayoutData(data);
-	            scrolled.setContent(composite);
-	            scrolled.setMinSize(composite.computeSize( SWT.DEFAULT, SWT.DEFAULT));
-//	            frame.setLayout(new GridBagLayout());
-//	    		GridLayoutFactory.swtDefaults().applyTo(composite);
-//	    		GridDataFactory.fillDefaults().grab(true, true).applyTo(composite);
-	            composite.pack();
-	            scrolled.redraw();
+	            String fontname = "FreeSans";
+	            java.awt.Font sfont = new java.awt.Font(fontname, java.awt.Font.PLAIN, 10);
+	            plot.getDomainAxis().setLabelFont(sfont);
+	            plot.getRangeAxis().setLabelFont(sfont);
+            	chart.getLegend().setItemFont(sfont);
+
+                DateAxis axis = (DateAxis)plot.getDomainAxis();
+                axis.setDateFormatOverride(new SimpleDateFormat("dd.MM"));
+                axis.setAutoTickUnitSelection(false);
+                axis.setVerticalTickLabels(true);
+
+                final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+                int scnt = dataset.getSeries().size();
+                for (int i = 0; i < scnt; i++)
+                	renderer.setSeriesStroke(i, new BasicStroke(3));
+
+	            final Display display = Display.getDefault();
+	            Shell shell = new Shell(display);
+	            Point point = DialogUtil.getScreenSize();
+	            shell.setSize(point.x - 800, point.y - 400);
+	            shell.setLayout(new FillLayout());
+	            shell.setText("Орбиты");
+	            ChartComposite frame = new ChartComposite(shell, SWT.NONE, chart, true);
+	            frame.setDisplayToolTips(true);
+	            frame.setHorizontalAxisTrace(false);
+	            frame.setVerticalAxisTrace(false);
+	            shell.open();
+	            while (!shell.isDisposed()) {
+	                if (!display.readAndDispatch())
+	                    display.sleep();
+	            }
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
