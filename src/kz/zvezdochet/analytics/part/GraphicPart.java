@@ -183,7 +183,7 @@ public class GraphicPart extends View implements IFilterable {
 	       		List<TimeSeriesDataItem> series = items.containsKey(pid) ? items.get(pid) : new ArrayList<TimeSeriesDataItem>();
 	       		if (null == series || 0 == series.size())
 	       			continue;
-				TimeSeries timeSeries = new TimeSeries(planet.getName());
+				TimeSeries timeSeries = new TimeSeries(planet.getSymbol());
 				for (TimeSeriesDataItem tsdi : series)
 					timeSeries.add(tsdi);
 				dataset.addSeries(timeSeries);
@@ -192,12 +192,6 @@ public class GraphicPart extends View implements IFilterable {
 	       		JFreeChart chart = ChartFactory.createTimeSeriesChart("Орбиты", "Даты", "Координаты", dataset, true, true, true);
 	            XYPlot plot = (XYPlot)chart.getPlot();
 	            plot.setBackgroundPaint(new java.awt.Color(230, 230, 250));
-
-	            String fontname = "FreeSans";
-	            java.awt.Font sfont = new java.awt.Font(fontname, java.awt.Font.PLAIN, 10);
-	            plot.getDomainAxis().setLabelFont(sfont);
-	            plot.getRangeAxis().setLabelFont(sfont);
-            	chart.getLegend().setItemFont(sfont);
 
                 DateAxis axis = (DateAxis)plot.getDomainAxis();
                 axis.setDateFormatOverride(new SimpleDateFormat("dd.MM"));
