@@ -5,9 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import kz.zvezdochet.analytics.bean.PlanetText;
+import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
+import kz.zvezdochet.service.PlanetService;
 
 /**
  * Сервис планет в знаках Зодиака
@@ -38,7 +40,7 @@ public class PlanetTextService extends GenderTextModelService {
 					"text = ? " +
 					"where id = " + dict.getId();
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setLong(1, dict.getPlanetid());
+			ps.setLong(1, dict.getPlanet().getId());
 			ps.setString(2, dict.getType());
 			ps.setString(3, dict.getText());
 			result = ps.executeUpdate();
@@ -71,7 +73,7 @@ public class PlanetTextService extends GenderTextModelService {
 	public PlanetText init(ResultSet rs, Model model) throws DataAccessException, SQLException {
 		PlanetText dict = (model != null) ? (PlanetText)model : (PlanetText)create();
 		dict = (PlanetText)super.init(rs, model);
-		dict.setPlanetid(rs.getLong("planetid"));
+		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("planetid")));
 		dict.setType(rs.getString("type"));
 		return dict;
 	}

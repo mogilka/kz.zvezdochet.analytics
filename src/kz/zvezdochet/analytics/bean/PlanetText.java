@@ -1,6 +1,7 @@
 package kz.zvezdochet.analytics.bean;
 
 import kz.zvezdochet.analytics.service.PlanetTextService;
+import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.TextGenderModel;
 import kz.zvezdochet.core.service.ModelService;
 
@@ -12,9 +13,9 @@ public class PlanetText extends TextGenderModel {
 	private static final long serialVersionUID = -8328248201235163517L;
 
 	/**
-	 * Идентификатор планеты
+	 * Планета
 	 */
-    private long planetid;
+    private Planet planet;
     /**
      * Тип
      */
@@ -24,12 +25,12 @@ public class PlanetText extends TextGenderModel {
 		return new PlanetTextService();
 	}
 
-	public long getPlanetid() {
-		return planetid;
+	public Planet getPlanet() {
+		return planet;
 	}
 
-	public void setPlanetid(long planetid) {
-		this.planetid = planetid;
+	public void setPlanet(Planet planet) {
+		this.planet = planet;
 	}
 
 	public String getType() {

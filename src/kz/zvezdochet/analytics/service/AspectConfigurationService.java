@@ -1,8 +1,13 @@
 package kz.zvezdochet.analytics.service;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import kz.zvezdochet.analytics.bean.AspectConfiguration;
 import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.TextGenderDictionaryService;
+import kz.zvezdochet.core.util.CoreUtil;
 
 /**
  * Сервис конфигурации аспектов
@@ -17,5 +22,16 @@ public class AspectConfigurationService extends TextGenderDictionaryService {
 	@Override
 	public Model create() {
 		return new AspectConfiguration();
+	}
+
+	@Override
+	public AspectConfiguration init(ResultSet rs, Model model) throws DataAccessException, SQLException {
+		AspectConfiguration type = (model != null) ? (AspectConfiguration)model : (AspectConfiguration)create();
+		super.init(rs, model);
+		type.setColor(CoreUtil.rgbToColor(rs.getString("Color")));
+		String s = rs.getString("positive");
+		boolean f = s.equals("1") ? true : false;
+		type.setPositive(f);
+		return type;
 	}
 }
