@@ -6,6 +6,7 @@ import org.eclipse.swt.graphics.Color;
 
 import kz.zvezdochet.analytics.Activator;
 import kz.zvezdochet.analytics.service.AspectConfigurationService;
+import kz.zvezdochet.bean.Element;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.util.PlatformUtil;
@@ -61,5 +62,18 @@ public class AspectConfiguration extends TextGenderDictionary {
 
 	public void setPositive(boolean positive) {
 		this.positive = positive;
+	}
+
+	/**
+	 * Стихия
+	 */
+	private Element element;
+
+	public Element getElement() {
+		return element;
+	}
+
+	public void setElement(Element element) {
+		this.element = element;
 	}
 }
