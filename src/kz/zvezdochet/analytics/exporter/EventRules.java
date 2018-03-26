@@ -274,4 +274,17 @@ public class EventRules {
 		}
 		return null;
 	}
+
+	/**
+	 * Селена и Лилит в одном доме
+	 * @param house дом
+	 * @return правило
+	 * @throws DataAccessException 
+	 */
+	public static Rule ruleMoonsHouse(House house) throws DataAccessException {
+		RuleService service = new RuleService();
+		if (house.getCode().equals("I"))
+			return (Rule)service.find(106L);
+		return null;
+	}
 }

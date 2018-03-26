@@ -1707,6 +1707,9 @@ public class PDFExporter {
 					section = PDFUtil.printSection(chapter, house.getName());
 			
 					for (Planet planet : planets) {
+						if (planet.getCode().equals("Lilith") && house.isSelened())
+							continue;
+
 						String sign = planet.isDamaged() || planet.isLilithed() ? "-" : "+";
 
 						p = new Paragraph("", fonth5);
@@ -1715,6 +1718,7 @@ public class PDFExporter {
 		    				p.add(new Chunk(mark, fonth5));
 		    				p.add(new Chunk(planet.getSymbol() + " ", PDFUtil.getHeaderAstroFont()));
 						}
+
 		    			if (term) {
 		    				p.add(new Chunk(" " + planet.getName() + " в " + house.getDesignation() + " доме", fonth5));
 		    				p.add(Chunk.NEWLINE);
@@ -1722,15 +1726,23 @@ public class PDFExporter {
 		    				p.add(new Chunk(planet.getShortName() + " " + sign + " " + house.getName(), fonth5));
 		    			section.addSection(p);
 
-						PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, null);
-						if (dict != null) {
-							section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
-							PDFUtil.printGender(section, dict, female, child, true);
-
-							Rule rule = EventRules.rulePlanetHouse(planet, house, female);
+						if (planet.getCode().equals("Selena") && house.isLilithed()) {
+							Rule rule = EventRules.ruleMoonsHouse(house);
 							if (rule != null) {
-								section.add(PDFUtil.html2pdf(rule.getText()));
+								section.add(new Paragraph(StringUtil.removeTags(rule.getText()), font));
 								section.add(Chunk.NEWLINE);
+							}
+						} else {
+							PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, null);
+							if (dict != null) {
+								section.add(new Paragraph(StringUtil.removeTags(dict.getText()), font));
+								PDFUtil.printGender(section, dict, female, child, true);
+	
+								Rule rule = EventRules.rulePlanetHouse(planet, house, female);
+								if (rule != null) {
+									section.add(PDFUtil.html2pdf(rule.getText()));
+									section.add(Chunk.NEWLINE);
+								}
 							}
 						}
 					}
