@@ -243,10 +243,6 @@ public class PDFExporter {
 			printCard(doc, chapter);
 			chapter.add(Chunk.NEXTPAGE);
 
-			//знаменитости
-			printSimilar(chapter, event);
-			chapter.add(Chunk.NEWLINE);
-
 			//лунный день
 			printLunar(chapter, event);
 			chapter.add(Chunk.NEXTPAGE);
@@ -389,8 +385,11 @@ public class PDFExporter {
 			
 			//зоны
 			printZones(writer, chapter, statistics);
-			doc.add(chapter);
+			chapter.add(Chunk.NEXTPAGE);
 
+			//знаменитости
+			printSimilar(chapter, event);
+			doc.add(chapter);
 
 			chapter = new ChapterAutoNumber(PDFUtil.printHeader(new Paragraph(), "Сокращения"));
 			chapter.setNumberDepth(0);
@@ -1346,11 +1345,11 @@ public class PDFExporter {
 				"davidstar",	//60° 60° 60° 60° 60° 60°
 				"trapezoid",	//60° 60° 60° 180°
 				"sail",			//120° 60° 60° 120°
-//				"triangle",		//120° 120° 120°
+				"triangle",		//120° 120° 120°
 				"bisextile",	//60° 120° 60°
-//				"boomerang",	//150° 30° 30° 150°
+				"boomerang",	//150° 30° 30° 150°
 				"pitchfork",	//150° 60° 150°
-				"vehicle",		//60° 120° 60° 120°
+//				"vehicle",		//60° 120° 60° 120°
 				"roof",			//30° 60° 30°
 				"railing",		//150° 30° 150° 30°
 				"cage",			//40° 40° 40° 40° 40° 40° 40° 40° 40°
@@ -1367,7 +1366,8 @@ public class PDFExporter {
 				"boat",			//36° 72° 36°
 				"bilasso",		//80° 80° 160°
 				"ram",			//130.55° 65.27° 65.27°
-				"rocket"		//144° 36° 36° 144°
+				"rocket",		//144° 36° 36° 144°
+//				"isolator"		//135° 45° 135° 45°
 			};
 			PlanetTextService service = new PlanetTextService();
 			PlanetText text = null;
@@ -1445,6 +1445,18 @@ public class PDFExporter {
 						map.put("right", new Planet[] { (Planet)planetService.find(30L) });
 						map.put("left", new Planet[] { (Planet)planetService.find(31L) });
 						map.put("base", new Planet[] { (Planet)planetService.find(26L), (Planet)planetService.find(22L) });
+
+					} else if (code.equals("isolator")) {
+						map.put("vertex", new Planet[] { (Planet)planetService.find(32L) });
+						map.put("right", new Planet[] { (Planet)planetService.find(30L) });
+						map.put("base", new Planet[] { (Planet)planetService.find(20L) });
+						map.put("left", new Planet[] { (Planet)planetService.find(31L) });
+
+					} else if (code.equals("vehicle")) {
+						map.put("vertex", new Planet[] { (Planet)planetService.find(27L) });
+						map.put("right", new Planet[] { (Planet)planetService.find(30L) });
+						map.put("base", new Planet[] { (Planet)planetService.find(29L) });
+						map.put("left", new Planet[] { (Planet)planetService.find(31L) });
 					}
 			    	printConf(event, section, conf, null, map, true);
 			    	if (!map2.isEmpty())
@@ -1519,13 +1531,6 @@ public class PDFExporter {
 					}
 				} else if (code.equals("pitchfork")) {
 					text = (PlanetText)service.findByPlanet(20L, "positive");
-					if (text != null) {
-						section.add(new Paragraph(text.getPlanet().getShortName(), bold));
-						section.add(PDFUtil.html2pdf(text.getText()));
-					}
-
-				} else if (code.equals("vehicle")) {
-					text = (PlanetText)service.findByPlanet(19L, "positive");
 					if (text != null) {
 						section.add(new Paragraph(text.getPlanet().getShortName(), bold));
 						section.add(PDFUtil.html2pdf(text.getText()));
@@ -1808,7 +1813,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue() * (-1));
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Темперамент в сознании");
+		    	bar.setCategory("в сознании");
 		    	bars[i] = bar;
 		    }
 		    
@@ -1860,7 +1865,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Темперамент в поступках");
+		    	bar.setCategory("в поступках");
 		    	bars[i] = bar;
 		    }
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Сравнение темпераментов", "Аспекты", "Баллы", bars, 500, 0, true);
@@ -1896,7 +1901,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue() * (-1));
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Мужское и женское в сознании");
+		    	bar.setCategory("в сознании");
 		    	bars[++i] = bar;
 		    	//определяем наиболее выраженный элемент
 		    	if (entry.getValue() > score) {
@@ -1933,7 +1938,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Мужское и женское в поступках");
+		    	bar.setCategory("в поступках");
 		    	bars[++i] = bar;
 		    }
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Мужское и женское начало", "Аспекты", "Баллы", bars, 500, 150, true);
@@ -1969,7 +1974,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue() * (-1));
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("В мыслях");
+		    	bar.setCategory("в мыслях");
 	    		bars[++i] = bar;
 		    	//определяем наиболее выраженный элемент
 		    	if (entry.getValue() > score) {
@@ -2005,7 +2010,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("В поступках");
+		    	bar.setCategory("в поступках");
 	    		bars[++i] = bar;
 		    }
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Открытость и закрытость", "Аспекты", "Баллы", bars, 500, 0, true);
@@ -2041,7 +2046,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue() * (-1));
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Зрелость в сознании");
+		    	bar.setCategory("в сознании");
 		    	bars[++i] = bar;
 		    	//определяем наиболее выраженный элемент
 		    	if (entry.getValue() > score) {
@@ -2058,7 +2063,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Зрелость в поступках");
+		    	bar.setCategory("в поступках");
 		    	bars[++i] = bar;
 		    }
 		    if (square != null) {
@@ -2143,7 +2148,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue() * (-1));
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Стратегия в сознании");
+		    	bar.setCategory("в сознании");
 		    	bars[++i] = bar;
 		    	//определяем наиболее выраженный элемент
 		    	if (entry.getValue() > score) {
@@ -2161,7 +2166,7 @@ public class PDFExporter {
 		    	bar.setName(element.getDiaName());
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Стратегия в поступках");
+		    	bar.setCategory("в поступках");
 		    	bars[++i] = bar;
 		    }
 		    if (cross != null) {
@@ -2246,7 +2251,7 @@ public class PDFExporter {
 		    	bar.setName(element.getName());
 		    	bar.setValue(entry.getValue() * (-1));
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Развитие духа в сознании");
+		    	bar.setCategory("в сознании");
 		    	bars[++i] = bar;
 		    	//определяем наиболее выраженный элемент
 		    	if (entry.getValue() > score) {
@@ -2264,7 +2269,7 @@ public class PDFExporter {
 		    	bar.setName(element.getName());
 		    	bar.setValue(entry.getValue());
 		    	bar.setColor(element.getColor());
-		    	bar.setCategory("Развитие духа в поступках");
+		    	bar.setCategory("в поступках");
 		    	bars[++i] = bar;
 		    }
 		    if (zone != null) {
@@ -2552,6 +2557,7 @@ public class PDFExporter {
 
 			String[] triangle = new String[] {"ram", "bilasso", "poleaxe", "taucross", "triangle"};
 			String[] rhombus = new String[] {"rocket", "boomerang"};
+			String[] rectangle = new String[] {"vehicle", "isolator"};
 
 			if (code.equals("stellium")) {
 				if (sign != null) {
@@ -2641,6 +2647,20 @@ public class PDFExporter {
 					if (map.containsKey("base"))
 						base = map.get("base");
 					shape = printRhombus(conf, vertex, left, right, base);
+				}
+
+			} else if (Arrays.asList(rectangle).contains(code)) {
+				Planet[] vertex = null, left = null, right = null, base = null;
+				if (map != null && !map.isEmpty()) {
+					if (map.containsKey("vertex"))
+						vertex = map.get("vertex");
+					if (map.containsKey("left"))
+						left = map.get("left");
+					if (map.containsKey("right"))
+						right = map.get("right");
+					if (map.containsKey("base"))
+						base = map.get("base");
+					shape = printRectangle(conf, vertex, left, right, base);
 				}
 			}
 
@@ -2917,7 +2937,7 @@ public class PDFExporter {
 	        font.setColor(color.getRed(), color.getGreen(), color.getBlue());
 	        boolean positive = conf.isPositive();
 
-	        //first row
+	        //вершина
 			PdfPCell cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			table.addCell(cell);
@@ -2936,7 +2956,7 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			table.addCell(cell);
 
-			//second row
+			//основание
 			text = "";
 			for (Planet planet : left)
 				text += planet.getPositive() + "\n";
@@ -2964,7 +2984,7 @@ public class PDFExporter {
 			cell.addElement(p);
 			table.addCell(cell);
 
-			//third row
+			//низ
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			table.addCell(cell);
@@ -3052,5 +3072,98 @@ public class PDFExporter {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Отрисовка прямоугольной конфигурации
+	 * @param conf конфигурация аспектов
+	 * @param vertex планета на вершине
+	 * @param left планета в основании слева
+	 * @param right планета в основании справа
+	 * @param base планета в основании
+	 * @return параграф с инфографикой
+	 */
+	private Paragraph printRectangle(AspectConfiguration conf, Planet[] vertex, Planet[] left, Planet[] right, Planet[] base) {
+		try {
+			if (null == vertex || null == left || null == right)
+				return null;
+
+	        PdfPTable table = new PdfPTable(3);
+	        table.setWidthPercentage(100);
+	        Font font = PDFUtil.getRegularFont();
+	        Color color = conf.getColor();
+	        font.setColor(color.getRed(), color.getGreen(), color.getBlue());
+	        boolean positive = conf.isPositive();
+
+	        //верх
+			String text = "";
+			for (Planet planet : vertex)
+				text += (positive ? planet.getPositive() : planet.getNegative()) + "\n";
+			Paragraph p = new Paragraph(text, font);
+			p.setAlignment(Element.ALIGN_RIGHT);
+			PdfPCell cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
+			text = "";
+			for (Planet planet : right)
+				text += (positive ? planet.getPositive() : planet.getNegative()) + "\n";
+			p = new Paragraph(text, font);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+			//изображение
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
+			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
+			cell = new PdfPCell(image);
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			table.addCell(cell);
+
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
+			//низ
+			text = "";
+			for (Planet planet : base)
+				text += (positive ? planet.getPositive() : planet.getNegative()) + "\n";
+			p = new Paragraph(text, font);
+			p.setAlignment(Element.ALIGN_RIGHT);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
+			text = "";
+			for (Planet planet : left)
+				text += (positive ? planet.getPositive() : planet.getNegative()) + "\n";
+			p = new Paragraph(text, font);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+			Paragraph paragraph = new Paragraph();
+			paragraph.add(table);
+			return paragraph;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
