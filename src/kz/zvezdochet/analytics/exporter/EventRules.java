@@ -32,15 +32,19 @@ public class EventRules {
 	 */
 	public static Rule rulePlanetSword(Planet planet, boolean female) throws DataAccessException {
 		RuleService service = new RuleService();
-		if (planet.getCode().equals("Venus")) {
+		String pcode = planet.getCode();
+		if (pcode.equals("Venus")) {
 			if (!planet.inMine() && !planet.isBroken() && !planet.isDamaged() && !planet.isRetrograde()
 					&& !planet.isBelt() && !planet.isSignExile() && !planet.isSignDeclined())
 				return (Rule)service.find(3L);
-		} else if (planet.getCode().equals("Mars")) {
+		} else if (pcode.equals("Mars")) {
 			if (planet.isNeutral()) {
 				long id = female ? 67L : 66L;
 				return (Rule)service.find(id);
 			}
+		} else if (pcode.equals("Saturn")) {
+			if (planet.isDamaged())
+				return (Rule)service.find(108L);
 		}
 		return null;
 	}
@@ -186,10 +190,10 @@ public class EventRules {
 		RuleService service = new RuleService();
 		String hcode = house.getCode();
 		String scode = sign.getCode();
-		List<Model> planets = event.getConfiguration().getPlanets();
 
 		if (hcode.equals("I")) {
 			if (scode.equals("Sagittarius")) {
+				List<Model> planets = event.getConfiguration().getPlanets();
 				for (Model model : planets) {
 					Planet planet = (Planet)model;
 					if (planet.getCode().equals("Jupiter")) {
@@ -222,6 +226,11 @@ public class EventRules {
 							return (Rule)service.find(82L);
 					}
 				}
+			}
+		} else if (hcode.equals("VII")) {
+			if (scode.equals("Leo")) {
+				if (event.isFemale())
+					return (Rule)service.find(109L);
 			}
 		}
 		return null;
@@ -285,6 +294,27 @@ public class EventRules {
 		RuleService service = new RuleService();
 		if (house.getCode().equals("I"))
 			return (Rule)service.find(106L);
+		return null;
+	}
+
+	/**
+	 * Нахождение планеты в знаке
+	 * @param planet планета
+	 * @param sign знак
+	 * @return правило
+	 * @throws DataAccessException
+	 */
+	public static Rule rulePlanetSign(Planet planet, Sign sign, Event event) throws DataAccessException {
+		RuleService service = new RuleService();
+		String pcode = planet.getCode();
+		String scode = sign.getCode();
+
+		if (pcode.equals("Venus")) {
+			if (scode.equals("Taurus")) {
+				if (planet.isDamaged() && event.isFemale())
+					return (Rule)service.find(107L);
+			}
+		}
 		return null;
 	}
 }
