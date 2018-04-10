@@ -1189,12 +1189,22 @@ public class PDFExporter {
 		    for (int i = 0; i < size; i++)
 		    	bars[i] = items.get(i);
 
-		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "Соотношение аспектов планет", "Аспекты", "Баллы", bars, 500, 300, false, false);
+		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "Соотношение аспектов планет", "Аспекты", "Баллы", bars, 500, 300, false, false, true);
 			Section section = PDFUtil.printSection(chapter, "Соотношение аспектов планет");
-			section.add(image);
 
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
+	        li.add(new Chunk("Если скрытого негатива больше, чем негармоничных аспектов, значит вам нужно искать разрядку своим негативным эмоциям, рассказывать о своих проблемах людям, которым вы доверяете. Не держите переживания в себе", font));
+	        list.add(li);
+
+			li = new ListItem();
+	        li.add(new Chunk("Если скрытого позитива больше, чем гармоничных аспектов, значит вам нужно выражать больше эмоций, не сдерживать радость, делиться своими успехами с любимыми и интересными вам людьми", font));
+	        list.add(li);
+			section.add(list);
+			section.add(image);
+
+			list = new com.itextpdf.text.List(false, false, 10);
+			li = new ListItem();
 	        li.add(new Chunk("Больше гармоничных аспектов — больше лёгкости", new Font(baseFont, 12, Font.NORMAL, BaseColor.RED)));
 	        list.add(li);
 
@@ -1657,7 +1667,7 @@ public class PDFExporter {
 				bar.setCategory("Сферы жизни");
 				bars[++i] = (bar);
 		    }
-		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "", "Сферы жизни", "Баллы", bars, 500, 500, false, false);
+		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "", "Сферы жизни", "Баллы", bars, 500, 500, false, false, false);
 			section.add(image);
 			section.add(new Paragraph("Более подробно сферы жизни описаны в разделе «Реализация личности»", font));
 		} catch(Exception e) {
@@ -1913,13 +1923,11 @@ public class PDFExporter {
 
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
-	        li.add(new Chunk("Категория \"Мужское и женское в сознании\" показывает, "
-			    	+ "насколько вы активны в мыслях и принятии решений наедине с самим собой.", font));
+	        li.add(new Chunk("Категория \"в сознании\" показывает, насколько вы активны в мыслях и принятии решений наедине с самим собой.", font));
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Категория \"Мужское и женское в поступках\" показывает, "
-					+ "как меняется ваша активность на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
+	        li.add(new Chunk("Категория \"в поступках\" показывает, как меняется ваша активность на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
 	        list.add(li);
 			section.add(list);
 
@@ -2304,7 +2312,7 @@ public class PDFExporter {
 				bar.setCategory("Планеты");
 				bars[++i] = (bar);
 		    }
-		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "", "Планеты", "Баллы", bars, 500, 500, false, false);
+		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "", "Планеты", "Баллы", bars, 500, 500, false, false, false);
 		    String text = term ? "Соотношение силы планет" : "Соотношение силы качеств";
 			Section section = PDFUtil.printSection(chapter, text);
 		    text = term ? "Чем выше значение, тем легче и активнее планета выражает свои качества" : "Чем выше значение, тем легче и активнее проявляются качества";
