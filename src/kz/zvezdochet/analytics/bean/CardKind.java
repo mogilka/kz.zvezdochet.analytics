@@ -16,4 +16,17 @@ public class CardKind extends TextGenderDictionary {
 	public ModelService getService() {
 		return new CardKindService();
 	}
+
+	/**
+	 * Направление рисунка up|down|left|right (для лука и т.п.)
+	 */
+	private String direction;
+
+	public String getDirection() {
+		return direction;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
 }

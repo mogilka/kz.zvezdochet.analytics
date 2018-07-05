@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import kz.zvezdochet.analytics.bean.CardKind;
 import kz.zvezdochet.analytics.bean.Degree;
 import kz.zvezdochet.analytics.bean.Rule;
 import kz.zvezdochet.analytics.service.RuleService;
@@ -314,6 +315,28 @@ public class EventRules {
 				if (planet.isDamaged() && event.isFemale())
 					return (Rule)service.find(107L);
 			}
+		}
+		return null;
+	}
+
+	/**
+	 * Вид космограммы
+	 * @param kind вид космограммы
+	 * @return правило
+	 * @throws DataAccessException
+	 */
+	public static Rule ruleCardKind(CardKind kind) throws DataAccessException {
+		RuleService service = new RuleService();
+		if (6 == kind.getId()) {
+			String dir = kind.getDirection();
+			if (dir.equals("up"))
+				return (Rule)service.find(110L);
+			else if (dir.equals("down"))
+				return (Rule)service.find(111L);
+			else if (dir.equals("right"))
+				return (Rule)service.find(112L);
+			else if (dir.equals("left"))
+				return (Rule)service.find(113L);
 		}
 		return null;
 	}
