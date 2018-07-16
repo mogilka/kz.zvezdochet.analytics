@@ -30,8 +30,26 @@ public class AspectConfigurationService extends TextGenderDictionaryService {
 		super.init(rs, model);
 		type.setColor(CoreUtil.rgbToColor(rs.getString("Color")));
 		String s = rs.getString("positive");
-		boolean f = s.equals("1") ? true : false;
-		type.setPositive(f);
+		type.setPositive(s.equals("1") ? true : false);
+
+		s = rs.getString("vertex");
+		type.setVertexPositive(s.equals("1") ? true : false);
+
+		s = rs.getString("leftfoot");
+		type.setLeftFootPositive(s.equals("1") ? true : false);
+
+		s = rs.getString("rightfoot");
+		type.setRightFootPositive(s.equals("1") ? true : false);
+
+		s = rs.getString("base");
+		type.setBasePositive(s.equals("1") ? true : false);
+
+		s = rs.getString("lefthand");
+		type.setLeftHandPositive(s.equals("1") ? true : false);
+
+		s = rs.getString("righthand");
+		type.setRightHandPositive(s.equals("1") ? true : false);
+
 		return type;
 	}
 }
