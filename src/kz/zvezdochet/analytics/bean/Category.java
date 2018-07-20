@@ -14,7 +14,7 @@ public class Category extends Dictionary {
 	private static final long serialVersionUID = -2878256195661519033L;
 
 	/**
-	 * Ссылка на идентификатор связанного объекта
+	 * Идентификатор планеты
 	 */
     private Long objectId;
     
@@ -24,7 +24,7 @@ public class Category extends Dictionary {
     private int priority;
 	
 	/**
-	 * Ссылка на объект
+	 * Планета
 	 */
     private Planet planet;
     

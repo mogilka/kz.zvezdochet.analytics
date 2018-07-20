@@ -119,6 +119,13 @@ public class PlanetSignService extends GenderTextModelService {
 		return new PlanetSignText();
 	}
 
+	/**
+	 * Поиск толкования планеты в знаке Зодиака
+	 * @param planet планета
+	 * @param sign знак
+	 * @return толкование
+	 * @throws DataAccessException
+	 */
 	public List<PlanetSignText> find(Planet planet, Sign sign) throws DataAccessException {
         List<PlanetSignText> list = new ArrayList<PlanetSignText>();
         PreparedStatement ps = null;
@@ -156,5 +163,39 @@ where planetsigns.SignID = 6
 and categories.ObjectID = 23
 order by categories.Priority
 */
+	}
+
+	/**
+	 * Поиск толкования планеты в знаке Зодиака
+	 * @param category категория
+	 * @param sign знак Зодиака
+	 * @return толкование
+	 * @throws DataAccessException
+	 */
+	public PlanetSignText find(Category category, Sign sign) throws DataAccessException {
+        PlanetSignText model = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+		try {
+			String sql = "select * from " + tableName + 
+				" where signid = ? " +
+					"and typeid = ?";
+			ps = Connector.getInstance().getConnection().prepareStatement(sql);
+			ps.setLong(1, sign.getId());
+			ps.setLong(2, category.getId());
+			rs = ps.executeQuery();
+			if (rs.next())
+				model = init(rs, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try { 
+				if (rs != null) rs.close();
+				if (ps != null) ps.close();
+			} catch (SQLException e) { 
+				e.printStackTrace(); 
+			}
+		}
+		return model;
 	}
 }
