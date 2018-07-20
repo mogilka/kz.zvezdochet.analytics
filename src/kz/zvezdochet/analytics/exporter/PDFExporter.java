@@ -1293,7 +1293,7 @@ public class PDFExporter {
 	        list.add(li);
 			
 			li = new ListItem();
-	        li.add(new Chunk("Чем больше духовных, тем более высокого уровня развития вы достигли", new Font(baseFont, 12, Font.NORMAL, BaseColor.MAGENTA)));
+	        li.add(new Chunk("Чем больше духовных, тем более высокого уровня развития вы достигли (больше трёх — уже хорошо)", new Font(baseFont, 12, Font.NORMAL, BaseColor.MAGENTA)));
 	        list.add(li);
 			section.add(list);
 		} catch(Exception e) {
