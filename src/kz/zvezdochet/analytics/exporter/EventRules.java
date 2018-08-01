@@ -227,6 +227,38 @@ public class EventRules {
 							return (Rule)service.find(82L);
 					}
 				}
+			} else if (scode.equals("Capricornus")) {
+				List<Model> planets = event.getConfiguration().getPlanets();
+				for (Model model : planets) {
+					Planet planet = (Planet)model;
+					if (planet.getCode().equals("Saturn")) {
+						String code = planet.getSign().getCode();
+						if (code.equals("Aries"))
+							return (Rule)service.find(114L);
+						else if (code.equals("Taurus"))
+							return (Rule)service.find(115L);
+						else if (code.equals("Gemini"))
+							return (Rule)service.find(116L);
+						else if (code.equals("Cancer"))
+							return (Rule)service.find(117L);
+						else if (code.equals("Leo"))
+							return (Rule)service.find(118L);
+						else if (code.equals("Virgo"))
+							return (Rule)service.find(119L);
+						else if (code.equals("Libra"))
+							return (Rule)service.find(121L);
+						else if (code.equals("Scorpio"))
+							return (Rule)service.find(122L);
+						else if (code.equals("Sagittarius"))
+							return (Rule)service.find(123L);
+						else if (code.equals("Capricornus"))
+							return (Rule)service.find(124L);
+						else if (code.equals("Aquarius"))
+							return (Rule)service.find(125L);
+						else if (code.equals("Pisces"))
+							return (Rule)service.find(126L);
+					}
+				}
 			}
 		} else if (hcode.equals("VII")) {
 			if (scode.equals("Leo")) {
