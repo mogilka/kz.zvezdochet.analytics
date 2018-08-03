@@ -624,7 +624,8 @@ public class PDFExporter {
 			    	Degree degree = (Degree)model;
 			    	if (term)
 			    		section.add(new Paragraph("Градус ASC: " + degree.getId() + "° управитель " + degree.getName() + ", " + degree.getCode(), fonth5));
-					section.add(new Paragraph(degree.getDescription(), PDFUtil.getAnnotationFont(true)));
+			    	String star = degree.isRoyal() ? "*" : "";
+					section.add(new Paragraph(degree.getDescription() + star, PDFUtil.getAnnotationFont(true)));
 					section.add(new Paragraph(StringUtil.removeTags(degree.getText()), font));
 					PDFUtil.printGender(section, degree, female, child, doctype.equals("normal"));
 
@@ -883,7 +884,7 @@ public class PDFExporter {
 				+ "которая не в деталях, а глобально описывает ваше предназначение и кармический опыт прошлого. "
 				+ "Определите, на каком уровне вы находитесь. Отследите по трём уровням своё развитие", font));
 
-			long id = 9L;
+			long id = 7L;
 			CardKind kind = (CardKind)new CardKindService().find(id);
 			Paragraph p = new Paragraph(kind.getName(), fonth5);
 			section.add(p);
@@ -1480,12 +1481,12 @@ public class PDFExporter {
 
 //----------вилы 150° 150° 60°
 
-//		    conf = (AspectConfiguration)service.find("pitchfork");
-//			conf.setHeadable(true);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(30L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(27L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(25L) });
-//			confs.add(conf);
+		    conf = (AspectConfiguration)service.find("pitchfork");
+			conf.setHeadable(true);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(25L), (Planet)planetService.find(23L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(26L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(29L) });
+			confs.add(conf);
 
 //----------перспектива 60° 30° 60° 150°
 
@@ -1588,7 +1589,7 @@ public class PDFExporter {
 //			conf.setRightHand(new Planet[] { (Planet)planetService.find(28L) });
 //			confs.add(conf);
 
-//----------корабль 72° 144° 72°
+//----------корабль 72° 72° 144°
 
 //		    conf = (AspectConfiguration)service.find("ship");
 //			conf.setHeadable(true);
@@ -1599,12 +1600,12 @@ public class PDFExporter {
 
 //----------пальма 144° 144° 72°
 
-//		    conf = (AspectConfiguration)service.find("palm");
-//			conf.setHeadable(true);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(29L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(27L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(20L) });
-//			confs.add(conf);
+		    conf = (AspectConfiguration)service.find("palm");
+			conf.setHeadable(true);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(29L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(27L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(20L) });
+			confs.add(conf);
 
 //----------конверт 108° 72° 108° 72°
 
@@ -1676,12 +1677,12 @@ public class PDFExporter {
 
 //----------тау-квадрат 90° 90° 180°
 
-//		    conf = (AspectConfiguration)service.find("taucross");
-//			conf.setHeadable(true);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(29L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(21L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(22L) });
-//			confs.add(conf);
+		    conf = (AspectConfiguration)service.find("taucross");
+			conf.setHeadable(true);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(32L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(22L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(21L) });
+			confs.add(conf);
 //
 //		    conf2 = (AspectConfiguration)service.find("taucross");
 //			conf2.setHeadable(false);
@@ -1958,7 +1959,11 @@ public class PDFExporter {
 						if (planet.getCode().equals("Lilith") && house.isSelened())
 							continue;
 
-						String sign = planet.isDamaged() || planet.isLilithed() ? "-" : "+";
+						boolean negative = planet.isDamaged()
+								|| planet.isLilithed()
+								|| (planet.getCode().equals("Lilith")
+									&& !planet.isLord() && !planet.isPerfect());
+						String sign = negative ? "-" : "+";
 
 						p = new Paragraph("", fonth5);
 						String mark = planet.getMark("house");
@@ -1971,7 +1976,7 @@ public class PDFExporter {
 		    				p.add(new Chunk(" " + planet.getName() + " в " + house.getDesignation() + " доме", fonth5));
 		    				p.add(Chunk.NEWLINE);
 		    			} else {
-		    				String pname = planet.isPositive() || planet.isNeutral() ? planet.getPositive() : planet.getNegative();
+		    				String pname = negative ? planet.getNegative() : planet.getPositive();
 		    				p.add(new Chunk(house.getName() + " " + sign + " " + pname, fonth5));
 		    			}
 		    			section.addSection(p);
@@ -3407,7 +3412,7 @@ public class PDFExporter {
 //					pheno = calc.calculate();
 //		  		}
 //			}
-			Pheno pheno = new Pheno(30);
+			Pheno pheno = new Pheno(25);
 			if (pheno != null) {
 				Moonday moonday = (Moonday)new MoondayService().find((long)pheno.getAge());
 				if (moonday != null) {
