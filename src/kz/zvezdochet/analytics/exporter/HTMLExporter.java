@@ -258,7 +258,7 @@ public class HTMLExporter {
 
 						Rule rule = EventRules.rulePlanetSword(planet, female);
 						if (rule != null)
-							div.add(PDFUtil.html2pdf(rule.getText()));
+							div.add(PDFUtil.html2pdf(rule.getText(), null));
 
 						printGender(div, planetText, female, child, true);
 
