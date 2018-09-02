@@ -1,6 +1,5 @@
 package kz.zvezdochet.analytics.bean;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import kz.zvezdochet.analytics.service.DegreeService;
