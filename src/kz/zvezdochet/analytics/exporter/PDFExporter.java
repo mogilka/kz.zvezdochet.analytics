@@ -3388,22 +3388,7 @@ public class PDFExporter {
 	 */
 	private void printLunar(Chapter chapter, Event event) {
 		try {
-//			Date birth = event.getBirth();
-//			String szone = Double.toString(event.getZone() + event.getDst());
-//			String slat = Double.toString(event.getPlace().getLatitude());
-//			String slon = Double.toString(event.getPlace().getLongitude());
-//	
-//			MoonCalc calc = new MoonCalc(birth, szone, slat, slon);
-//			Pheno pheno = calc.calculate();
-//			if (pheno != null) {
-//		  		Date start = pheno.getStart();
-//		  		if (start != null && birth.before(start)) {
-//		  			Date date = new Date(birth.getTime() - 86400000);
-//					calc = new MoonCalc(date, szone, slat, slon);
-//					pheno = calc.calculate();
-//		  		}
-//			}
-			Pheno pheno = new Pheno(17);
+			Pheno pheno = new Pheno((int)event.getMoondayid());
 			if (pheno != null) {
 				Moonday moonday = (Moonday)new MoondayService().find((long)pheno.getAge());
 				if (moonday != null) {
