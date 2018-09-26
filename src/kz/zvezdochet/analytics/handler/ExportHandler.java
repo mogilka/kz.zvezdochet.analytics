@@ -21,7 +21,7 @@ public class ExportHandler extends Handler {
 	@Execute
 	public void execute(@Active MPart activePart) {
 		try {
-			EventPart eventPart = (EventPart)activePart.getObject();
+			final EventPart eventPart = (EventPart)activePart.getObject();
 			final Event event = (Event)eventPart.getModel(EventPart.MODE_CALC, true);
 			if (null == event) return;
 			if (null == event.getConfiguration()) {
@@ -33,7 +33,7 @@ public class ExportHandler extends Handler {
     		BusyIndicator.showWhile(display, new Runnable() {
     			@Override
     			public void run() {
-    				new PDFExporter(display).generate(event);
+    				new PDFExporter(display).generate(event, eventPart.isTerm());
     			}
     		});
 			updateStatus("Экспорт завершён", false);
