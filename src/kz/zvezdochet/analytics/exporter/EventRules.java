@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import kz.zvezdochet.analytics.bean.CardKind;
 import kz.zvezdochet.analytics.bean.Degree;
 import kz.zvezdochet.analytics.bean.Rule;
 import kz.zvezdochet.analytics.service.RuleService;
+import kz.zvezdochet.bean.CardKind;
 import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
@@ -369,6 +369,28 @@ public class EventRules {
 				return (Rule)service.find(112L);
 			else if (dir.equals("left"))
 				return (Rule)service.find(113L);
+		}
+		return null;
+	}
+
+	/**
+	 * Дирекция планет
+	 * @param spa аспект
+	 * @return правило
+	 * @throws DataAccessException
+	 */
+	public static Rule ruleDirectionAspect(SkyPointAspect spa) throws DataAccessException {
+		RuleService service = new RuleService();
+		Planet planet = (Planet)spa.getSkyPoint1();
+		Planet planet2 = (Planet)spa.getSkyPoint2();
+		String code = spa.getAspect().getType().getCode();
+
+		//TODO а откуда мы узнаем, что дирекционные планеты плохие?
+		if (code.equals("NEGATIVE") &&
+				(planet.getCode().equals("Moon") && planet2.getCode().equals("Venus"))
+					|| (planet.getCode().equals("Venus") && planet2.getCode().equals("Moon"))) {
+			if (planet.isDamaged() && planet2.isDamaged())
+				return (Rule)service.find(129L);
 		}
 		return null;
 	}
