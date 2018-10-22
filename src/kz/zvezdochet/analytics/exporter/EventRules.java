@@ -193,7 +193,39 @@ public class EventRules {
 		String scode = sign.getCode();
 
 		if (hcode.equals("I")) {
-			if (scode.equals("Sagittarius")) {
+			if (scode.equals("Aries")) {
+				List<Model> planets = event.getConfiguration().getPlanets();
+				for (Model model : planets) {
+					Planet planet = (Planet)model;
+					if (planet.getCode().equals("Mars")) {
+						String code = planet.getSign().getCode();
+						if (code.equals("Aries"))
+							return (Rule)service.find(132L);
+						else if (code.equals("Taurus"))
+							return (Rule)service.find(133L);
+						else if (code.equals("Gemini"))
+							return (Rule)service.find(134L);
+						else if (code.equals("Cancer"))
+							return (Rule)service.find(135L);
+						else if (code.equals("Leo"))
+							return (Rule)service.find(136L);
+						else if (code.equals("Virgo"))
+							return (Rule)service.find(137L);
+						else if (code.equals("Libra"))
+							return (Rule)service.find(138L);
+						else if (code.equals("Scorpio"))
+							return (Rule)service.find(139L);
+						else if (code.equals("Sagittarius"))
+							return (Rule)service.find(140L);
+						else if (code.equals("Capricornus"))
+							return (Rule)service.find(141L);
+						else if (code.equals("Aquarius"))
+							return (Rule)service.find(142L);
+						else if (code.equals("Pisces"))
+							return (Rule)service.find(143L);
+					}
+				}
+			} else if (scode.equals("Sagittarius")) {
 				List<Model> planets = event.getConfiguration().getPlanets();
 				for (Model model : planets) {
 					Planet planet = (Planet)model;
