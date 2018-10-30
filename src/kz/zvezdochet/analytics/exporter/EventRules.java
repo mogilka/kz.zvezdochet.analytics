@@ -35,8 +35,7 @@ public class EventRules {
 		RuleService service = new RuleService();
 		String pcode = planet.getCode();
 		if (pcode.equals("Venus")) {
-			if (!planet.inMine() && !planet.isBroken() && !planet.isDamaged() && !planet.isRetrograde()
-					&& !planet.isBelt() && !planet.isSignExile() && !planet.isSignDeclined())
+			if (planet.isPositive() && planet.isInNeutralSign())
 				return (Rule)service.find(3L);
 		} else if (pcode.equals("Mars")) {
 			if (planet.isNeutral()) {
@@ -80,14 +79,23 @@ public class EventRules {
 	/**
 	 * Аспект планет
 	 * @param spa аспект
+	 * @param female true|false женский|мужской
 	 * @return правило
 	 * @throws DataAccessException
 	 */
-	public static Rule rulePlanetAspect(SkyPointAspect spa) throws DataAccessException {
+	public static Rule rulePlanetAspect(SkyPointAspect spa, boolean female) throws DataAccessException {
 		RuleService service = new RuleService();
 		Planet planet = (Planet)spa.getSkyPoint1();
 		Planet planet2 = (Planet)spa.getSkyPoint2();
 		String code = spa.getAspect().getType().getCode();
+
+		if (planet.getCode().equals("Sun") && planet2.getCode().equals("Moon")) {
+			if (female && spa.getAspect().getCode().equals("BELT")) {
+				Map<String, Integer> map = planet2.getAspectCountMap();
+				if (map.size() < 2) 
+					return (Rule)service.find(144L);
+			}
+		}
 
 		if (planet.getCode().equals("Moon") && planet2.getCode().equals("Pluto")) {
 			if (code.equals("NEGATIVE")) {
@@ -423,6 +431,24 @@ public class EventRules {
 					|| (planet.getCode().equals("Venus") && planet2.getCode().equals("Moon"))) {
 			if (planet.isDamaged() && planet2.isDamaged())
 				return (Rule)service.find(129L);
+		}
+		return null;
+	}
+
+	/**
+	 * Планета в шахте
+	 * @param planet планета
+	 * @param female true|false женский|мужской
+	 * @return правило
+	 * @throws DataAccessException 
+	 */
+	public static Rule rulePlanetMine(Planet planet, boolean female) throws DataAccessException {
+		RuleService service = new RuleService();
+		String pcode = planet.getCode();
+		if (pcode.equals("Moon")) {
+			Map<String, Integer> map = planet.getAspectCountMap();
+			if (map.size() < 2) 
+				return (Rule)service.find(144L);
 		}
 		return null;
 	}
