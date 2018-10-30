@@ -50,6 +50,12 @@ public class AspectConfigurationService extends TextGenderDictionaryService {
 		s = rs.getString("righthand");
 		type.setRightHandPositive(s.equals("1") ? true : false);
 
+		s = rs.getString("lefthorn");
+		type.setLeftHornPositive(s.equals("1") ? true : false);
+
+		s = rs.getString("righthorn");
+		type.setRightHornPositive(s.equals("1") ? true : false);
+
 		return type;
 	}
 }

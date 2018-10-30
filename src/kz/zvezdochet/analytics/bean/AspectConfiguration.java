@@ -144,7 +144,7 @@ public class AspectConfiguration extends TextGenderDictionary {
 	 */
 	private Planet[] base;
 	/**
-	 * Массив планет слева вверху
+	 * Массив планет слева посередине
 	 */
 	private Planet[] leftHand;
 
@@ -165,7 +165,7 @@ public class AspectConfiguration extends TextGenderDictionary {
 	}
 
 	/**
-	 * Массив планет справа вверху
+	 * Массив планет справа посередине
 	 */
 	private Planet[] rightHand;
 
@@ -202,11 +202,11 @@ public class AspectConfiguration extends TextGenderDictionary {
 	}
 
 	/**
-	 * Признак позитивной планеты слева вверху
+	 * Признак позитивной планеты слева посередине
 	 */
 	private boolean leftHandPositive;
 	/**
-	 * Признак позитивной планеты справа вверху
+	 * Признак позитивной планеты справа посередине
 	 */
 	private boolean rightHandPositive;
 
@@ -237,5 +237,55 @@ public class AspectConfiguration extends TextGenderDictionary {
 
 	public void setHeadable(boolean headable) {
 		this.headable = headable;
+	}
+
+	/**
+	 * Массив планет слева вверху
+	 */
+	private Planet[] leftHorn;
+	/**
+	 * Массив планет справа вверху
+	 */
+	private Planet[] rightHorn;
+
+	public Planet[] getLeftHorn() {
+		return leftHorn;
+	}
+
+	public void setLeftHorn(Planet[] leftHorn) {
+		this.leftHorn = leftHorn;
+	}
+
+	public Planet[] getRightHorn() {
+		return rightHorn;
+	}
+
+	public void setRightHorn(Planet[] rightHorn) {
+		this.rightHorn = rightHorn;
+	}
+
+	/**
+	 * Признак позитивной планеты слева вверху
+	 */
+	private boolean leftHornPositive;
+	/**
+	 * Признак позитивной планеты справа вверху
+	 */
+	private boolean rightHornPositive;
+
+	public boolean isLeftHornPositive() {
+		return leftHornPositive;
+	}
+
+	public void setLeftHornPositive(boolean leftHornPositive) {
+		this.leftHornPositive = leftHornPositive;
+	}
+
+	public boolean isRightHornPositive() {
+		return rightHornPositive;
+	}
+
+	public void setRightHornPositive(boolean rightHornPositive) {
+		this.rightHornPositive = rightHornPositive;
 	}
 }
