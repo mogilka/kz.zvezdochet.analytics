@@ -34,6 +34,7 @@ public class DegreeService extends TextGenderDictionaryService {
 		dict.setPositive(rs.getBoolean("positive"));
 		dict.setRoyal(rs.getBoolean("royal"));
 		dict.setDestructive(rs.getBoolean("destructive"));
+		dict.setOccult(rs.getBoolean("occult"));
 		return dict;
 	}
 

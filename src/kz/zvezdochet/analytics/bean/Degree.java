@@ -47,4 +47,16 @@ public class Degree extends TextGenderDictionary {
 	public void setDestructive(boolean destructive) {
 		this.destructive = destructive;
 	}
+
+	/**
+	 * Оккультный
+	 */
+	private boolean occult;
+
+	public boolean isOccult() {
+		return occult;
+	}
+	public void setOccult(boolean occult) {
+		this.occult = occult;
+	}
 }
