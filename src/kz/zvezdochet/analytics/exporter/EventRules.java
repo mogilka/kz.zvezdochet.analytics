@@ -151,6 +151,9 @@ public class EventRules {
 				return (Rule)service.find(96L);
 			else if (planet.isDamaged())
 				return (Rule)service.find(97L);
+		} else if (planet.getCode().equals("Mars")) {
+			if (planet.getSign().getCode().equals("Taurus"))
+				return (Rule)service.find(96L);
 		}
 		return null;
 	}

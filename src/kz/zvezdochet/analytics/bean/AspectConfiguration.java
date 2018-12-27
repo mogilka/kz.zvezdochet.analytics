@@ -288,4 +288,17 @@ public class AspectConfiguration extends TextGenderDictionary {
 	public void setRightHornPositive(boolean rightHornPositive) {
 		this.rightHornPositive = rightHornPositive;
 	}
+
+	/**
+	 * Градусы
+	 */
+	private String degree;
+
+	public String getDegree() {
+		return degree;
+	}
+
+	public void setDegree(String degree) {
+		this.degree = degree;
+	}
 }
