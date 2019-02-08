@@ -1,7 +1,7 @@
 package kz.zvezdochet.analytics.exporter;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -170,7 +170,7 @@ public class EventRules {
 		Planet planet2 = (Planet)spa.getSkyPoint2();
 		String code = spa.getAspect().getType().getCode();
 
-		List<Model> planets = partner.getConfiguration().getPlanets();
+		Collection<Planet> planets = partner.getConfiguration().getPlanets().values();
 		if (planet.getCode().equals("Venus") && planet2.getCode().equals("Saturn")) {
 			if (code.equals("POSITIVE")) {
 				for (Model model : planets) {
@@ -205,9 +205,8 @@ public class EventRules {
 
 		if (hcode.equals("I")) {
 			if (scode.equals("Aries")) {
-				List<Model> planets = event.getConfiguration().getPlanets();
-				for (Model model : planets) {
-					Planet planet = (Planet)model;
+				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				for (Planet planet : planets) {
 					if (planet.getCode().equals("Mars")) {
 						String code = planet.getSign().getCode();
 						if (code.equals("Aries"))
@@ -237,9 +236,8 @@ public class EventRules {
 					}
 				}
 			} else if (scode.equals("Sagittarius")) {
-				List<Model> planets = event.getConfiguration().getPlanets();
-				for (Model model : planets) {
-					Planet planet = (Planet)model;
+				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				for (Planet planet : planets) {
 					if (planet.getCode().equals("Jupiter")) {
 						String code = planet.getSign().getCode();
 						if (code.equals("Aries"))
@@ -271,9 +269,8 @@ public class EventRules {
 					}
 				}
 			} else if (scode.equals("Capricornus")) {
-				List<Model> planets = event.getConfiguration().getPlanets();
-				for (Model model : planets) {
-					Planet planet = (Planet)model;
+				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				for (Planet planet : planets) {
 					if (planet.getCode().equals("Saturn")) {
 						String code = planet.getSign().getCode();
 						if (code.equals("Aries"))
@@ -305,7 +302,7 @@ public class EventRules {
 			}
 		} else if (hcode.equals("VII")) {
 			if (scode.equals("Leo")) {
-				if (event.isFemale())
+				if (!event.isFemale())
 					return (Rule)service.find(109L);
 			}
 		}
@@ -338,9 +335,8 @@ public class EventRules {
 	public static Rule ruleDegree(Degree degree, Event event, Map<String, Double> signMap) throws DataAccessException {
 		RuleService service = new RuleService();
 		if (147 == degree.getId()) {
-			List<Model> planets = event.getConfiguration().getPlanets();
-			for (Model model : planets) {
-				Planet planet = (Planet)model;
+			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			for (Planet planet : planets) {
 				String pcode = planet.getCode();
 				if (pcode.equals("Mars") || pcode.equals("Uranus")) {
 					if (planet.isLord() || planet.isRakhued())

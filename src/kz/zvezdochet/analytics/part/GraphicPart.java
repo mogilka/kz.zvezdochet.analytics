@@ -163,8 +163,7 @@ public class GraphicPart extends View implements IFilterable {
 				Date date = new Date(entry.getKey());
 				Event event = entry.getValue();
 	
-				for (Model model : event.getConfiguration().getPlanets()) {
-					Planet planet = (Planet)model;
+				for (Planet planet : event.getConfiguration().getPlanets().values()) {
 					long pid = planet.getId();
 					List<TimeSeriesDataItem> series = items.containsKey(pid) ? items.get(pid) : new ArrayList<TimeSeriesDataItem>();
 					TimeSeriesDataItem tsdi = new TimeSeriesDataItem(new Day(date), Math.abs(planet.getCoord()));

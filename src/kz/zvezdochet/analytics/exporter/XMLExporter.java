@@ -78,7 +78,7 @@ public class XMLExporter {
 	private void exportPlanets(Document document, Element root, Configuration conf) {
 		Element planets = document.createElement("sets");
 		int count = 0;
-		for (Model planet : conf.getPlanets()) {
+		for (Planet planet : conf.getPlanets().values()) {
 			Element element = document.createElement("set");
 			element.appendChild(document.createTextNode(((Planet)planet).getCode()));
 			element.setAttribute("id", String.valueOf(count++));

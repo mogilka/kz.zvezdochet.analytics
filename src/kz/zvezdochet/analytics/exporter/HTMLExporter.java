@@ -3,6 +3,7 @@ package kz.zvezdochet.analytics.exporter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -169,7 +170,7 @@ public class HTMLExporter {
 	 */
 	private void printPlanetHouse(Event event, Tag body, Map<String, Double> houseMap) {
 		List<Model> houses = event.getConfiguration().getHouses();
-		List<Model> cplanets = event.getConfiguration().getPlanets();
+		Collection<Planet> cplanets = event.getConfiguration().getPlanets().values();
 		if (null == houses) return;
 		try {
 			Tag div = new Tag("div");
@@ -246,8 +247,7 @@ public class HTMLExporter {
 
 			tag = new Tag("h2");
 			PlanetTextService service = new PlanetTextService();
-			for (Model model : event.getConfiguration().getPlanets()) {
-				Planet planet = (Planet)model;
+			for (Planet planet : event.getConfiguration().getPlanets().values()) {
 				PlanetText planetText = null;
 				if (planet.isSword()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "sword");
@@ -301,7 +301,7 @@ public class HTMLExporter {
 	private void generateAspectTypes(Event event, Tag cell) {
 		try {
 			event.getConfiguration().initPlanetAspects();
-			List<Model> planets = event.getConfiguration().getPlanets();
+			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
 			//фильтрация списка типов аспектов
 			List<Model> aspectTypes = new AspectTypeService().getList();
 			List<AspectType> types = new ArrayList<AspectType>();
@@ -1095,8 +1095,7 @@ public class HTMLExporter {
 				House house = (House)hmodel;
 				//Определяем количество планет в доме
 				List<Planet> planets = new ArrayList<Planet>();
-				for (Model pmodel : event.getConfiguration().getPlanets()) {
-					Planet planet = (Planet)pmodel;
+				for (Planet planet : event.getConfiguration().getPlanets().values()) {
 					if (planet.getCode().equals("Kethu")) continue;
 					if (planet.getHouse().getId().equals(house.getId()))
 						planets.add(planet);
@@ -1314,8 +1313,7 @@ public class HTMLExporter {
 				tag.add("Общий типаж");
 				div.add(tag);
 
-				for (Model model : event.getConfiguration().getPlanets()) {
-					Planet planet = (Planet)model;
+				for (Planet planet : event.getConfiguration().getPlanets().values()) {
 				    if (planet.isMain()) {
 				    	List<PlanetSignText> list = service.find(planet, planet.getSign());
 				    	if (list != null && list.size() > 0)
@@ -1387,9 +1385,8 @@ public class HTMLExporter {
 			td.add(p);
 			p = new Tag("table", "class=legend-list");
 			int i = -1;
-			for (Model model : event.getConfiguration().getPlanets()) {
+			for (Planet planet : event.getConfiguration().getPlanets().values()) {
 				String trstyle = (++i % 2 > 0) ? "odd" : "";
-				Planet planet = (Planet)model;
 				Tag tr2 = new Tag("tr", "class=" + trstyle);
 				Tag td2 = new Tag("td");
 				Tag img = new Tag("img", "src=horoscope_files/planet/" + planet.getCode() + ".png");
@@ -1616,8 +1613,7 @@ public class HTMLExporter {
 
 			tag = new Tag("h2");
 			PlanetTextService service = new PlanetTextService();
-			for (Model model : event.getConfiguration().getPlanets()) {
-				Planet planet = (Planet)model;
+			for (Planet planet : event.getConfiguration().getPlanets().values()) {
 				PlanetText planetText = null;
 				if (planet.inMine()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "mine");
