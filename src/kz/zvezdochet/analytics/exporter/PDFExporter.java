@@ -1229,7 +1229,7 @@ public class PDFExporter {
 	 */
 	private void printAspectTypes(PdfWriter writer, Chapter chapter, Event event) {
 		try {
-			event.getConfiguration().initPlanetAspects();
+//			event.getConfiguration().initPlanetAspects();
 			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
 			//фильтрация списка типов аспектов
 			List<Model> types = new AspectTypeService().getList();

@@ -301,7 +301,7 @@ public class HTMLExporter {
 	 */
 	private void generateAspectTypes(Event event, Tag cell) {
 		try {
-			event.getConfiguration().initPlanetAspects();
+//			event.getConfiguration().initPlanetAspects();
 			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
 			//фильтрация списка типов аспектов
 			List<Model> aspectTypes = new AspectTypeService().getList();
