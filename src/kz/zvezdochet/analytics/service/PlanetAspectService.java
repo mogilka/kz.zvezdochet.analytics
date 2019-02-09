@@ -184,8 +184,10 @@ public class PlanetAspectService extends GenderTextModelService {
 		String sql;
 		try {
 			AspectType type = aspect.checkType(false);
+			String wheretype = aspect.getAspect().getCode().equals("KERNEL") ? "or typeid = 1" : "";
+
 			sql = "select * from " + tableName + 
-				" where typeid = ?" +
+				" where (typeid = ? " + wheretype + ")" +
 					" and ((planet1id = ? and planet2id = ?)" +
 						" or (planet1id = ? and planet2id = ?))" +
 					" and (aspectid is null" +
