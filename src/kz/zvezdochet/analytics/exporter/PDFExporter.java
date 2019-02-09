@@ -1229,7 +1229,6 @@ public class PDFExporter {
 	 */
 	private void printAspectTypes(PdfWriter writer, Chapter chapter, Event event) {
 		try {
-//			event.getConfiguration().initPlanetAspects();
 			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
 			//фильтрация списка типов аспектов
 			List<Model> types = new AspectTypeService().getList();
@@ -1326,84 +1325,89 @@ public class PDFExporter {
 			}
 			PlanetAspectService service = new PlanetAspectService();
 			Configuration conf = event.getConfiguration();
-			List<SkyPointAspect> aspects = conf.getAspects();
 			Map<Long, Planet> planets = conf.getPlanets();
 			boolean exists = false;
 
-			for (SkyPointAspect aspect : aspects) {
-				Planet planet1 = (Planet)aspect.getSkyPoint1();
+			for (Planet planet1 : planets.values()) {
 				if (!planet1.isMain())
 					continue;
-				long asplanetid = aspect.getAspect().getPlanetid();
-				if (asplanetid > 0 && asplanetid != planet1.getId())
-					continue;
-				Planet planet2 = (Planet)aspect.getSkyPoint2();
-				if (planet1.getNumber() > planet2.getNumber())
-					continue;
-				if (aspect.getAspect().getCode().equals("OPPOSITION")
-						&& (planet2.getCode().equals("Kethu")
-							|| planet2.getCode().equals("Rakhu")))
+
+				List<SkyPointAspect> aspects = planet1.getAspectList();
+				if (null == aspects)
 					continue;
 
-				AspectType type = aspect.checkType(true);
-				boolean match = false;
-				String tcode = type.getCode();
-				//аспект соответствует заявленному (негативному или позитивному)
-				if (tcode.equals(aspectType))
-					match = true;
-				//в позитивные добавляем соединения и ядро Солнца
-				else if	(aspectType.equals("POSITIVE") &&
-						(tcode.equals("NEUTRAL_KERNEL") || tcode.equals("NEUTRAL")))
-					match = true;
-				//в негативные добавляем пояс Солнца
-				else if (aspectType.equals("NEGATIVE") &&
-						type.getCode().equals("NEGATIVE_BELT"))
-					match = true;
+				for (SkyPointAspect aspect : aspects) {
+					long asplanetid = aspect.getAspect().getPlanetid();
+					if (asplanetid > 0 && asplanetid != planet1.getId())
+						continue;
+					Planet planet2 = (Planet)aspect.getSkyPoint2();
+					if (planet1.getNumber() > planet2.getNumber())
+						continue;
+					if (aspect.getAspect().getCode().equals("OPPOSITION")
+							&& (planet2.getCode().equals("Kethu")
+								|| planet2.getCode().equals("Rakhu")))
+						continue;
 
-				if (match) {
-					List<Model> dicts = service.finds(aspect);
-					for (Model model : dicts) {
-						PlanetAspectText dict = (PlanetAspectText)model;
-						if (dict != null) {
-							exists = true;
-		    				Planet aspl1 = (Planet)planets.get(planet1.getId());
-		    				Planet aspl2 = (Planet)planets.get(planet2.getId());
+					AspectType type = aspect.checkType(true);
+					boolean match = false;
+					String tcode = type.getCode();
+					//аспект соответствует заявленному (негативному или позитивному)
+					if (tcode.equals(aspectType))
+						match = true;
+					//в позитивные добавляем соединения и ядро Солнца
+					else if	(aspectType.equals("POSITIVE") &&
+							(tcode.equals("NEUTRAL_KERNEL") || tcode.equals("NEUTRAL")))
+						match = true;
+					//в негативные добавляем пояс Солнца
+					else if (aspectType.equals("NEGATIVE") &&
+							tcode.equals("NEGATIVE_BELT"))
+						match = true;
 
-		    				Paragraph p = new Paragraph("", fonth5);
-		    				p.add(new Chunk(dict.getMark(aspl1, aspl2), fonth5));
-		    				if (term)
-								p.add(new Chunk(dict.getPlanet1().getName() + " " + 
-									type.getSymbol() + " " + 
-									dict.getPlanet2().getName(), fonth5));
-		    				else
-								p.add(new Chunk(dict.getPlanet1().getShortName() + " " + 
-									type.getSymbol() + " " + 
-									dict.getPlanet2().getShortName(), fonth5));
-
-							if (term) {
-								p.add(new Chunk(" " + planet1.getSymbol(), PDFUtil.getHeaderAstroFont()));
+					if (match) {
+						List<Model> dicts = service.finds(aspect);
+						for (Model model : dicts) {
+							PlanetAspectText dict = (PlanetAspectText)model;
+							if (dict != null) {
+								exists = true;
+			    				Planet aspl1 = planets.get(planet1.getId());
+			    				Planet aspl2 = planets.get(planet2.getId());
 	
-			    				if (aspect.getAspect().getCode().equals("CONJUNCTION") || aspect.getAspect().getCode().equals("OPPOSITION"))
-			    					p.add(new Chunk(aspect.getAspect().getSymbol(), PDFUtil.getHeaderAstroFont()));
+			    				Paragraph p = new Paragraph("", fonth5);
+			    				p.add(new Chunk(dict.getMark(aspl1, aspl2), fonth5));
+			    				if (term)
+									p.add(new Chunk(dict.getPlanet1().getName() + " " + 
+										type.getSymbol() + " " + 
+										dict.getPlanet2().getName(), fonth5));
 			    				else
-			    					p.add(new Chunk(type.getSymbol(), fonth5));
+									p.add(new Chunk(dict.getPlanet1().getShortName() + " " + 
+										type.getSymbol() + " " + 
+										dict.getPlanet2().getShortName(), fonth5));
+
+								if (term) {
+									p.add(new Chunk(" " + planet1.getSymbol(), PDFUtil.getHeaderAstroFont()));
+		
+				    				if (aspect.getAspect().getCode().equals("CONJUNCTION") || aspect.getAspect().getCode().equals("OPPOSITION"))
+				    					p.add(new Chunk(aspect.getAspect().getSymbol(), PDFUtil.getHeaderAstroFont()));
+				    				else
+				    					p.add(new Chunk(type.getSymbol(), fonth5));
+		
+				    				p.add(new Chunk(planet2.getSymbol(), PDFUtil.getHeaderAstroFont()));
 	
-			    				p.add(new Chunk(planet2.getSymbol(), PDFUtil.getHeaderAstroFont()));
-
-								String pretext = aspect.getAspect().getCode().equals("CONJUNCTION")
-										? "с планетой"
-										: "к планете";
-				    				p.add(new Paragraph(aspect.getAspect().getName() + " планеты " + dict.getPlanet1().getName() + " " + pretext + " " + dict.getPlanet2().getName(), PDFUtil.getAnnotationFont(true)));
+									String pretext = aspect.getAspect().getCode().equals("CONJUNCTION")
+											? "с планетой"
+											: "к планете";
+					    				p.add(new Paragraph(aspect.getAspect().getName() + " планеты " + dict.getPlanet1().getName() + " " + pretext + " " + dict.getPlanet2().getName(), PDFUtil.getAnnotationFont(true)));
+								}
+			    				section.addSection(p);
+								section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
+	
+								Rule rule = EventRules.rulePlanetAspect(aspect, female);
+								if (rule != null) {
+				    				section.add(Chunk.NEWLINE);
+									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+								}
+								PDFUtil.printGender(section, dict, female, child, true);
 							}
-		    				section.addSection(p);
-							section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
-
-							Rule rule = EventRules.rulePlanetAspect(aspect, female);
-							if (rule != null) {
-			    				section.add(Chunk.NEWLINE);
-								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
-							}
-							PDFUtil.printGender(section, dict, female, child, true);
 						}
 					}
 				}

@@ -394,45 +394,51 @@ public class HTMLExporter {
 			div.add(tag);
 	
 			PlanetAspectService service = new PlanetAspectService();
-			List<SkyPointAspect> aspects = event.getConfiguration().getAspects();
 			AspectType damaged = (AspectType)new AspectTypeService().find("NEGATIVE");
 
-			for (SkyPointAspect aspect : aspects) {
-				Planet planet1 = (Planet)aspect.getSkyPoint1();
-				if (!planet1.isMain())
-					continue;
-				long asplanetid = aspect.getAspect().getPlanetid();
-				if (asplanetid > 0 && asplanetid != planet1.getId())
-					continue;
-				Planet planet2 = (Planet)aspect.getSkyPoint2();
-				if (planet1.getNumber() > planet2.getNumber())
+			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			for (Planet p : planets) {
+				List<SkyPointAspect> aspects = p.getAspectList();
+				if (null == aspects)
 					continue;
 
-				AspectType type = aspect.checkType(true);
-				boolean match = false;
-				//аспект соответствует заявленному (негативному или позитивному)
-				if (type.getCode().equals(aspectType))
-					match = true;
-				//в позитивные добавляем ядро Солнца
-				else if	(aspectType.equals("POSITIVE") &&
-						type.getCode().equals("NEUTRAL_KERNEL"))
-					match = true;
-				//в негативные добавляем пояс Солнца
-				else if (aspectType.equals("NEGATIVE") &&
-						type.getCode().equals("NEGATIVE_BELT"))
-					match = true;
+				for (SkyPointAspect aspect : aspects) {
+					Planet planet1 = (Planet)aspect.getSkyPoint1();
+					if (!planet1.isMain())
+						continue;
+					long asplanetid = aspect.getAspect().getPlanetid();
+					if (asplanetid > 0 && asplanetid != planet1.getId())
+						continue;
+					Planet planet2 = (Planet)aspect.getSkyPoint2();
+					if (planet1.getNumber() > planet2.getNumber())
+						continue;
 
-				if (match) {
-					PlanetAspectText dict = (PlanetAspectText)service.find(aspect, true);
-					if (dict != null) {
-						tag = new Tag("h5");
-						tag.add(dict.getPlanet1().getShortName() + " " + 
-							type.getSymbol() + " " + 
-							dict.getPlanet2().getShortName());
-						div.add(tag);
-						div.add(dict.getText());
-						printGender(div, dict, female, child, true);
-						div.add(new Tag("/br"));
+					AspectType type = aspect.checkType(true);
+					boolean match = false;
+					//аспект соответствует заявленному (негативному или позитивному)
+					if (type.getCode().equals(aspectType))
+						match = true;
+					//в позитивные добавляем ядро Солнца
+					else if	(aspectType.equals("POSITIVE") &&
+							type.getCode().equals("NEUTRAL_KERNEL"))
+						match = true;
+					//в негативные добавляем пояс Солнца
+					else if (aspectType.equals("NEGATIVE") &&
+							type.getCode().equals("NEGATIVE_BELT"))
+						match = true;
+
+					if (match) {
+						PlanetAspectText dict = (PlanetAspectText)service.find(aspect, true);
+						if (dict != null) {
+							tag = new Tag("h5");
+							tag.add(dict.getPlanet1().getShortName() + " " + 
+								type.getSymbol() + " " + 
+								dict.getPlanet2().getShortName());
+							div.add(tag);
+							div.add(dict.getText());
+							printGender(div, dict, female, child, true);
+							div.add(new Tag("/br"));
+						}
 					}
 				}
 			}
