@@ -5,6 +5,7 @@ import java.awt.Stroke;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -162,8 +163,9 @@ public class GraphicPart extends View implements IFilterable {
 			for (Map.Entry<Long, Event> entry : dates.entrySet()) {
 				Date date = new Date(entry.getKey());
 				Event event = entry.getValue();
+				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
 	
-				for (Planet planet : event.getConfiguration().getPlanets().values()) {
+				for (Planet planet : planets) {
 					long pid = planet.getId();
 					List<TimeSeriesDataItem> series = items.containsKey(pid) ? items.get(pid) : new ArrayList<TimeSeriesDataItem>();
 					TimeSeriesDataItem tsdi = new TimeSeriesDataItem(new Day(date), Math.abs(planet.getCoord()));

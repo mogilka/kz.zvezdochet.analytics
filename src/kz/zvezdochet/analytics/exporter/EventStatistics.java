@@ -1,5 +1,6 @@
 package kz.zvezdochet.analytics.exporter;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -71,7 +72,8 @@ public class EventStatistics {
 			conf.initPlanetSigns(true);
 			planetSigns = new HashMap<String, Double>();
 			signPlanets = new HashMap<String, Integer>();
-			for (Planet planet : conf.getPlanets().values()) {
+			Collection<Planet> planets = conf.getPlanets().values();
+			for (Planet planet : planets) {
 				if (main && !planet.isMain())
 					continue;
 				double value = 0.0;
@@ -97,7 +99,8 @@ public class EventStatistics {
 		if (conf.getPlanets() != null) {
 			planetHouses = new HashMap<String, Double>();
 			List<Model> houses = conf.getHouses();
-			for (Planet planet : conf.getPlanets().values()) {
+			Collection<Planet> planets = conf.getPlanets().values();
+			for (Planet planet : planets) {
 				for (int i = 0; i < houses.size(); i++) {
 					House house1 = (House)houses.get(i);
 					int j = (i == houses.size() - 1) ? 0 : i + 1;

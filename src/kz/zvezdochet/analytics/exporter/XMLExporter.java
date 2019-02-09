@@ -3,6 +3,7 @@ package kz.zvezdochet.analytics.exporter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -78,7 +79,8 @@ public class XMLExporter {
 	private void exportPlanets(Document document, Element root, Configuration conf) {
 		Element planets = document.createElement("sets");
 		int count = 0;
-		for (Planet planet : conf.getPlanets().values()) {
+		Collection<Planet> eplanets = conf.getPlanets().values();
+		for (Planet planet : eplanets) {
 			Element element = document.createElement("set");
 			element.appendChild(document.createTextNode(((Planet)planet).getCode()));
 			element.setAttribute("id", String.valueOf(count++));

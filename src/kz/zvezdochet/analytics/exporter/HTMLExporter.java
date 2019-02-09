@@ -247,7 +247,8 @@ public class HTMLExporter {
 
 			tag = new Tag("h2");
 			PlanetTextService service = new PlanetTextService();
-			for (Planet planet : event.getConfiguration().getPlanets().values()) {
+			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			for (Planet planet : planets) {
 				PlanetText planetText = null;
 				if (planet.isSword()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "sword");
@@ -1091,11 +1092,13 @@ public class HTMLExporter {
 			td.add(a);
 			td.add(new Tag("/br"));
 
-			for (Model hmodel : event.getConfiguration().getHouses()) {
+			Collection<Planet> eplanets = event.getConfiguration().getPlanets().values();
+			List<Model> ehouses = event.getConfiguration().getHouses();
+			for (Model hmodel : ehouses) {
 				House house = (House)hmodel;
 				//Определяем количество планет в доме
 				List<Planet> planets = new ArrayList<Planet>();
-				for (Planet planet : event.getConfiguration().getPlanets().values()) {
+				for (Planet planet : eplanets) {
 					if (planet.getCode().equals("Kethu")) continue;
 					if (planet.getHouse().getId().equals(house.getId()))
 						planets.add(planet);
@@ -1313,7 +1316,8 @@ public class HTMLExporter {
 				tag.add("Общий типаж");
 				div.add(tag);
 
-				for (Planet planet : event.getConfiguration().getPlanets().values()) {
+				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				for (Planet planet : planets) {
 				    if (planet.isMain()) {
 				    	List<PlanetSignText> list = service.find(planet, planet.getSign());
 				    	if (list != null && list.size() > 0)
@@ -1385,7 +1389,8 @@ public class HTMLExporter {
 			td.add(p);
 			p = new Tag("table", "class=legend-list");
 			int i = -1;
-			for (Planet planet : event.getConfiguration().getPlanets().values()) {
+			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			for (Planet planet : planets) {
 				String trstyle = (++i % 2 > 0) ? "odd" : "";
 				Tag tr2 = new Tag("tr", "class=" + trstyle);
 				Tag td2 = new Tag("td");
@@ -1613,7 +1618,8 @@ public class HTMLExporter {
 
 			tag = new Tag("h2");
 			PlanetTextService service = new PlanetTextService();
-			for (Planet planet : event.getConfiguration().getPlanets().values()) {
+			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			for (Planet planet : planets) {
 				PlanetText planetText = null;
 				if (planet.inMine()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "mine");

@@ -716,7 +716,8 @@ public class PDFExporter {
 				PlanetSignService service = new PlanetSignService();
 //				String[] deals = {"personality", "emotions", "thinking", "contact", "work", "activity"};
 
-				for (Planet planet : event.getConfiguration().getPlanets().values()) {
+				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				for (Planet planet : planets) {
 				    if (planet.isMain()) {
 				    	List<PlanetSignText> list = service.find(planet, planet.getSign());
 				    	if (list != null && list.size() > 0)
@@ -791,7 +792,8 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			int i = -1;
-			for (Planet planet : event.getConfiguration().getPlanets().values()) {
+			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			for (Planet planet : planets) {
 				BaseColor color = (++i % 2 > 0) ? new BaseColor(255, 255, 255) : new BaseColor(230, 230, 250);
 
 				cell = new PdfPCell(new Phrase(CalcUtil.roundTo(planet.getCoord(), 2) + "°", font));
@@ -2737,7 +2739,6 @@ public class PDFExporter {
 	private void printPlanetStrength(PdfWriter writer, Chapter chapter, Event event) {
 		try {
 			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
-
 		    Bar[] bars = new Bar[planets.size()];
 		    int i = -1;
 		    for (Planet planet : planets) {
@@ -2846,37 +2847,38 @@ public class PDFExporter {
 				Section section = PDFUtil.printSection(chapter, "Ваше предназначение");
 				com.itextpdf.text.List ilist = new com.itextpdf.text.List(false, false, 10);
 
+				Map<Long, Planet> planets = event.getConfiguration().getPlanets();
 				ListItem li = new ListItem();
-				for (Planet planet : event.getConfiguration().getPlanets().values()) {
-				    if (planet.getCode().equals("Sun")) {
-				    	sign = planet.getSign();
+				li = new ListItem();
+		        li.add(new Chunk("Предназначение Духа: ", bold));
+				Planet planet = planets.get(19L);
+				sign = planet.getSign();
+		        li.add(new Chunk(sign.getSlogan(), font));
+		        ilist.add(li);
 
-						li = new ListItem();
-				        li.add(new Chunk("Предназначение Духа: ", bold));
-				        li.add(new Chunk(sign.getSlogan(), font));
-				        ilist.add(li);
-				    } else if (planet.getCode().equals("Moon")) {
-						li = new ListItem();
-				        li.add(new Chunk("Предназначение Души: ", bold));
-				        li.add(new Chunk(planet.getSign().getSlogan(), font));
-				        ilist.add(li);
-				    } else if (planet.getCode().equals("Mercury")) {
-						li = new ListItem();
-				        li.add(new Chunk("Предназначение Ума: ", bold));
-				        li.add(new Chunk(planet.getSign().getSlogan(), font));
-				        ilist.add(li);
-				    } else if (planet.getCode().equals("Venus")) {
-						li = new ListItem();
-				        li.add(new Chunk("Предназначение Любви: ", bold));
-				        li.add(new Chunk(planet.getSign().getSlogan(), font));
-				        ilist.add(li);
-				    } else if (planet.getCode().equals("Mars")) {
-						li = new ListItem();
-				        li.add(new Chunk("Предназначение Силы: ", bold));
-				        li.add(new Chunk(planet.getSign().getSlogan(), font));
-				        ilist.add(li);
-				    }
-				}
+				li = new ListItem();
+		        li.add(new Chunk("Предназначение Души: ", bold));
+				planet = planets.get(20L);
+		        li.add(new Chunk(planet.getSign().getSlogan(), font));
+		        ilist.add(li);
+
+				li = new ListItem();
+		        li.add(new Chunk("Предназначение Ума: ", bold));
+				planet = planets.get(23L);
+		        li.add(new Chunk(planet.getSign().getSlogan(), font));
+		        ilist.add(li);
+
+				li = new ListItem();
+		        li.add(new Chunk("Предназначение Любви: ", bold));
+				planet = planets.get(24L);
+		        li.add(new Chunk(planet.getSign().getSlogan(), font));
+		        ilist.add(li);
+
+				li = new ListItem();
+		        li.add(new Chunk("Предназначение Силы: ", bold));
+				planet = planets.get(25L);
+		        li.add(new Chunk(planet.getSign().getSlogan(), font));
+		        ilist.add(li);
 		        section.add(ilist);
 
 		        if (sign != null) {
@@ -3023,17 +3025,11 @@ public class PDFExporter {
 			} else if (Arrays.asList(triangle).contains(code)) {
 				if (code.equals("triangle")) {
 					Planet vertex = conf.getVertex()[0];
-					for (Planet planet : event.getConfiguration().getPlanets().values()) {
-						if (vertex.getId() == planet.getId()) { 
-							vertex.setSign(planet.getSign());
-							break;
-						}
-					}
+					vertex.setSign(event.getConfiguration().getPlanets().get(vertex.getId()).getSign());
 					kz.zvezdochet.bean.Element element = vertex.getSign().getElement();
 					if (element != null)
 						conf.setElement(element);
 				}
-
 				shape = printTriangle(conf);
 
 				if (code.equals("taucross")) {
@@ -3054,12 +3050,7 @@ public class PDFExporter {
 
 				if (code.equals("taucross")) {
 					Planet vertex = conf.getVertex()[0];
-					for (Planet planet : event.getConfiguration().getPlanets().values()) {
-						if (vertex.getId() == planet.getId()) { 
-							vertex.setSign(planet.getSign());
-							break;
-						}
-					}
+					vertex.setSign(event.getConfiguration().getPlanets().get(vertex.getId()).getSign());
 					Cross cross = (Cross)new CrossService().find(vertex.getSign().getCrossId());
 					if (cross != null) {
 						String str = "Ваша реакция на удары судьбы";
@@ -3226,7 +3217,8 @@ public class PDFExporter {
 			Section section = PDFUtil.printSection(chapter, "Лояльность и категоричность");
 
 			int loyalty = 0, flatness = 0, max = 5, loyalty2 = 0, flatness2 = 0;
-			for (Planet planet : event.getConfiguration().getPlanets().values()) {
+			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			for (Planet planet : planets) {
 				boolean loyal2 = planet.getHouse().getElement().isLoyalty();
 		    	if (loyal2)
 		    		++loyalty2;
