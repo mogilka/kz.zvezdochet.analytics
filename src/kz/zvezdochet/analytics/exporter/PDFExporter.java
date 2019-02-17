@@ -1534,21 +1534,21 @@ public class PDFExporter {
 
 //----------парус 120° 120° 60° 60°
 			
-//		    conf = (AspectConfiguration)service.find("sail");
-//			conf.setHeadable(true);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(30L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(20L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(33L) });
-//			conf.setBase(new Planet[] { (Planet)planetService.find(32L) });
-//			confs.add(conf);
+		    conf = (AspectConfiguration)service.find("sail");
+			conf.setHeadable(true);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(33L), (Planet)planetService.find(31L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(28L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(19L) });
+			conf.setBase(new Planet[] { (Planet)planetService.find(30L) });
+			confs.add(conf);
 
 //----------тригон 120° 120° 120°
 
 //		    conf = (AspectConfiguration)service.find("triangle");
 //			conf.setHeadable(true);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(28L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(25L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(27L) });
+//			conf.setVertex(new Planet[] { (Planet)planetService.find(19L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(25L), (Planet)planetService.find(28L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(30L) });
 //			confs.add(conf);
 
 //----------флейта: 150° 150° 30° 30°
@@ -1573,12 +1573,12 @@ public class PDFExporter {
 
 //----------крыша 30° 30° 60°
 
-		    conf = (AspectConfiguration)service.find("roof");
-			conf.setHeadable(true);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(23L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(33L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(32L) });
-			confs.add(conf);
+//		    conf = (AspectConfiguration)service.find("roof");
+//			conf.setHeadable(true);
+//			conf.setVertex(new Planet[] { (Planet)planetService.find(23L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(33L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(32L) });
+//			confs.add(conf);
 
 //----------ограда 30° 150° 30° 150°
 
@@ -1759,13 +1759,13 @@ public class PDFExporter {
 
 //----------тау-квадрат 90° 90° 180°
 
-//		    conf = (AspectConfiguration)service.find("taucross");
-//			conf.setHeadable(true);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(30L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(22L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(24L), (Planet)planetService.find(26L), (Planet)planetService.find(21L) });
-//			confs.add(conf);
-//
+		    conf = (AspectConfiguration)service.find("taucross");
+			conf.setHeadable(true);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(25L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(21L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(23L), (Planet)planetService.find(22L) });
+			confs.add(conf);
+
 //		    conf2 = (AspectConfiguration)service.find("taucross");
 //			conf2.setHeadable(false);
 //			conf2.setVertex(new Planet[] { (Planet)planetService.find(24L) });
@@ -1846,10 +1846,10 @@ public class PDFExporter {
 
 //		    conf = (AspectConfiguration)service.find("iron");
 //			conf.setHeadable(true);
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(27L) });
-//			conf.setLeftHand(new Planet[] { (Planet)planetService.find(29L) });
-//			conf.setRightHand(new Planet[] { (Planet)planetService.find(23L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(22L) });
+//			conf.setLeftHand(new Planet[] { (Planet)planetService.find(23L) });
+//			conf.setRightHand(new Planet[] { (Planet)planetService.find(24L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(29L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(30L) });
 //			confs.add(conf);
 
 //----------призрак 45° 135° 45° 135°
@@ -1864,20 +1864,20 @@ public class PDFExporter {
 
 //----------заноза 45° 90° 135°
 
-		    conf = (AspectConfiguration)service.find("splinter");
-			conf.setHeadable(true);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(19L), (Planet)planetService.find(34L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(27L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(32L) });
-			confs.add(conf);
+//		    conf = (AspectConfiguration)service.find("splinter");
+//			conf.setHeadable(true);
+//			conf.setVertex(new Planet[] { (Planet)planetService.find(19L), (Planet)planetService.find(34L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(27L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(32L) });
+//			confs.add(conf);
 
 //----------булавка 45° 135° 180°
 
 		    conf = (AspectConfiguration)service.find("pin");
 			conf.setHeadable(true);
 			conf.setVertex(new Planet[] { (Planet)planetService.find(20L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(21L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(22L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(30L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(33L), (Planet)planetService.find(31L) });
 			confs.add(conf);
 
 //		    conf2 = (AspectConfiguration)service.find("pin");
@@ -2012,6 +2012,15 @@ public class PDFExporter {
 //			conf.setRightFoot(new Planet[] { (Planet)planetService.find(24L) });
 //			confs.add(conf);
 
+//----------ракета 65.27° 98.11° 163.38°
+
+		    conf = (AspectConfiguration)service.find("rocket");
+			conf.setHeadable(true);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(30L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(27L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(21L) });
+			confs.add(conf);
+
 //----------маска 48° 48° 96°
 
 //		    conf = (AspectConfiguration)service.find("mask");
@@ -2034,7 +2043,7 @@ public class PDFExporter {
 
 		    conf = (AspectConfiguration)service.find("lighter");
 			conf.setHeadable(true);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(25L) });
+			conf.setVertex(new Planet[] { (Planet)planetService.find(34L) });
 			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(21L) });
 			conf.setRightFoot(new Planet[] { (Planet)planetService.find(22L) });
 			confs.add(conf);
@@ -3004,7 +3013,7 @@ public class PDFExporter {
 
 			String[] triangle = new String[] {"ram", "lasso", "tunnel", "poleaxe", "taucross", "triangle", "pitchfork",
 				"bisextile", "chock", "javelin", "roof", "lock", "ship", "boat", "palm", "pyramid", "compass",
-				"splinter", "pin", "roll", "lead", "mask", "lighter", "ray", "bookmark", "weathercock"};
+				"splinter", "pin", "roll", "lead", "mask", "lighter", "ray", "bookmark", "weathercock", "rocket"};
 			String[] rhombus = new String[] {"liana", "flute", "sail", "dagger", "spinner"};
 			String[] tetragon = new String[] {"vehicle", "ridgepole", "cross", "trapezoid", "railing", "box", "stretcher",
 				"envelope", "iron", "dirigible", "anvil", "bird", "ghost", "reel", "hawk", "dirigible", "boomerang"};
@@ -3309,6 +3318,7 @@ public class PDFExporter {
 			e.printStackTrace();
 		}
 	}
+
 
 	/**
 	 * Отрисовка треугольной конфигурации
