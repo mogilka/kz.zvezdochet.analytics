@@ -1,7 +1,9 @@
 package kz.zvezdochet.analytics.exporter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -450,5 +452,29 @@ public class EventRules {
 				return (Rule)service.find(144L);
 		}
 		return null;
+	}
+
+	/**
+	 * Нахождение планеты партнёра в доме
+	 * @param planet планета второго партнёра
+	 * @param house дом первого партнёра
+	 * @param female true - партнёр женского пола
+	 * @return список правил
+	 * @throws DataAccessException
+	 */
+	public static List<Rule> ruleSynastryPlanetHouse(Planet planet, House house, boolean female) throws DataAccessException {
+		List<Rule> rules = new ArrayList<>();
+		RuleService service = new RuleService();
+		String hcode = house.getCode();
+		String pcode = planet.getCode();
+		if (hcode.equals("I")) {
+			if (pcode.equals("Venus")) {
+				if (planet.isKethued() || planet.isBroken())
+					rules.add((Rule)service.find(150L));
+				if (!female)
+					rules.add((Rule)service.find(151L));
+			}
+		}
+		return rules;
 	}
 }
