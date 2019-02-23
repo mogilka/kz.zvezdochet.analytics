@@ -301,4 +301,17 @@ public class AspectConfiguration extends TextGenderDictionary {
 	public void setDegree(String degree) {
 		this.degree = degree;
 	}
+
+	/**
+	 * Тип фигуры
+	 */
+	private String shape;
+
+	public String getShape() {
+		return shape;
+	}
+
+	public void setShape(String shape) {
+		this.shape = shape;
+	}
 }
