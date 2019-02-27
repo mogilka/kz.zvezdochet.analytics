@@ -2091,7 +2091,7 @@ public class PDFExporter {
 			    section.add(p);
 
 				for (AspectConfiguration configuration : confs)
-					printConf(event, section, configuration, null);
+					printConfiguration(event, section, configuration, null);
 				section.add(Chunk.NEWLINE);
 			}
 		} catch(Exception e) {
@@ -3019,7 +3019,7 @@ public class PDFExporter {
 	 * @param conf конфигурация
 	 * @param sign знак Зодиака
 	 */
-	private void printConf(Event event, Section section, AspectConfiguration conf, Sign sign) {
+	private void printConfiguration(Event event, Section section, AspectConfiguration conf, Sign sign) {
 		try {
 			String code = conf.getCode();
 			String text = "";
@@ -3109,6 +3109,7 @@ public class PDFExporter {
 							}
 						}
 					}
+					appendix.add(new Paragraph("Это касается следующих сфер жизни:", bold));
 					for (House h : houses) {
 						if (h != null) {
 							ListItem li = new ListItem();
@@ -3122,7 +3123,7 @@ public class PDFExporter {
 					if (conf.getElement() != null) {
 						if (term)
 							appendix.add(new Paragraph(conf.getElement().getDescription(), fonth5));
-						appendix.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех: ", bold));
+						appendix.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
 						appendix.add(new Paragraph(conf.getElement().getTriangle(), font));
 					}
 
@@ -3914,6 +3915,8 @@ public class PDFExporter {
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.addElement(p);
+			float fontSize = font.getSize();
+			PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
 			table.addCell(cell);
 
 			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
@@ -3933,6 +3936,7 @@ public class PDFExporter {
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.addElement(p);
+			PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
 			table.addCell(cell);
 
 			//низ
