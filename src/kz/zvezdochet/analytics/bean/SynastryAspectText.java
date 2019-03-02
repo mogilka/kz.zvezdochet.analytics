@@ -1,5 +1,8 @@
 package kz.zvezdochet.analytics.bean;
 
+import kz.zvezdochet.analytics.service.SynastryAspectService;
+import kz.zvezdochet.core.service.ModelService;
+
 /**
  * Синастрический аспект
  * @author Nataly Didenko
@@ -21,5 +24,10 @@ public class SynastryAspectText extends PlanetAspectText {
 
 	public void setRoles(String roles) {
 		this.roles = roles;
+	}
+
+	@Override
+	public ModelService getService() {
+		return new SynastryAspectService();
 	}
 }
