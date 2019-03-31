@@ -12,7 +12,7 @@
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_wU4UoOlkEeaCS4O9hiLsMg" featurename="children" parentElementId="kz.zvezdochet.toolbar.event">
     <elements xsi:type="menu:HandledToolItem" xmi:id="_0zGMYOlkEeaCS4O9hiLsMg" elementId="kz.zvezdochet.analytics.handledtoolitem.export" label="&#x42d;&#x43a;&#x441;&#x43f;&#x43e;&#x440;&#x442; &#x433;&#x43e;&#x440;&#x43e;&#x441;&#x43a;&#x43e;&#x43f;&#x430;" iconURI="platform:/plugin/kz.zvezdochet.export/icons/export.gif" tooltip="&#x42d;&#x43a;&#x441;&#x43f;&#x43e;&#x440;&#x442; &#x433;&#x43e;&#x440;&#x43e;&#x441;&#x43a;&#x43e;&#x43f;&#x430;" command="_bRtc0OlkEeaCS4O9hiLsMg"/>
-    <elements xsi:type="menu:HandledToolItem" xmi:id="_2xj9QKTqEeeLb_6iVhiuwA" elementId="kz.zvezdochet.analytics.handledtoolitem.html" label="HTML &#x43e;&#x442;&#x447;&#x451;&#x442;" iconURI="platform:/plugin/kz.zvezdochet.core/icons/discovery.gif" tooltip="HTML &#x43e;&#x442;&#x447;&#x451;&#x442;" command="_nHi7cKTqEeeLb_6iVhiuwA"/>
+    <elements xsi:type="menu:HandledToolItem" xmi:id="_2xj9QKTqEeeLb_6iVhiuwA" elementId="kz.zvezdochet.analytics.handledtoolitem.html" visible="false" label="HTML &#x43e;&#x442;&#x447;&#x451;&#x442;" iconURI="platform:/plugin/kz.zvezdochet.core/icons/discovery.gif" tooltip="HTML &#x43e;&#x442;&#x447;&#x451;&#x442;" command="_nHi7cKTqEeeLb_6iVhiuwA"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Fwl6gADDEeiGBMQIaNSirA" featurename="children" parentElementId="org.eclipse.ui.main.menu">
     <elements xsi:type="menu:Menu" xmi:id="_QBVxkADDEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.menu.graphics" label="&#x410;&#x43d;&#x430;&#x43b;&#x438;&#x442;&#x438;&#x43a;&#x430;">
