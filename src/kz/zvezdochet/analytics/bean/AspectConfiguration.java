@@ -15,7 +15,7 @@ import kz.zvezdochet.core.util.PlatformUtil;
 
 /**
  * Конфигурация аспектов
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class AspectConfiguration extends TextGenderDictionary {
@@ -314,4 +314,28 @@ public class AspectConfiguration extends TextGenderDictionary {
 	public void setShape(String shape) {
 		this.shape = shape;
 	}
+
+//	/**
+//	 * Конвертация параметров JSON в объект
+//	 * @param json объект JSON
+//	 */
+//	public AspectConfiguration(JSONObject json) {
+//		super();
+//		setId(json.getLong("ID"));
+//		setName(json.getString("Name"));
+//		Object value = json.get("Code");
+//		if (value != JSONObject.NULL)
+//			setCode(value.toString());
+//		value = json.get("Description");
+//		if (value != JSONObject.NULL)
+//			setDescription(value.toString());
+//		value = json.get("Text");
+//		if (value != JSONObject.NULL)
+//			setText(value.toString());
+//		setLatitude(json.getDouble("Latitude"));
+//		setLongitude(json.getDouble("Longitude"));
+//		setGreenwich(json.getDouble("Greenwich"));
+//		setType(json.getString("type"));
+//		setDate(DateUtil.getDatabaseDateTime(json.getString("date")));
+//	}
 }
