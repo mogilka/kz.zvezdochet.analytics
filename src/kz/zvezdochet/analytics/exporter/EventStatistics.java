@@ -105,7 +105,7 @@ public class EventStatistics {
 					House house1 = (House)houses.get(i);
 					int j = (i == houses.size() - 1) ? 0 : i + 1;
 					House house2 = (House)houses.get(j);
-					if (SkyPoint.getHouse(house1.getCoord(), house2.getCoord(), planet.getCoord())) { 
+					if (SkyPoint.getHouse(house1.getLongitude(), house2.getLongitude(), planet.getLongitude())) { 
 						planet.setHouse(house1);
 						double value = 0.0;
 						Object object = planetHouses.get(house1.getCode());

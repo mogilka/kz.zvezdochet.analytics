@@ -617,7 +617,7 @@ public class PDFExporter {
 					event.getConfiguration().getHouses().size() > 0) {
 				House house = (House)event.getConfiguration().getHouses().get(0);
 				if (null == house) return;
-				int value = (int)house.getCoord();
+				int value = (int)house.getLongitude();
 				Model model = new DegreeService().find(new Long(String.valueOf(value)));
 			    if (model != null) {
 			    	Degree degree = (Degree)model;
@@ -802,7 +802,7 @@ public class PDFExporter {
 			for (Planet planet : planets) {
 				BaseColor color = (++i % 2 > 0) ? new BaseColor(255, 255, 255) : new BaseColor(230, 230, 250);
 
-				cell = new PdfPCell(new Phrase(CalcUtil.roundTo(planet.getCoord(), 2) + "°", font));
+				cell = new PdfPCell(new Phrase(CalcUtil.roundTo(planet.getLongitude(), 2) + "°", font));
 		        cell.setBorder(PdfPCell.NO_BORDER);
 		        cell.setBackgroundColor(color);
 				table.addCell(cell);
@@ -860,7 +860,7 @@ public class PDFExporter {
 
 				House house = planet.getHouse();
 				if (event.isHousable())
-					cell = new PdfPCell(new Phrase(CalcUtil.roundTo(house.getCoord(), 2) + "°", font));
+					cell = new PdfPCell(new Phrase(CalcUtil.roundTo(house.getLongitude(), 2) + "°", font));
 				else
 					cell = new PdfPCell();
 		        cell.setBorder(PdfPCell.NO_BORDER);
@@ -2265,7 +2265,7 @@ public class PDFExporter {
 				if (!house.isExportOnSign())
 					continue;
 
-				Sign sign = SkyPoint.getSign(house.getCoord(), event.getBirthYear());
+				Sign sign = SkyPoint.getSign(house.getLongitude(), event.getBirthYear());
 				HouseSignText dict = (HouseSignText)hservice.find(house, sign);
 				if (dict != null) {
 					if (null == section)

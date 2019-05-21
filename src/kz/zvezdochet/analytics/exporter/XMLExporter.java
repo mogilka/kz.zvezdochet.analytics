@@ -69,7 +69,7 @@ public class XMLExporter {
 			element.appendChild(document.createTextNode(((House)house).getCode()));
 			element.setAttribute("id", String.valueOf(count++));
 			element.setAttribute("name", ((House)house).getCode());
-			double coord = CalcUtil.roundTo(CalcUtil.decToDeg(((House)house).getCoord()), 2);
+			double coord = CalcUtil.roundTo(CalcUtil.decToDeg(((House)house).getLongitude()), 2);
 			element.setAttribute("coord", String.valueOf(coord));
 			houses.appendChild(element);
 		}
@@ -85,7 +85,7 @@ public class XMLExporter {
 			element.appendChild(document.createTextNode(((Planet)planet).getCode()));
 			element.setAttribute("id", String.valueOf(count++));
 			element.setAttribute("name", ((Planet)planet).getName());
-			double coord = CalcUtil.roundTo(CalcUtil.decToDeg(((Planet)planet).getCoord()), 2);
+			double coord = CalcUtil.roundTo(CalcUtil.decToDeg(((Planet)planet).getLongitude()), 2);
 			element.setAttribute("coord", String.valueOf(coord));
 			planets.appendChild(element);
 		}

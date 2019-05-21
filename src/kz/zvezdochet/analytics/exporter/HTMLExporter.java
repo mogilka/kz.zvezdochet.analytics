@@ -215,7 +215,7 @@ public class HTMLExporter {
 				if (!house.isExportOnSign())
 					continue;
 
-				Sign sign = SkyPoint.getSign(house.getCoord(), event.getBirthYear());
+				Sign sign = SkyPoint.getSign(house.getLongitude(), event.getBirthYear());
 				HouseSignText dict = (HouseSignText)new HouseSignService().find(house, sign);
 				if (dict != null) {
 					if (null == tag)
@@ -1279,7 +1279,7 @@ public class HTMLExporter {
 					event.getConfiguration().getHouses().size() > 0) {
 				House house = (House)event.getConfiguration().getHouses().get(0);
 				if (null == house) return;
-				int value = (int)house.getCoord();
+				int value = (int)house.getLongitude();
 				Model model = new DegreeService().find(new Long(String.valueOf(value)));
 			    if (model != null) {
 			    	TextGenderDictionary degree = (TextGenderDictionary)model;
@@ -1410,7 +1410,7 @@ public class HTMLExporter {
 				tr2.add(td2);
 				
 				td2 = new Tag("td");
-				td2.add(CalcUtil.roundTo(planet.getCoord(), 2) + "&#176;");
+				td2.add(CalcUtil.roundTo(planet.getLongitude(), 2) + "&#176;");
 				tr2.add(td2);
 				
 				Sign sign = planet.getSign();
