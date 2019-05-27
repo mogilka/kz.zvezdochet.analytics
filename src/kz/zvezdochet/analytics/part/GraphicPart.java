@@ -54,7 +54,7 @@ import kz.zvezdochet.service.PlanetService;
 
 /**
  * Представление графиков
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class GraphicPart extends View implements IFilterable {
@@ -163,7 +163,7 @@ public class GraphicPart extends View implements IFilterable {
 			for (Map.Entry<Long, Event> entry : dates.entrySet()) {
 				Date date = new Date(entry.getKey());
 				Event event = entry.getValue();
-				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				Collection<Planet> planets = event.getPlanets().values();
 	
 				for (Planet planet : planets) {
 					long pid = planet.getId();

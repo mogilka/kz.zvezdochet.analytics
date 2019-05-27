@@ -13,7 +13,7 @@ import kz.zvezdochet.core.util.CoreUtil;
 
 /**
  * Сервис подкатегорий крестов
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class CrossSignService extends DictionaryService {
 	

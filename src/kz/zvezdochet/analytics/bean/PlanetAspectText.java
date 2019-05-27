@@ -9,7 +9,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование аспекта планет
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class PlanetAspectText extends TextGenderModel {

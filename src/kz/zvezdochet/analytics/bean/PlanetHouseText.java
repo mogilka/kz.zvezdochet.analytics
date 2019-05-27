@@ -9,7 +9,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование планеты в астрологическом доме
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class PlanetHouseText extends TextGenderModel {

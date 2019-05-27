@@ -8,7 +8,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Прототип справочника синастрии по выбранной планете
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class SynastryText extends TextGenderModel {

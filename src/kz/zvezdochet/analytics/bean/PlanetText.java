@@ -7,7 +7,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование планеты
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class PlanetText extends TextGenderModel {
 	private static final long serialVersionUID = -8328248201235163517L;

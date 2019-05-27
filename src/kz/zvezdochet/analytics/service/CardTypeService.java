@@ -6,7 +6,7 @@ import kz.zvezdochet.core.service.TextGenderDictionaryService;
 
 /**
  * Сервис типов космограмм
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class CardTypeService extends TextGenderDictionaryService {
 

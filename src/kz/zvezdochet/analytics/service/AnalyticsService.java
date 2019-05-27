@@ -15,7 +15,7 @@ import kz.zvezdochet.service.PlanetService;
 
 /**
  * Сервис взаимодействия с БД
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class AnalyticsService {
 

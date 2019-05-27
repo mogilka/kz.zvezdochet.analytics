@@ -14,7 +14,7 @@ import kz.zvezdochet.part.EventPart;
 
 /**
  * Обработка события для PDF-экспорта индивидуального гороскопа
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class ExportHandler extends Handler {
@@ -23,8 +23,7 @@ public class ExportHandler extends Handler {
 		try {
 			final EventPart eventPart = (EventPart)activePart.getObject();
 			final Event event = (Event)eventPart.getModel(EventPart.MODE_CALC, true);
-			if (null == event) return;
-			if (null == event.getConfiguration()) {
+			if (null == event) {
 				DialogUtil.alertWarning("Произведите расчёт");
 				return;
 			}

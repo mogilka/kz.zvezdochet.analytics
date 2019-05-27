@@ -9,7 +9,7 @@ import kz.zvezdochet.core.util.DateUtil;
 
 /**
  * Нумерологическое толкование
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class Numerology extends Model {
 	private static final long serialVersionUID = -3797987279024365454L;

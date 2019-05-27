@@ -11,7 +11,7 @@ import kz.zvezdochet.core.util.CoreUtil;
 
 /**
  * Сервис конфигурации аспектов
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class AspectConfigurationService extends TextGenderDictionaryService {
 

@@ -17,7 +17,7 @@ import kz.zvezdochet.service.SignService;
 
 /**
  * Сервис домов в знаках Зодиака
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class HouseSignService extends GenderTextModelService {
 

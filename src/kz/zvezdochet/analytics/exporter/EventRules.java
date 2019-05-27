@@ -21,7 +21,7 @@ import kz.zvezdochet.core.service.DataAccessException;
 
 /**
  * Набор правил толкования события
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class EventRules {
@@ -172,7 +172,7 @@ public class EventRules {
 		Planet planet2 = (Planet)spa.getSkyPoint2();
 		String code = spa.getAspect().getType().getCode();
 
-		Collection<Planet> planets = partner.getConfiguration().getPlanets().values();
+		Collection<Planet> planets = partner.getPlanets().values();
 		if (planet.getCode().equals("Venus") && planet2.getCode().equals("Saturn")) {
 			if (code.equals("POSITIVE")) {
 				for (Model model : planets) {
@@ -207,7 +207,7 @@ public class EventRules {
 
 		if (hcode.equals("I")) {
 			if (scode.equals("Aries")) {
-				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				Collection<Planet> planets = event.getPlanets().values();
 				for (Planet planet : planets) {
 					if (planet.getCode().equals("Mars")) {
 						String code = planet.getSign().getCode();
@@ -238,7 +238,7 @@ public class EventRules {
 					}
 				}
 			} else if (scode.equals("Sagittarius")) {
-				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				Collection<Planet> planets = event.getPlanets().values();
 				for (Planet planet : planets) {
 					if (planet.getCode().equals("Jupiter")) {
 						String code = planet.getSign().getCode();
@@ -271,7 +271,7 @@ public class EventRules {
 					}
 				}
 			} else if (scode.equals("Capricornus")) {
-				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				Collection<Planet> planets = event.getPlanets().values();
 				for (Planet planet : planets) {
 					if (planet.getCode().equals("Saturn")) {
 						String code = planet.getSign().getCode();
@@ -337,7 +337,7 @@ public class EventRules {
 	public static Rule ruleDegree(Degree degree, Event event, Map<String, Double> signMap) throws DataAccessException {
 		RuleService service = new RuleService();
 		if (147 == degree.getId()) {
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				String pcode = planet.getCode();
 				if (pcode.equals("Mars") || pcode.equals("Uranus")) {

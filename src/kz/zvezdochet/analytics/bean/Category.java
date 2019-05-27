@@ -7,7 +7,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Категория объектов
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class Category extends Dictionary {

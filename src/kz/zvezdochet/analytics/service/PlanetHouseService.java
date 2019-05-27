@@ -19,7 +19,7 @@ import kz.zvezdochet.service.PlanetService;
 
 /**
  * Сервис планет в астрологических домах
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class PlanetHouseService extends GenderTextModelService {
 

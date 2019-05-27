@@ -16,7 +16,7 @@ import kz.zvezdochet.service.PlanetService;
 
 /**
  * Сервис категорий
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class CategoryService extends DictionaryService {
 

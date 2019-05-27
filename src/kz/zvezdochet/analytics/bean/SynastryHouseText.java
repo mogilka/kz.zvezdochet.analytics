@@ -5,7 +5,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование планеты партнёра в синастрическом доме
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class SynastryHouseText extends PlanetHouseText {

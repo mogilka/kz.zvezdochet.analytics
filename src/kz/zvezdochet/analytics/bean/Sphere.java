@@ -6,7 +6,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Сфера жизни
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class Sphere extends Dictionary {
 	private static final long serialVersionUID = 672735353317629369L;

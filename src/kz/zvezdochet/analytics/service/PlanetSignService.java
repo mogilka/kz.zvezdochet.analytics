@@ -18,7 +18,7 @@ import kz.zvezdochet.service.SignService;
 
 /**
  * Сервис планет в знаках Зодиака
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class PlanetSignService extends GenderTextModelService {
 

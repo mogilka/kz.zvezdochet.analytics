@@ -8,7 +8,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование дома в знаке Зодиака
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class HouseSignText extends TextGenderModel {

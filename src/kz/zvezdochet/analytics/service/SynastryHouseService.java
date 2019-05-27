@@ -5,7 +5,7 @@ import kz.zvezdochet.core.bean.Model;
 
 /**
  * Сервис планет в синастрических домах
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class SynastryHouseService extends PlanetHouseService {
 

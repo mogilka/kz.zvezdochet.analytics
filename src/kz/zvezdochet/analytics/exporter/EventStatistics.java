@@ -11,6 +11,7 @@ import kz.zvezdochet.analytics.bean.CrossSign;
 import kz.zvezdochet.analytics.service.CrossSignService;
 import kz.zvezdochet.bean.Cross;
 import kz.zvezdochet.bean.Element;
+import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.Halfsphere;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
@@ -31,15 +32,14 @@ import kz.zvezdochet.service.SignService;
 import kz.zvezdochet.service.SquareService;
 import kz.zvezdochet.service.YinYangService;
 import kz.zvezdochet.service.ZoneService;
-import kz.zvezdochet.util.Configuration;
 
 /**
  * Набор статистических данных события
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class EventStatistics {
-	private Configuration conf;
+	private Event event;
 	private Map<String, Double> planetSigns;
 	private Map<String, Double> planetHouses;
 	private Map<String, Double> planetElements;
@@ -57,8 +57,8 @@ public class EventStatistics {
 	private Map<String, Double> houseCrosses;
 	private Map<String, Double> houseZones;
 	
-	public EventStatistics(Configuration conf) {
-		this.conf = conf;
+	public EventStatistics(Event event) {
+		this.event = event;
 	}
 
 	/**
@@ -68,11 +68,11 @@ public class EventStatistics {
 	 * @throws DataAccessException 
 	 */
 	public Map<String, Double> getPlanetSigns(boolean main) throws DataAccessException {
-		if (conf.getPlanets() != null) {
-			conf.initPlanetSigns(true);
+		if (event.getPlanets() != null) {
+			event.initSigns();
 			planetSigns = new HashMap<String, Double>();
 			signPlanets = new HashMap<String, Integer>();
-			Collection<Planet> planets = conf.getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				if (main && !planet.isMain())
 					continue;
@@ -96,10 +96,10 @@ public class EventStatistics {
 	 * @throws DataAccessException 
 	 */
 	public void initPlanetHouses() throws DataAccessException {
-		if (conf.getPlanets() != null) {
+		if (event.getPlanets() != null) {
 			planetHouses = new HashMap<String, Double>();
-			List<Model> houses = conf.getHouses();
-			Collection<Planet> planets = conf.getPlanets().values();
+			List<Model> houses = event.getHouses();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				for (int i = 0; i < houses.size(); i++) {
 					House house1 = (House)houses.get(i);
@@ -126,7 +126,7 @@ public class EventStatistics {
 	 * @throws DataAccessException 
 	 */
 	public House getHouse(String code) throws DataAccessException {
-		for (Model model : conf.getHouses())
+		for (Model model : event.getHouses())
 			if (((House)model).getCode().equals(code))
 				return (House)model;
 		return null;

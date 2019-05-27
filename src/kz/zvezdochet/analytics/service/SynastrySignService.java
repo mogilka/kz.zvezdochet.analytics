@@ -18,7 +18,7 @@ import kz.zvezdochet.service.SignService;
 
 /**
  * Сервис синастрических планет
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class SynastrySignService extends ModelService {
 

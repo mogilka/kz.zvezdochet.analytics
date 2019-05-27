@@ -71,7 +71,7 @@ import kz.zvezdochet.service.ZoneService;
 
 /**
  * Генератор HTML-отчёта
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 @SuppressWarnings("unchecked")
@@ -102,7 +102,7 @@ public class HTMLExporter {
 
 			Tag body = new Tag("body");
 	
-			EventStatistics statistics = new EventStatistics(event.getConfiguration());
+			EventStatistics statistics = new EventStatistics(event);
 			statistics.initPlanetHouses();
 
 			//градус рождения
@@ -169,8 +169,8 @@ public class HTMLExporter {
 	 * @param houseMap карта домов
 	 */
 	private void printPlanetHouse(Event event, Tag body, Map<String, Double> houseMap) {
-		List<Model> houses = event.getConfiguration().getHouses();
-		Collection<Planet> cplanets = event.getConfiguration().getPlanets().values();
+		List<Model> houses = event.getHouses();
+		Collection<Planet> cplanets = event.getPlanets().values();
 		if (null == houses) return;
 		try {
 			Tag div = new Tag("div");
@@ -247,7 +247,7 @@ public class HTMLExporter {
 
 			tag = new Tag("h2");
 			PlanetTextService service = new PlanetTextService();
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				PlanetText planetText = null;
 				if (planet.isSword()) {
@@ -302,7 +302,7 @@ public class HTMLExporter {
 	private void generateAspectTypes(Event event, Tag cell) {
 		try {
 //			event.getConfiguration().initPlanetAspects();
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			//фильтрация списка типов аспектов
 			List<Model> aspectTypes = new AspectTypeService().getList();
 			List<AspectType> types = new ArrayList<AspectType>();
@@ -396,7 +396,7 @@ public class HTMLExporter {
 			PlanetAspectService service = new PlanetAspectService();
 			AspectType damaged = (AspectType)new AspectTypeService().find("NEGATIVE");
 
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet p : planets) {
 				List<SkyPointAspect> aspects = p.getAspectList();
 				if (null == aspects)
@@ -1098,8 +1098,8 @@ public class HTMLExporter {
 			td.add(a);
 			td.add(new Tag("/br"));
 
-			Collection<Planet> eplanets = event.getConfiguration().getPlanets().values();
-			List<Model> ehouses = event.getConfiguration().getHouses();
+			Collection<Planet> eplanets = event.getPlanets().values();
+			List<Model> ehouses = event.getHouses();
 			for (Model hmodel : ehouses) {
 				House house = (House)hmodel;
 				//Определяем количество планет в доме
@@ -1275,9 +1275,9 @@ public class HTMLExporter {
 	 */
 	private void printDegree(Event event, Tag body) {
 		try {
-			if (event.getConfiguration().getHouses() != null &&
-					event.getConfiguration().getHouses().size() > 0) {
-				House house = (House)event.getConfiguration().getHouses().get(0);
+			if (event.getHouses() != null &&
+					event.getHouses().size() > 0) {
+				House house = (House)event.getHouses().get(0);
 				if (null == house) return;
 				int value = (int)house.getLongitude();
 				Model model = new DegreeService().find(new Long(String.valueOf(value)));
@@ -1315,14 +1315,14 @@ public class HTMLExporter {
 	 */
 	private void printPlanetSign(Event event, Tag body) {
 		try {
-			if (event.getConfiguration().getPlanets() != null) {
+			if (event.getPlanets() != null) {
 				PlanetSignService service = new PlanetSignService();
 				Tag div = new Tag("div");
 				Tag tag = new Tag("h1");
 				tag.add("Общий типаж");
 				div.add(tag);
 
-				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				Collection<Planet> planets = event.getPlanets().values();
 				for (Planet planet : planets) {
 				    if (planet.isMain()) {
 				    	List<PlanetSignText> list = service.find(planet, planet.getSign());
@@ -1395,7 +1395,7 @@ public class HTMLExporter {
 			td.add(p);
 			p = new Tag("table", "class=legend-list");
 			int i = -1;
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				String trstyle = (++i % 2 > 0) ? "odd" : "";
 				Tag tr2 = new Tag("tr", "class=" + trstyle);
@@ -1452,10 +1452,10 @@ public class HTMLExporter {
 	 */
 	private void printCardType(Event event, Tag body, Map<String, Integer> signMap) {
 		try {
-			if (event.getConfiguration().getPlanets() != null) {
+			if (event.getPlanets() != null) {
 				String type = "";
-				Planet sun = (Planet)event.getConfiguration().getPlanets().get(0);
-				Planet moon = (Planet)event.getConfiguration().getPlanets().get(1);
+				Planet sun = (Planet)event.getPlanets().get(0);
+				Planet moon = (Planet)event.getPlanets().get(1);
 				
 				if (sun.getSign().getId().equals(moon.getSign().getId()))
 					type = "centered";
@@ -1624,7 +1624,7 @@ public class HTMLExporter {
 
 			tag = new Tag("h2");
 			PlanetTextService service = new PlanetTextService();
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				PlanetText planetText = null;
 				if (planet.inMine()) {

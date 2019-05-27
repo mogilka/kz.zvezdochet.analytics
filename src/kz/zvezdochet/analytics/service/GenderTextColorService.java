@@ -15,7 +15,7 @@ import kz.zvezdochet.core.util.CoreUtil;
 
 /**
  * Прототип сервиса модели, имеющей цвет
- * @author Nataly Didenko
+ * @author Natalie Didenko
  * //TODO удалить класс??
  */
 public abstract class GenderTextColorService extends TextGenderDictionaryService {

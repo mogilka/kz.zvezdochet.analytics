@@ -14,7 +14,7 @@ import kz.zvezdochet.core.util.DateUtil;
 
 /**
  * Сервис Зодиакальных градусов
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class DegreeService extends TextGenderDictionaryService {
 

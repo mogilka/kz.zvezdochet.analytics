@@ -13,7 +13,7 @@ import kz.zvezdochet.core.tool.Connector;
 
 /**
  * Сервис моделей с гендерной информацией
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public abstract class GenderTextModelService extends ModelService {
 

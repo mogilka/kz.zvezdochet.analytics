@@ -12,7 +12,7 @@ import kz.zvezdochet.core.tool.Connector;
 
 /**
  * Сервис нумерологии
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class NumerologyService extends ModelService {
 

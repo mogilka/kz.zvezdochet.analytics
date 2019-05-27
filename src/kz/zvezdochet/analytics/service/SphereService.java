@@ -16,7 +16,7 @@ import kz.zvezdochet.service.HouseService;
 
 /**
  * Сервис сфер жизни
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class SphereService extends DictionaryService {
 

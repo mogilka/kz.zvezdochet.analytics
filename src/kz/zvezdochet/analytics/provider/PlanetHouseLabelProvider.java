@@ -7,7 +7,7 @@ import kz.zvezdochet.core.ui.ArrayLabelProvider;
 
 /**
  * Формат таблицы планет в домах
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class PlanetHouseLabelProvider extends ArrayLabelProvider {
 	@Override

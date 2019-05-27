@@ -107,7 +107,6 @@ import kz.zvezdochet.service.SignService;
 import kz.zvezdochet.service.SquareService;
 import kz.zvezdochet.service.YinYangService;
 import kz.zvezdochet.service.ZoneService;
-import kz.zvezdochet.util.Configuration;
 import kz.zvezdochet.util.Cosmogram;
 
 /**
@@ -181,7 +180,7 @@ public class PDFExporter {
 	 * @param term признак использования астрологических терминов
 	 */
 	public void generate(Event event, boolean term) {
-		event.init(true);
+//		event.init(true);
 		child = event.isChild();
 		female = event.isFemale();
 		this.term = term;
@@ -253,7 +252,7 @@ public class PDFExporter {
 			printLunar(chapter, event);
 			chapter.add(Chunk.NEXTPAGE);
 
-			EventStatistics statistics = new EventStatistics(event.getConfiguration());
+			EventStatistics statistics = new EventStatistics(event);
 			Map<String, Double> signMap = statistics.getPlanetSigns(true);
 
 			//градус рождения
@@ -421,7 +420,7 @@ public class PDFExporter {
 		    GC gc = new GC(image);
 		    gc.setBackground(new Color(display, 254, 250, 248));
 		    gc.fillRectangle(image.getBounds());
-			new Cosmogram(event.getConfiguration(), null, null, gc);
+			new Cosmogram(event, null, null, gc);
 			ImageLoader loader = new ImageLoader();
 		    loader.data = new ImageData[] {image.getImageData()};
 		    try {
@@ -613,9 +612,9 @@ public class PDFExporter {
 	private void printDegree(Chapter chapter, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, term ? "Градус рождения" : "Символ рождения", null);
-			if (event.getConfiguration().getHouses() != null &&
-					event.getConfiguration().getHouses().size() > 0) {
-				House house = (House)event.getConfiguration().getHouses().get(0);
+			if (event.getHouses() != null &&
+					event.getHouses().size() > 0) {
+				House house = (House)event.getHouses().get(0);
 				if (null == house) return;
 				int value = (int)house.getLongitude();
 				Model model = new DegreeService().find(new Long(String.valueOf(value)));
@@ -718,11 +717,11 @@ public class PDFExporter {
 	 */
 	private void printPlanetSign(Chapter chapter, Event event) {
 		try {
-			if (event.getConfiguration().getPlanets() != null) {
+			if (event.getPlanets() != null) {
 				PlanetSignService service = new PlanetSignService();
 //				String[] deals = {"personality", "emotions", "thinking", "contact", "work", "activity"};
 
-				Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+				Collection<Planet> planets = event.getPlanets().values();
 				for (Planet planet : planets) {
 				    if (planet.isMain()) {
 				    	List<PlanetSignText> list = service.find(planet, planet.getSign());
@@ -798,7 +797,7 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			int i = -1;
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				BaseColor color = (++i % 2 > 0) ? new BaseColor(255, 255, 255) : new BaseColor(230, 230, 250);
 
@@ -1065,9 +1064,9 @@ public class PDFExporter {
 	 */
 	private void printCardType(Chapter chapter, Event event) {
 		try {
-			Map<Long, Planet> pmap = event.getConfiguration().getPlanets();
+			Map<Long, Planet> pmap = event.getPlanets();
 			if (pmap != null) {
-				EventStatistics stat = new EventStatistics(event.getConfiguration());
+				EventStatistics stat = new EventStatistics(event);
 				stat.getPlanetSigns(false);
 				Map<String, Integer> signMap = stat.getSignPlanets();
 
@@ -1128,7 +1127,7 @@ public class PDFExporter {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Сильные стороны", null);
 			PlanetTextService service = new PlanetTextService();
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				if (!event.isHousable() && planet.getCode().equals("Moon"))
 					continue;
@@ -1178,7 +1177,7 @@ public class PDFExporter {
 	private void printPlanetWeak(Chapter chapter, Event event) {
 		try {
 			List<Planet> weaks = new ArrayList<>();
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				if (!event.isHousable() && planet.getCode().equals("Moon"))
 					continue;
@@ -1243,7 +1242,7 @@ public class PDFExporter {
 	 */
 	private void printAspectTypes(PdfWriter writer, Chapter chapter, Event event) {
 		try {
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			//фильтрация списка типов аспектов
 			List<Model> types = new AspectTypeService().getList();
 			String[] codes = {
@@ -1338,8 +1337,7 @@ public class PDFExporter {
 				section.add(p);
 			}
 			PlanetAspectService service = new PlanetAspectService();
-			Configuration conf = event.getConfiguration();
-			Map<Long, Planet> planets = conf.getPlanets();
+			Map<Long, Planet> planets = event.getPlanets();
 			boolean exists = false;
 
 			for (Planet planet1 : planets.values()) {
@@ -2193,9 +2191,9 @@ public class PDFExporter {
 	    p.setSpacingAfter(10);
 		chapter.add(p);
 
-		List<Model> houses = event.getConfiguration().getHouses();
+		List<Model> houses = event.getHouses();
 		if (null == houses) return;
-		Collection<Planet> cplanets = event.getConfiguration().getPlanets().values();
+		Collection<Planet> cplanets = event.getPlanets().values();
 		try {
 			PlanetHouseService service = new PlanetHouseService();
 			HouseSignService hservice = new HouseSignService();
@@ -2837,7 +2835,7 @@ public class PDFExporter {
 	 */
 	private void printPlanetStrength(PdfWriter writer, Chapter chapter, Event event) {
 		try {
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 		    Bar[] bars = new Bar[planets.size()];
 		    int i = -1;
 		    for (Planet planet : planets) {
@@ -2939,14 +2937,14 @@ public class PDFExporter {
 	 */
 	private void printSymbols(Chapter chapter, Event event) {
 		try {
-			if (event.getConfiguration().getPlanets() != null) {
+			if (event.getPlanets() != null) {
 		    	Sign sign = null;
 				Font bold = PDFUtil.getSubheaderFont();
 
 				Section section = PDFUtil.printSection(chapter, "Ваше предназначение", null);
 				com.itextpdf.text.List ilist = new com.itextpdf.text.List(false, false, 10);
 
-				Map<Long, Planet> planets = event.getConfiguration().getPlanets();
+				Map<Long, Planet> planets = event.getPlanets();
 				ListItem li = new ListItem();
 				li = new ListItem();
 		        li.add(new Chunk("Предназначение Духа: ", bold));
@@ -3115,7 +3113,7 @@ public class PDFExporter {
 			} else if (conf.getShape().equals("triangle")) {
 				if (code.equals("triangle")) {
 					Planet vertex = conf.getVertex()[0];
-					vertex.setSign(event.getConfiguration().getPlanets().get(vertex.getId()).getSign());
+					vertex.setSign(event.getPlanets().get(vertex.getId()).getSign());
 					kz.zvezdochet.bean.Element element = vertex.getSign().getElement();
 					if (element != null)
 						conf.setElement(element);
@@ -3140,7 +3138,7 @@ public class PDFExporter {
 
 				if (code.equals("taucross")) {
 					Planet vertex = conf.getVertex()[0];
-					vertex.setSign(event.getConfiguration().getPlanets().get(vertex.getId()).getSign());
+					vertex.setSign(event.getPlanets().get(vertex.getId()).getSign());
 					Cross cross = (Cross)new CrossService().find(vertex.getSign().getCrossId());
 					if (cross != null) {
 						String str = "Ваша реакция на удары судьбы";
@@ -3161,7 +3159,7 @@ public class PDFExporter {
 					com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 					Planet[] tplanets = {conf.getVertex()[0], conf.getLeftFoot()[0], conf.getRightFoot()[0]};
 					House[] houses = new House[3];
-					Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+					Collection<Planet> planets = event.getPlanets().values();
 					for (int i = 0; i < 3; i++) {
 						 Planet tp = tplanets[i];
 						for (Planet p : planets) {
@@ -3321,7 +3319,7 @@ public class PDFExporter {
 			Section section = PDFUtil.printSection(chapter, "Лояльность и категоричность", null);
 
 			int loyalty = 0, flatness = 0, max = 5, loyalty2 = 0, flatness2 = 0;
-			Collection<Planet> planets = event.getConfiguration().getPlanets().values();
+			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				if (event.isHousable()) {
 					boolean loyal2 = planet.getHouse().getElement().isLoyalty();

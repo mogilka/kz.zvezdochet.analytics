@@ -5,7 +5,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Синастрический аспект
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class SynastryAspectText extends PlanetAspectText {

@@ -6,7 +6,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Зодиакальный градус
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class Degree extends TextGenderDictionary {
 	private static final long serialVersionUID = -3521775467191351633L;

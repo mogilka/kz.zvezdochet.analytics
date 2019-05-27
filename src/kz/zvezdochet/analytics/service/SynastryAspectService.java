@@ -9,7 +9,7 @@ import kz.zvezdochet.core.service.DataAccessException;
 
 /**
  * Сервис синастрических аспектов
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class SynastryAspectService extends PlanetAspectService {
 

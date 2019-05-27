@@ -12,7 +12,7 @@ import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.ModelService;
 
 /**
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class RuleService extends ModelService {

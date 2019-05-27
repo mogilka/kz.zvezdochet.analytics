@@ -10,7 +10,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Сервис Лунных дней
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class MoondayService extends ModelService {
 

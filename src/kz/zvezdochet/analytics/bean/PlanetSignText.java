@@ -8,7 +8,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Толкование планеты в знаке Зодиака
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class PlanetSignText extends TextGenderModel {

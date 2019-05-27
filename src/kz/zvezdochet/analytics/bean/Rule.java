@@ -9,7 +9,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Правило дополнительного толкования
- * @author Nataly Didenko
+ * @author Natalie Didenko
  */
 public class Rule extends Model {
 	private static final long serialVersionUID = -7317270890720890440L;

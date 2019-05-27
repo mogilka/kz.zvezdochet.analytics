@@ -16,6 +16,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import kz.zvezdochet.analytics.Activator;
+import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
@@ -24,16 +25,15 @@ import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.util.CalcUtil;
 import kz.zvezdochet.core.util.PlatformUtil;
 import kz.zvezdochet.service.SignService;
-import kz.zvezdochet.util.Configuration;
 
 /**
  * Генератор XML-файла для flash-изображения
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class XMLExporter {
 	
-	public XMLExporter(Configuration conf) throws DataAccessException {
+	public XMLExporter(Event event) throws DataAccessException {
 		String xmlfile = null;
 		try {
 			String path = PlatformUtil.getPath(Activator.PLUGIN_ID, "/out/horoscope_files/data.xml").getPath(); //$NON-NLS-1$
@@ -55,16 +55,16 @@ public class XMLExporter {
 			e.printStackTrace();
 		}
 
-		exportHouses(document, rootElement, conf);
-		exportPlanets(document, rootElement, conf);
-		exportSigns(document, rootElement, conf);
+		exportHouses(document, rootElement, event);
+		exportPlanets(document, rootElement, event);
+		exportSigns(document, rootElement, event);
 		saveDocument(rootElement, xmlfile);
 	}
 
-	private void exportHouses(Document document, Element root, Configuration conf) {
+	private void exportHouses(Document document, Element root, Event event) {
 		Element houses = document.createElement("sets");
 		int count = 0;
-		for (Model house : conf.getHouses()) {
+		for (Model house : event.getHouses()) {
 			Element element = document.createElement("set");
 			element.appendChild(document.createTextNode(((House)house).getCode()));
 			element.setAttribute("id", String.valueOf(count++));
@@ -76,10 +76,10 @@ public class XMLExporter {
 		root.appendChild(houses);
 	}
 
-	private void exportPlanets(Document document, Element root, Configuration conf) {
+	private void exportPlanets(Document document, Element root, Event event) {
 		Element planets = document.createElement("sets");
 		int count = 0;
-		Collection<Planet> eplanets = conf.getPlanets().values();
+		Collection<Planet> eplanets = event.getPlanets().values();
 		for (Planet planet : eplanets) {
 			Element element = document.createElement("set");
 			element.appendChild(document.createTextNode(((Planet)planet).getCode()));
@@ -92,7 +92,7 @@ public class XMLExporter {
 		root.appendChild(planets);
 	}
 	
-	private void exportSigns(Document document, Element root, Configuration conf) throws DataAccessException {
+	private void exportSigns(Document document, Element root, Event event) throws DataAccessException {
 		List<Model> signlist = new SignService().getList();
 		Element signs = document.createElement("sets");
 		int count = 0;

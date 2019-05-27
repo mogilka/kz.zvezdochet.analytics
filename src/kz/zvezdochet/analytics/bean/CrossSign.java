@@ -6,7 +6,7 @@ import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Подкатегория крестов
- * @author Nataly Didenko
+ * @author Natalie Didenko
  *
  */
 public class CrossSign extends DiagramObject {
