@@ -151,7 +151,7 @@ public class GraphicPart extends View implements IFilterable {
 					System.out.println("Новый добавлен: " + event.toLog() + "\n");
 				} else {
 					event = events.get(0);
-					event.init(false);
+					event.initData(false);
 				}
 				long time = event.getBirth().getTime(); 
 				if (!dates.containsKey(time))
@@ -168,7 +168,7 @@ public class GraphicPart extends View implements IFilterable {
 				for (Planet planet : planets) {
 					long pid = planet.getId();
 					List<TimeSeriesDataItem> series = items.containsKey(pid) ? items.get(pid) : new ArrayList<TimeSeriesDataItem>();
-					TimeSeriesDataItem tsdi = new TimeSeriesDataItem(new Day(date), Math.abs(planet.getLongitude()));
+					TimeSeriesDataItem tsdi = new TimeSeriesDataItem(new Day(date), planet.getLongitude());
 					if (!series.contains(tsdi))
 						series.add(tsdi);
 					items.put(pid, series);
