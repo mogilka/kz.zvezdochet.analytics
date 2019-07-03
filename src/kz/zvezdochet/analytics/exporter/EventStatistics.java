@@ -98,13 +98,12 @@ public class EventStatistics {
 	public void initPlanetHouses() throws DataAccessException {
 		if (event.getPlanets() != null) {
 			planetHouses = new HashMap<String, Double>();
-			List<Model> houses = event.getHouses();
+			Map<Long, House> houses = event.getHouses();
 			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
-				for (int i = 0; i < houses.size(); i++) {
-					House house1 = (House)houses.get(i);
-					int j = (i == houses.size() - 1) ? 0 : i + 1;
-					House house2 = (House)houses.get(j);
+				for (House house1 : houses.values()) {
+					long j = (house1.getNumber() == houses.size()) ? 142 : house1.getId() + 1;
+					House house2 = houses.get(j);
 					if (SkyPoint.getHouse(house1.getLongitude(), house2.getLongitude(), planet.getLongitude())) { 
 						planet.setHouse(house1);
 						double value = 0.0;
@@ -126,9 +125,9 @@ public class EventStatistics {
 	 * @throws DataAccessException 
 	 */
 	public House getHouse(String code) throws DataAccessException {
-		for (Model model : event.getHouses())
-			if (((House)model).getCode().equals(code))
-				return (House)model;
+		for (House house : event.getHouses().values())
+			if (house.getCode().equals(code))
+				return house;
 		return null;
 	}
 

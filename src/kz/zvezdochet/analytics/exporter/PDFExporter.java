@@ -612,9 +612,8 @@ public class PDFExporter {
 	private void printDegree(Chapter chapter, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, term ? "Градус рождения" : "Символ рождения", null);
-			if (event.getHouses() != null &&
-					event.getHouses().size() > 0) {
-				House house = (House)event.getHouses().get(0);
+			if (event.getHouses() != null && event.getHouses().size() > 0) {
+				House house = event.getHouses().get(142L);
 				if (null == house) return;
 				int value = (int)house.getLongitude();
 				Model model = new DegreeService().find(new Long(String.valueOf(value)));
@@ -1453,6 +1452,7 @@ public class PDFExporter {
 	 * @param chapter раздел
 	 * @param event событие
 	 */
+	@SuppressWarnings("unused")
 	private void printConfigurations(Chapter chapter, Event event) {
 		try {
 		    List<AspectConfiguration> confs = new ArrayList<>();
@@ -2228,15 +2228,13 @@ public class PDFExporter {
 	    p.setSpacingAfter(10);
 		chapter.add(p);
 
-		List<Model> houses = event.getHouses();
+		Collection<House> houses = event.getHouses().values();
 		if (null == houses) return;
 		Collection<Planet> cplanets = event.getPlanets().values();
 		try {
 			PlanetHouseService service = new PlanetHouseService();
 			HouseSignService hservice = new HouseSignService();
-			for (Model hmodel : houses) {
-				House house = (House)hmodel;
-
+			for (House house : houses) {
 				//Определяем количество планет в доме
 				List<Planet> planets = new ArrayList<Planet>();
 				for (Planet planet : cplanets) {
@@ -2396,7 +2394,7 @@ public class PDFExporter {
 
 			li = new ListItem();
 	        li.add(new Chunk("Категория \"в поступках\" показывает, "
-					+ "как меняются ваши приоритеты на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
+					+ "как меняются ваши приоритеты в социуме, когда приходит время действовать.", font));
 	        list.add(li);
 	        section.add(list);
 
@@ -2488,7 +2486,7 @@ public class PDFExporter {
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Категория \"в поступках\" показывает, как меняется ваша активность на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
+	        li.add(new Chunk("Категория \"в поступках\" показывает, как меняется ваша активность на событийном уровне, когда приходит время действовать.", font));
 	        list.add(li);
 			section.add(list);
 
@@ -2747,8 +2745,8 @@ public class PDFExporter {
 		    	section.add(new Paragraph(PDFUtil.removeTags(cross.getText(), font)));
 		    	PDFUtil.printGender(section, cross, female, child, true);
 		    }
-		    Paragraph p = new Paragraph("Диаграмма показывает, какой тип стратегии присущ вашим мыслям (в состоянии покоя). " +
-				"И как эта стратегия меняется при принятии решений в действии (на событийном уровне, в социуме):", font);
+		    Paragraph p = new Paragraph("Диаграмма показывает, какой тип стратегии присущ вашим мыслям в состоянии покоя, " +
+				"и как эта стратегия меняется, когда приходит время действовать и принимать решения:", font);
 		    p.setSpacingBefore(10);
 	    	section.add(p);
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Стратегия", "Аспекты", "Баллы", bars, 500, 0, true);
@@ -2854,8 +2852,8 @@ public class PDFExporter {
 		    	section.add(new Paragraph(PDFUtil.removeTags(zone.getText(), font)));
 		    	PDFUtil.printGender(section, zone, female, child, true);
 		    }
-		    Paragraph p = new Paragraph("Диаграмма показывает, какие приоритеты вы ставите для своего развития. " +
-				"И как на событийном уровне (в действии) они меняются:", font);
+		    Paragraph p = new Paragraph("Диаграмма показывает, какие приоритеты вы ставите для своего развития, " +
+				"и как на событийном уровне (в действии) они меняются:", font);
 		    p.setSpacingBefore(10);
 	    	section.add(p);
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Развитие духа", "Аспекты", "Баллы", bars, 500, 0, true);
@@ -3435,7 +3433,7 @@ public class PDFExporter {
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Категория \"в поступках\" показывает, как уровень лояльности меняется на событийном уровне, в социуме по сравнению с предыдущей моделью.", font));
+	        li.add(new Chunk("Категория \"в поступках\" показывает, как уровень лояльности меняется на практике, когда приходит время действовать.", font));
 	        list.add(li);
 	        section.add(list);
 

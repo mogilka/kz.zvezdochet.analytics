@@ -169,7 +169,7 @@ public class HTMLExporter {
 	 * @param houseMap карта домов
 	 */
 	private void printPlanetHouse(Event event, Tag body, Map<String, Double> houseMap) {
-		List<Model> houses = event.getHouses();
+		Collection<House> houses = event.getHouses().values();
 		Collection<Planet> cplanets = event.getPlanets().values();
 		if (null == houses) return;
 		try {
@@ -299,6 +299,7 @@ public class HTMLExporter {
 	 * @param event событие
 	 * @param cell тег-контейнер для вложенных тегов
 	 */
+	@SuppressWarnings("unused")
 	private void generateAspectTypes(Event event, Tag cell) {
 		try {
 //			event.getConfiguration().initPlanetAspects();
@@ -394,7 +395,7 @@ public class HTMLExporter {
 			div.add(tag);
 	
 			PlanetAspectService service = new PlanetAspectService();
-			AspectType damaged = (AspectType)new AspectTypeService().find("NEGATIVE");
+//			AspectType damaged = (AspectType)new AspectTypeService().find("NEGATIVE");
 
 			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet p : planets) {
@@ -454,6 +455,7 @@ public class HTMLExporter {
 	 * @param cell тег-контейнер для вложенных тегов
 	 * @param statistics объект статистики
 	 */
+	@SuppressWarnings("unused")
 	private void generateZones(Event event, Tag cell, EventStatistics statistics) {
 		try {
 			Tag tr = new Tag("tr");
@@ -540,6 +542,7 @@ public class HTMLExporter {
 	 * @param cell тег-контейнер для вложенных тегов
 	 * @param statistics объект статистики
 	 */
+	@SuppressWarnings("unused")
 	private void generateCrosses(Event event, Tag cell, EventStatistics statistics) {
 		try {
 			Tag tr = new Tag("tr");
@@ -679,6 +682,7 @@ public class HTMLExporter {
 	 * @param cell тег-контейнер для вложенных тегов
 	 * @param statistics объект статистики
 	 */
+	@SuppressWarnings("unused")
 	private void generateSquares(Event event, Tag cell, EventStatistics statistics, Map<String, Double> signMap) {
 		try {
 			Tag tr = new Tag("tr");
@@ -817,6 +821,7 @@ public class HTMLExporter {
 	 * @param cell тег-контейнер для вложенных тегов
 	 * @param statistics объект статистики
 	 */
+	@SuppressWarnings("unused")
 	private void generateHalfSpheres(Event event, Tag cell, EventStatistics statistics) {
 		try {
 			Tag tr = new Tag("tr");
@@ -914,6 +919,7 @@ public class HTMLExporter {
 	 * @param cell тег-контейнер для вложенных тегов
 	 * @param statistics объект статистики
 	 */
+	@SuppressWarnings("unused")
 	private void generateYinYang(Event event, Tag cell, EventStatistics statistics) {
 		try {
 			Tag tr = new Tag("tr");
@@ -999,6 +1005,7 @@ public class HTMLExporter {
 	 * @param event событие
 	 * @param cell ячейка-контейнер таблицы разметки
 	 */
+	@SuppressWarnings("unused")
 	private void generateContents(Event event, Tag cell) {
 		try {
 			//левая часть содержания
@@ -1099,7 +1106,7 @@ public class HTMLExporter {
 			td.add(new Tag("/br"));
 
 			Collection<Planet> eplanets = event.getPlanets().values();
-			List<Model> ehouses = event.getHouses();
+			Collection<House> ehouses = event.getHouses().values();
 			for (Model hmodel : ehouses) {
 				House house = (House)hmodel;
 				//Определяем количество планет в доме
@@ -1132,6 +1139,7 @@ public class HTMLExporter {
 	 * @param date дата события
 	 * @param cell тег-контейнер для вложенных тегов
 	 */
+	@SuppressWarnings("unused")
 	private void generateCelebrities(Date date, Tag cell) {
 		try {
 			List<Event> list = new EventService().findEphemeron(date);
@@ -1170,6 +1178,7 @@ public class HTMLExporter {
 	 * @param cell тег-контейнер для вложенных тегов
 	 * @param signMap карта знаков
 	 */
+	@SuppressWarnings("unused")
 	private void generateSignChart(Tag cell, Map<String, Double> signMap) {
 		try {
 			//выраженные знаки
@@ -1230,6 +1239,7 @@ public class HTMLExporter {
 	 * @param statistics объект статистики события
 	 * @param cell тег-контейнер для вложенных тегов
 	 */
+	@SuppressWarnings("unused")
 	private void generateHouseChart(EventStatistics statistics, Tag cell) {
 		try {
 			Tag tr = new Tag("tr");
@@ -1277,7 +1287,7 @@ public class HTMLExporter {
 		try {
 			if (event.getHouses() != null &&
 					event.getHouses().size() > 0) {
-				House house = (House)event.getHouses().get(0);
+				House house = (House)event.getHouses().get(142L);
 				if (null == house) return;
 				int value = (int)house.getLongitude();
 				Model model = new DegreeService().find(new Long(String.valueOf(value)));
@@ -1353,6 +1363,7 @@ public class HTMLExporter {
 	 * @param event событие
 	 * @param cell тег-контейнер для вложенных тегов
 	 */
+	@SuppressWarnings("unused")
 	private void generateCard(Event event, Tag cell) {
 		try {
 			//космограмма
@@ -1454,8 +1465,8 @@ public class HTMLExporter {
 		try {
 			if (event.getPlanets() != null) {
 				String type = "";
-				Planet sun = (Planet)event.getPlanets().get(0);
-				Planet moon = (Planet)event.getPlanets().get(1);
+				Planet sun = (Planet)event.getPlanets().get(19L);
+				Planet moon = (Planet)event.getPlanets().get(20L);
 				
 				if (sun.getSign().getId().equals(moon.getSign().getId()))
 					type = "centered";
@@ -1514,6 +1525,7 @@ public class HTMLExporter {
 	 * @param cell тег-контейнер для вложенных тегов
 	 * @param statistics объект статистики
 	 */
+	@SuppressWarnings("unused")
 	private void generateElements(Event event, Tag cell, EventStatistics statistics) {
 		try {
 			Tag tr = new Tag("tr");
