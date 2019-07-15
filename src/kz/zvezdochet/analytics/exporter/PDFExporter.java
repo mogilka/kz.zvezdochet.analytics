@@ -70,6 +70,7 @@ import kz.zvezdochet.analytics.service.PlanetHouseService;
 import kz.zvezdochet.analytics.service.PlanetSignService;
 import kz.zvezdochet.analytics.service.PlanetTextService;
 import kz.zvezdochet.analytics.service.RuleService;
+import kz.zvezdochet.bean.Aspect;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.CardKind;
 import kz.zvezdochet.bean.Cross;
@@ -224,7 +225,8 @@ public class PDFExporter {
 			chapter.add(p);
 
 			Font fontgray = PDFUtil.getAnnotationFont(false);
-			text = "Дата составления: " + DateUtil.fulldtf.format(event.getDate());
+			Date date = (null == event.getDate()) ? new Date() : event.getDate(); 
+			text = "Дата составления: " + DateUtil.fulldtf.format(date);
 			p = new Paragraph(text, fontgray);
 	        p.setAlignment(Element.ALIGN_CENTER);
 			chapter.add(p);
@@ -1321,7 +1323,7 @@ public class PDFExporter {
 	 * @param chapter раздел
 	 * @param event событие
 	 * @param title заголовок секции
-	 * @param aspectType код типа аспектов
+	 * @param aspectType код типа аспектов POSITIVE|NEGATIVE
 	 */
 	private void printAspects(Chapter chapter, Event event, String title, String aspectType) {
 		try {
@@ -1334,10 +1336,22 @@ public class PDFExporter {
 			PlanetAspectService service = new PlanetAspectService();
 			Map<Long, Planet> planets = event.getPlanets();
 			boolean exists = false;
+			List<SkyPointAspect> spas = new ArrayList<>();
+
+			//отсутствие аспекта между светилами
+			if (aspectType.equals("NEGATIVE")) {
+				Planet sun = planets.get(19L);
+				String amoon = sun.getAspectMap().get("Moon");
+				if (null == amoon) {
+					SkyPointAspect spa = new SkyPointAspect(sun, planets.get(20L), new Aspect((AspectType)new AspectTypeService().find(16L)));
+					spas.add(spa);
+				}
+			}
 
 			for (Planet planet1 : planets.values()) {
 				if (!planet1.isMain())
 					continue;
+
 				if (!event.isHousable() && planet1.getCode().equals("Moon"))
 					continue;
 
@@ -1366,70 +1380,77 @@ public class PDFExporter {
 						continue;
 
 					AspectType type = aspect.checkType(true);
-					boolean match = false;
 					String tcode = type.getCode();
+
 					//аспект соответствует заявленному (негативному или позитивному)
 					if (tcode.equals(aspectType))
-						match = true;
-					//в позитивные добавляем соединения и ядро Солнца
+						spas.add(aspect);
+
+					//в позитивные добавляем нейтральные соединения и ядро Солнца
 					else if	(aspectType.equals("POSITIVE")
 							&& (tcode.equals("NEUTRAL_KERNEL") || tcode.equals("NEUTRAL")
-							&& !planet2.getCode().equals("Kethu")))
-						match = true;
+							&& !planet2.getCode().equals("Kethu")
+							&& !planet2.getCode().equals("Lilith")))
+						spas.add(aspect);
+
 					//в негативные добавляем пояс Солнца
 					else if (aspectType.equals("NEGATIVE")) {
-						if (tcode.equals("NEUTRAL") && planet2.getCode().equals("Kethu"))
-							match = true;
+						if (tcode.equals("NEUTRAL")
+								&& (planet2.getCode().equals("Kethu"))
+									|| planet2.getCode().equals("Lilith"))
+							spas.add(aspect);
 					}
+				}
+			}
 
-					if (match) {
-						List<Model> dicts = service.finds(aspect);
-						for (Model model : dicts) {
-							PlanetAspectText dict = (PlanetAspectText)model;
-		    				Planet aspl1 = planets.get(planet1.getId());
-		    				Planet aspl2 = planets.get(planet2.getId());
+			for (SkyPointAspect aspect : spas) {
+				List<Model> dicts = service.finds(aspect);
+				Planet aspl1 = planets.get(aspect.getSkyPoint1().getId());
+				Planet aspl2 = planets.get(aspect.getSkyPoint2().getId());
+				AspectType type = aspect.getAspect().getType();
 
-		    				Paragraph p = new Paragraph("", fonth5);
-		    				if (dict != null) {
-			    				p.add(new Chunk(dict.getMark(aspl1, aspl2), fonth5));
-			    				if (term)
-									p.add(new Chunk(dict.getPlanet1().getName() + " " + 
-										type.getSymbol() + " " + 
-										dict.getPlanet2().getName(), fonth5));
-			    				else
-									p.add(new Chunk(dict.getPlanet1().getShortName() + " " + 
-										type.getSymbol() + " " + 
-										dict.getPlanet2().getShortName(), fonth5));
-		    				}
-							if (term) {
-								p.add(new Chunk(" " + planet1.getSymbol(), PDFUtil.getHeaderAstroFont()));
+				for (Model model : dicts) {
+					PlanetAspectText dict = (PlanetAspectText)model;
+
+    				Paragraph p = new Paragraph("", fonth5);
+    				if (dict != null) {
+	    				p.add(new Chunk(dict.getMark(aspl1, aspl2), fonth5));
+	    				if (term)
+							p.add(new Chunk(dict.getPlanet1().getName() + " " + 
+								type.getSymbol() + " " + 
+								dict.getPlanet2().getName(), fonth5));
+	    				else
+							p.add(new Chunk(dict.getPlanet1().getShortName() + " " + 
+								type.getSymbol() + " " + 
+								dict.getPlanet2().getShortName(), fonth5));
+    				}
+					if (term) {
+						p.add(new Chunk(" " + aspl1.getSymbol(), PDFUtil.getHeaderAstroFont()));
 	
-			    				if (aspect.getAspect().getCode().equals("CONJUNCTION") || aspect.getAspect().getCode().equals("OPPOSITION"))
-			    					p.add(new Chunk(aspect.getAspect().getSymbol(), PDFUtil.getHeaderAstroFont()));
-			    				else
-			    					p.add(new Chunk(type.getSymbol(), fonth5));
+			    		if (aspect.getAspect().getCode().equals("CONJUNCTION") || aspect.getAspect().getCode().equals("OPPOSITION"))
+			    			p.add(new Chunk(aspect.getAspect().getSymbol(), PDFUtil.getHeaderAstroFont()));
+			    		else
+			    			p.add(new Chunk(type.getSymbol(), fonth5));
 	
-			    				p.add(new Chunk(planet2.getSymbol(), PDFUtil.getHeaderAstroFont()));
+			    		p.add(new Chunk(aspl2.getSymbol(), PDFUtil.getHeaderAstroFont()));
 
-								String pretext = aspect.getAspect().getCode().equals("CONJUNCTION")
-										? "с планетой"
-										: "к планете";
-				    				p.add(new Paragraph(aspect.getAspect().getName() + " планеты " + dict.getPlanet1().getName() + " " + pretext + " " + dict.getPlanet2().getName(), PDFUtil.getAnnotationFont(true)));
-							}
-		    				section.addSection(p);
+						String pretext = aspect.getAspect().getCode().equals("CONJUNCTION")
+								? "с планетой"
+								: "к планете";
+				    		p.add(new Paragraph(aspect.getAspect().getName() + " планеты " + dict.getPlanet1().getName() + " " + pretext + " " + dict.getPlanet2().getName(), PDFUtil.getAnnotationFont(true)));
+					}
+    				section.addSection(p);
 
-							if (dict != null) {
-								exists = true;
-								section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
+					if (dict != null) {
+						exists = true;
+						section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
 	
-								Rule rule = EventRules.rulePlanetAspect(aspect, female);
-								if (rule != null) {
-				    				section.add(Chunk.NEWLINE);
-									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
-								}
-								PDFUtil.printGender(section, dict, female, child, true);
-							}
+						Rule rule = EventRules.rulePlanetAspect(aspect, female);
+						if (rule != null) {
+		    				section.add(Chunk.NEWLINE);
+							section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 						}
+						PDFUtil.printGender(section, dict, female, child, true);
 					}
 				}
 			}
@@ -1574,12 +1595,12 @@ public class PDFExporter {
 
 //----------тригон 120° 120° 120°
 
-		    conf = (AspectConfiguration)service.find("triangle");
-			conf.setHeadable(true);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(20L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(24L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(28L) });
-			confs.add(conf);
+//		    conf = (AspectConfiguration)service.find("triangle");
+//			conf.setHeadable(true);
+//			conf.setVertex(new Planet[] { (Planet)planetService.find(20L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(24L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(28L) });
+//			confs.add(conf);
 
 //		    conf2 = (AspectConfiguration)service.find("triangle");
 //			conf2.setHeadable(false);
@@ -1629,12 +1650,12 @@ public class PDFExporter {
 
 //----------талисман 30° 150° 120°
 
-		    conf = (AspectConfiguration)service.find("talisman");
-			conf.setHeadable(true);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(24L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(20L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(34L) });
-			confs.add(conf);
+//		    conf = (AspectConfiguration)service.find("talisman");
+//			conf.setHeadable(true);
+//			conf.setVertex(new Planet[] { (Planet)planetService.find(24L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(20L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(34L) });
+//			confs.add(conf);
 
 //----------громоотвод 90° 60° 60° 90° 60°
 
@@ -1731,9 +1752,9 @@ public class PDFExporter {
 
 		    conf = (AspectConfiguration)service.find("prism");
 			conf.setHeadable(true);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(33L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(21L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(28L) });
+			conf.setVertex(new Planet[] { (Planet)planetService.find(26L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(24L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(33L) });
 			confs.add(conf);
 
 //----------конверт 108° 72° 108° 72°
@@ -1787,12 +1808,12 @@ public class PDFExporter {
 
 //----------Закладка 36° 72° 108°
 
-//		    conf = (AspectConfiguration)service.find("bookmark");
-//			conf.setHeadable(true);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(31L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(28L), (Planet)planetService.find(34L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(29L) });
-//			confs.add(conf);
+		    conf = (AspectConfiguration)service.find("bookmark");
+			conf.setHeadable(true);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(29L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(20L), (Planet)planetService.find(27L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(23L) });
+			confs.add(conf);
 
 //----------пирамида 150° 72° 135°
 
@@ -1826,17 +1847,17 @@ public class PDFExporter {
 
 		    conf = (AspectConfiguration)service.find("taucross");
 			conf.setHeadable(true);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(30L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(26L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(32L) });
+			conf.setVertex(new Planet[] { (Planet)planetService.find(23L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(21L), (Planet)planetService.find(32L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(25L), (Planet)planetService.find(22L), (Planet)planetService.find(30L) });
 			confs.add(conf);
 
-//		    conf2 = (AspectConfiguration)service.find("taucross");
-//			conf2.setHeadable(false);
-//			conf2.setVertex(new Planet[] { (Planet)planetService.find(31L) });
-//			conf2.setLeftFoot(new Planet[] { (Planet)planetService.find(23L) });
-//			conf2.setRightFoot(new Planet[] { (Planet)planetService.find(32L) });
-//			confs.add(conf2);
+		    conf2 = (AspectConfiguration)service.find("taucross");
+			conf2.setHeadable(false);
+			conf2.setVertex(new Planet[] { (Planet)planetService.find(34L) });
+			conf2.setLeftFoot(new Planet[] { (Planet)planetService.find(28L) });
+			conf2.setRightFoot(new Planet[] { (Planet)planetService.find(29L) });
+			confs.add(conf2);
 
 //		    conf3 = (AspectConfiguration)service.find("taucross");
 //			conf3.setHeadable(false);
@@ -1866,16 +1887,16 @@ public class PDFExporter {
 
 		    conf = (AspectConfiguration)service.find("poleaxe");
 			conf.setHeadable(true);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(29L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(33L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(19L) });
+			conf.setVertex(new Planet[] { (Planet)planetService.find(24L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(29L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(34L) });
 			confs.add(conf);
 
 		    conf2 = (AspectConfiguration)service.find("poleaxe");
 			conf2.setHeadable(false);
-			conf2.setVertex(new Planet[] { (Planet)planetService.find(32L) });
+			conf2.setVertex(new Planet[] { (Planet)planetService.find(26L) });
 			conf2.setLeftFoot(new Planet[] { (Planet)planetService.find(23L) });
-			conf2.setRightFoot(new Planet[] { (Planet)planetService.find(20L) });
+			conf2.setRightFoot(new Planet[] { (Planet)planetService.find(21L) });
 			confs.add(conf2);
 			
 //----------дротик 45° 45° 90°
@@ -1889,13 +1910,13 @@ public class PDFExporter {
 
 //----------наковальня 45° 90° 45° 180°
 
-		    conf = (AspectConfiguration)service.find("anvil");
-			conf.setHeadable(true);
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(26L) });
-			conf.setLeftHand(new Planet[] { (Planet)planetService.find(27L) });
-			conf.setRightHand(new Planet[] { (Planet)planetService.find(23L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(20L) });
-			confs.add(conf);			
+//		    conf = (AspectConfiguration)service.find("anvil");
+//			conf.setHeadable(true);
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(26L) });
+//			conf.setLeftHand(new Planet[] { (Planet)planetService.find(27L) });
+//			conf.setRightHand(new Planet[] { (Planet)planetService.find(23L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(20L) });
+//			confs.add(conf);			
 
 //----------растяжка 45° 135° 45° 135°
 
