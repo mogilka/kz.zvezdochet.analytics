@@ -184,7 +184,8 @@ public class PlanetAspectService extends GenderTextModelService {
 		String sql;
 		try {
 			AspectType type = aspect.checkType(false);
-			String wheretype = aspect.getAspect().getCode().equals("KERNEL") ? "or typeid = 1" : "";
+			String acode = aspect.getAspect().getCode();
+			String wheretype = acode != null && acode.equals("KERNEL") ? "or typeid = 1" : "";
 
 			sql = "select * from " + tableName + 
 				" where (typeid = ? " + wheretype + ")" +
@@ -200,7 +201,7 @@ public class PlanetAspectService extends GenderTextModelService {
 			ps.setLong(3, pid2);
 			ps.setLong(4, pid2);
 			ps.setLong(5, pid1);
-			ps.setLong(6, aspect.getAspect().getId());
+			ps.setLong(6, null == acode ? java.sql.Types.NULL : aspect.getAspect().getId());
 //			System.out.println(ps);
 			rs = ps.executeQuery();
 			while (rs.next())
