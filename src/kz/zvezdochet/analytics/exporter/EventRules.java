@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import kz.zvezdochet.analytics.bean.Degree;
+import kz.zvezdochet.analytics.bean.HouseSignText;
 import kz.zvezdochet.analytics.bean.Rule;
+import kz.zvezdochet.analytics.service.HouseSignService;
 import kz.zvezdochet.analytics.service.RuleService;
 import kz.zvezdochet.bean.CardKind;
 import kz.zvezdochet.bean.Event;
@@ -74,6 +76,14 @@ public class EventRules {
 						return (Rule)service.find(105L);
 				}
 			}
+//		} else if (spa.getAspect().getType().getCode().equals("NEUTRAL") //нереалистично
+//				&& house.getCode().equals("II_2")) {
+//			HouseSignText text = new HouseSignService().find(house, planet.getSign());
+//			if (text != null) {
+//				Rule rule = new Rule();
+//				rule.setText(text.getText());
+//				return rule;
+//			}
 		}
 		return null;
 	}
