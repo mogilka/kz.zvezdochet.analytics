@@ -102,11 +102,13 @@ public class EventRules {
 		String code = spa.getAspect().getType().getCode();
 
 		if (planet.getCode().equals("Sun") && planet2.getCode().equals("Moon")) {
-			if (female && spa.getAspect().getCode().equals("BELT")) {
-				Map<String, Integer> map = planet2.getAspectCountMap();
-				if (map.size() < 2) 
-					return (Rule)service.find(144L);
-			}
+			String acode = spa.getAspect().getCode();
+			if (acode != null)
+				if (female && spa.getAspect().getCode().equals("BELT")) {
+					Map<String, Integer> map = planet2.getAspectCountMap();
+					if (map.size() < 2) 
+						return (Rule)service.find(144L);
+				}
 		}
 
 		if (planet.getCode().equals("Moon") && planet2.getCode().equals("Pluto")) {

@@ -1161,7 +1161,7 @@ public class HTMLExporter {
 					Tag a = new Tag("a", "target=_blank href=" + event.getUrl());
 					a.add(event.getName());
 					p.add(a);
-					p.add(util.getSmallTaggedString("&nbsp;&nbsp;&nbsp;" + event.getDescription()));
+					p.add(util.getSmallTaggedString("&nbsp;&nbsp;&nbsp;" + event.getComment()));
 					p.add(new Tag("/br"));
 				}
 				td.add(p);
