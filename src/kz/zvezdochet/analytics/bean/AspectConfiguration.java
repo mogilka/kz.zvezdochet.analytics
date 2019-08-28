@@ -227,19 +227,6 @@ public class AspectConfiguration extends TextGenderDictionary {
 	}
 
 	/**
-	 * Признак того, что нужно печатать заголовок и описание в отчёте
-	 */
-	private boolean headable = true;
-
-	public boolean isHeadable() {
-		return headable;
-	}
-
-	public void setHeadable(boolean headable) {
-		this.headable = headable;
-	}
-
-	/**
 	 * Массив планет слева вверху
 	 */
 	private Planet[] leftHorn;
