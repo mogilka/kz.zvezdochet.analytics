@@ -10,6 +10,7 @@ import kz.zvezdochet.analytics.bean.PlanetAspectText;
 import kz.zvezdochet.bean.Aspect;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.bean.SkyPoint;
 import kz.zvezdochet.bean.SkyPointAspect;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
@@ -183,25 +184,24 @@ public class PlanetAspectService extends GenderTextModelService {
         ResultSet rs = null;
 		String sql;
 		try {
-			AspectType type = aspect.checkType(false);
+			AspectType type = aspect.checkType(true);
 			String acode = aspect.getAspect().getCode();
 			String wheretype = acode != null && acode.equals("KERNEL") ? "or typeid = 1" : "";
 
+			boolean reverse = aspect.getSkyPoint1().getNumber() > aspect.getSkyPoint2().getNumber();
+			SkyPoint skyPoint1 = reverse ? aspect.getSkyPoint2() : aspect.getSkyPoint1();
+			SkyPoint skyPoint2 = reverse ? aspect.getSkyPoint1() : aspect.getSkyPoint2();
+
 			sql = "select * from " + tableName + 
 				" where (typeid = ? " + wheretype + ")" +
-					" and ((planet1id = ? and planet2id = ?)" +
-						" or (planet1id = ? and planet2id = ?))" +
+					" and (planet1id = ? and planet2id = ?)" +
 					" and (aspectid is null" +
 						" or aspectid = ?)";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, type.getId());
-			long pid1 = aspect.getSkyPoint1().getId();
-			long pid2 = aspect.getSkyPoint2().getId();
-			ps.setLong(2, pid1);
-			ps.setLong(3, pid2);
-			ps.setLong(4, pid2);
-			ps.setLong(5, pid1);
-			ps.setLong(6, null == acode ? java.sql.Types.NULL : aspect.getAspect().getId());
+			ps.setLong(2, skyPoint1.getId());
+			ps.setLong(3, skyPoint2.getId());
+			ps.setLong(4, null == acode ? java.sql.Types.NULL : aspect.getAspect().getId());
 //			System.out.println(ps);
 			rs = ps.executeQuery();
 			while (rs.next())
