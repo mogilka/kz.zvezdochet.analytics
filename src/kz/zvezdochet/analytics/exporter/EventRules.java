@@ -136,7 +136,14 @@ public class EventRules {
 		RuleService service = new RuleService();
 		String hcode = house.getCode();
 		String pcode = planet.getCode();
-		if (hcode.equals("I_3")) {
+		if (hcode.equals("I")) {
+			if (pcode.equals("Mercury")) {
+				if (planet.isWeak())
+					return (Rule)service.find(186L);
+				else if (planet.isDamaged())
+					return (Rule)service.find(187L);
+			}
+		} else if (hcode.equals("I_3")) {
 			if (pcode.equals("Sun")) {
 				if (planet.getSign().getCode().equals("Aquarius"))
 					return (Rule)service.find(26L);
