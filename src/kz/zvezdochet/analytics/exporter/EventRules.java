@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.analytics.bean.Degree;
-import kz.zvezdochet.analytics.bean.HouseSignText;
 import kz.zvezdochet.analytics.bean.Rule;
-import kz.zvezdochet.analytics.service.HouseSignService;
 import kz.zvezdochet.analytics.service.RuleService;
 import kz.zvezdochet.bean.CardKind;
 import kz.zvezdochet.bean.Event;
@@ -387,10 +386,12 @@ public class EventRules {
 	 * Нахождение планеты в знаке
 	 * @param planet планета
 	 * @param sign знак
+	 * @param event гороскоп
+	 * @param category категория
 	 * @return правило
 	 * @throws DataAccessException
 	 */
-	public static Rule rulePlanetSign(Planet planet, Sign sign, Event event) throws DataAccessException {
+	public static Rule rulePlanetSign(Planet planet, Sign sign, Event event, Category category) throws DataAccessException {
 		RuleService service = new RuleService();
 		String pcode = planet.getCode();
 		String scode = sign.getCode();
@@ -399,6 +400,12 @@ public class EventRules {
 			if (scode.equals("Taurus")) {
 				if (planet.isDamaged() && event.isFemale())
 					return (Rule)service.find(107L);
+			}
+		} else if (pcode.equals("Mars")) {
+			if (scode.equals("Pisces")) {
+				if (planet.isDamaged() && event.isFemale())
+					if (category.getCode().equals("male"))
+						return (Rule)service.find(185L);
 			}
 		}
 		return null;
