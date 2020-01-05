@@ -1,6 +1,7 @@
 package kz.zvezdochet.analytics.bean;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.eclipse.swt.graphics.Color;
 
@@ -32,11 +33,11 @@ public class AspectConfiguration extends TextGenderDictionary {
 	 */
 	public String getImageUrl() {
 		try {
-			return PlatformUtil.getPath(Activator.PLUGIN_ID, "/icons/conf/" + code + ".gif").getPath();
+			URL url = PlatformUtil.getPath(Activator.PLUGIN_ID, "/icons/conf/" + code + ".gif");
+			return (null == url) ? null : url.getPath();
 		} catch (IOException e) {
-			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 
 	/**
