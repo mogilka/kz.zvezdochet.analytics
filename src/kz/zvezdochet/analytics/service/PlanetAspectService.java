@@ -174,16 +174,18 @@ public class PlanetAspectService extends GenderTextModelService {
 	/**
 	 * Поиск толкования аспекта
 	 * @param aspect аспект
+	 * @param reverse true порядок планет, указанных в аспекте не меняется
 	 * @return список толкований аспектов между планетами
 	 * @throws DataAccessException
 	 */
-	public List<Model> finds(SkyPointAspect aspect) throws DataAccessException {
+	public List<Model> finds(SkyPointAspect aspect, boolean reverse) throws DataAccessException {
         List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
 		try {
-			Planet planet = (Planet)aspect.getSkyPoint1();
+			Planet planet = reverse ? (Planet)aspect.getSkyPoint2() : (Planet)aspect.getSkyPoint1();
+			Planet planet2 = reverse ? (Planet)aspect.getSkyPoint1() : (Planet)aspect.getSkyPoint2();
 			AspectType type = aspect.checkType(planet.isMain());
 			String acode = aspect.getAspect().getCode();
 			String wheretype = (acode != null) && acode.equals("KERNEL") ? "or typeid = 1" : "";
@@ -195,8 +197,8 @@ public class PlanetAspectService extends GenderTextModelService {
 						" or aspectid = ?)";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, type.getId());
-			ps.setLong(2, aspect.getSkyPoint1().getId());
-			ps.setLong(3, aspect.getSkyPoint2().getId());
+			ps.setLong(2, planet.getId());
+			ps.setLong(3, planet2.getId());
 			ps.setLong(4, null == acode ? java.sql.Types.NULL : aspect.getAspect().getId());
 //			System.out.println(ps);
 			rs = ps.executeQuery();
