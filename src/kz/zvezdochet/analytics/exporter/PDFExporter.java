@@ -1213,8 +1213,7 @@ public class PDFExporter {
 					continue;
 
 				if (planet.inMine()
-						|| planet.isDamaged()
-						|| planet.isBroken())
+						|| planet.isDamaged())
 					weaks.add(planet);
 			}
 			if (weaks.isEmpty())
@@ -1244,7 +1243,7 @@ public class PDFExporter {
 						}
 						PDFUtil.printGender(section, planetText, female, child, true);
 					}
-				} else if (planet.isDamaged() || planet.isBroken()) {
+				} else if (planet.isDamaged()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "damaged");
 					if (planetText != null) {
 						section.addSection(new Paragraph((term ? planet.getName() + " без позитивных аспектов" : planet.getShortName()) + "-дисгармония", fonth5));
@@ -2904,9 +2903,6 @@ public class PDFExporter {
 					section = PDFUtil.printSection(chapter, house.getName(), null);
 			
 					for (Planet planet : planets) {
-						if (planet.getCode().equals("Lilith") && house.isSelened())
-							continue;
-
 						boolean negative = planet.isDamaged()
 								|| planet.isLilithed()
 								|| (planet.getCode().equals("Lilith")
@@ -2928,7 +2924,8 @@ public class PDFExporter {
 		    			}
 		    			section.addSection(p);
 
-						if (planet.getCode().equals("Selena") && house.isLilithed()) {
+						if ((planet.getCode().equals("Lilith") && house.isSelened())
+								|| (planet.getCode().equals("Selena") && house.isLilithed())) {
 							Rule rule = EventRules.ruleMoonsHouse(house);
 							if (rule != null) {
 								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
