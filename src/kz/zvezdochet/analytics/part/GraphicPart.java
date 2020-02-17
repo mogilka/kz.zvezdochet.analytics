@@ -46,7 +46,6 @@ import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.ui.util.DialogUtil;
-import kz.zvezdochet.core.ui.view.IFilterable;
 import kz.zvezdochet.core.ui.view.View;
 import kz.zvezdochet.core.util.DateUtil;
 import kz.zvezdochet.service.EventService;
@@ -57,21 +56,20 @@ import kz.zvezdochet.service.PlanetService;
  * @author Natalie Didenko
  *
  */
-public class GraphicPart extends View implements IFilterable {
+public class GraphicPart extends View {
 
 	@Inject
 	public GraphicPart() {}
 	
 	@PostConstruct @Override
 	public View create(Composite parent) {
-		super.create(parent);
-		initFilter(parent);
-		return null;
+		return super.create(parent);
 	}
 
 	@Override
-	public void initFilter(Composite parent) {
-		Group grFilter = new Group(parent, SWT.NONE);
+	protected void init(Composite parent) {
+		super.init(parent);
+		Group grFilter = new Group(sashForm, SWT.NONE);
 		grFilter.setText("Поиск");
 		grFilter.setLayout(new GridLayout());
 
