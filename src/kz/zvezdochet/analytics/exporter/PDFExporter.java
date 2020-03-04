@@ -256,7 +256,6 @@ public class PDFExporter {
 
 			//лунный день
 			printLunar(chapter, event);
-			chapter.add(Chunk.NEXTPAGE);
 
 			EventStatistics statistics = new EventStatistics(event);
 			Map<String, Double> signMap = statistics.getPlanetSigns(true);
@@ -384,7 +383,7 @@ public class PDFExporter {
 			//стихии
 			statistics.initPlanetDivisions();
 			statistics.initHouseDivisions();
-			printElements(writer, chapter, statistics);
+			printElements(writer, chapter, statistics, event);
 			chapter.add(Chunk.NEXTPAGE);
 
 			//лояльность
@@ -392,7 +391,7 @@ public class PDFExporter {
 			chapter.add(Chunk.NEXTPAGE);
 
 			//инь-ян
-			printYinYang(writer, chapter, statistics);
+			printYinYang(writer, chapter, statistics, event);
 			chapter.add(Chunk.NEXTPAGE);
 			
 			//полусферы
@@ -1450,7 +1449,7 @@ public class PDFExporter {
 				}
 			}
 			li = new ListItem();
-	        li.add(new Chunk("В остальном показатели среднестатистические", font));
+	        li.add(new Chunk("В остальном показатели среднестатистические", PDFUtil.getAnnotationFont(false)));
 	        list.add(li);
 			section.add(list);
 		} catch(Exception e) {
@@ -1687,13 +1686,13 @@ public class PDFExporter {
 
 //----------бисикстиль 60° 60° 120°
 
-//			code = "bisextile";
-//			confs = new ArrayList<>();
-//		    conf = (AspectConfiguration)service.find(code);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(31L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(33L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(29L) });
-//			confs.add(conf);
+			code = "bisextile";
+			confs = new ArrayList<>();
+		    conf = (AspectConfiguration)service.find(code);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(31L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(21L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(29L) });
+			confs.add(conf);
 
 //		    conf2 = (AspectConfiguration)service.find(code);
 //			conf2.setVertex(new Planet[] { (Planet)planetService.find(28L) });
@@ -1745,15 +1744,15 @@ public class PDFExporter {
 
 //----------трапеция 60° 60° 60° 180°
 
-			code = "trapezoid";
-			confs = new ArrayList<>();
-		    conf = (AspectConfiguration)service.find(code);
-			conf.setLeftHand(new Planet[] { (Planet)planetService.find(34L) });
-			conf.setRightHand(new Planet[] { (Planet)planetService.find(31L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(22L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(21L), (Planet)planetService.find(19L) });
-			confs.add(conf);
-			map.put(code, confs);
+//			code = "trapezoid";
+//			confs = new ArrayList<>();
+//		    conf = (AspectConfiguration)service.find(code);
+//			conf.setLeftHand(new Planet[] { (Planet)planetService.find(34L) });
+//			conf.setRightHand(new Planet[] { (Planet)planetService.find(31L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(22L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(21L), (Planet)planetService.find(19L) });
+//			confs.add(conf);
+//			map.put(code, confs);
 
 //----------парус 120° 120° 60° 60°
 
@@ -1932,15 +1931,15 @@ public class PDFExporter {
 
 //----------бумеранг 60° 90° 60° 150°
 
-//			code = "boomerang";
-//			confs = new ArrayList<>();
-//		    conf = (AspectConfiguration)service.find(code);
-//			conf.setLeftHand(new Planet[] { (Planet)planetService.find(24L) });
-//			conf.setRightHand(new Planet[] { (Planet)planetService.find(33L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(30L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(32L) });
-//			confs.add(conf);
-//			map.put(code, confs);
+			code = "boomerang";
+			confs = new ArrayList<>();
+		    conf = (AspectConfiguration)service.find(code);
+			conf.setLeftHand(new Planet[] { (Planet)planetService.find(27L) });
+			conf.setRightHand(new Planet[] { (Planet)planetService.find(31L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(28L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(29L) });
+			confs.add(conf);
+			map.put(code, confs);
 
 //----------дельтаплан 60° 120° 60° 120°
 
@@ -2177,13 +2176,13 @@ public class PDFExporter {
 
 //----------тау-квадрат 90° 90° 180°
 
-			code = "taucross";
-			confs = new ArrayList<>();
-		    conf = (AspectConfiguration)service.find(code);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(27L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(30L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(31L) });
-			confs.add(conf);
+//			code = "taucross";
+//			confs = new ArrayList<>();
+//		    conf = (AspectConfiguration)service.find(code);
+//			conf.setVertex(new Planet[] { (Planet)planetService.find(27L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(30L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(31L) });
+//			confs.add(conf);
 
 //		    conf = (AspectConfiguration)service.find(code);
 //			conf.setVertex(new Planet[] { (Planet)planetService.find(23L) });
@@ -2218,13 +2217,13 @@ public class PDFExporter {
 
 //----------секира 135° 135° 90°
 
-			code = "poleaxe";
-			confs = new ArrayList<>();
-		    conf = (AspectConfiguration)service.find(code);
-			conf.setVertex(new Planet[] { (Planet)planetService.find(25L) });
-			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(31L) });
-			conf.setRightFoot(new Planet[] { (Planet)planetService.find(27L) });
-			confs.add(conf);
+//			code = "poleaxe";
+//			confs = new ArrayList<>();
+//		    conf = (AspectConfiguration)service.find(code);
+//			conf.setVertex(new Planet[] { (Planet)planetService.find(25L) });
+//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(31L) });
+//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(27L) });
+//			confs.add(conf);
 
 //		    conf = (AspectConfiguration)service.find(code);
 //			conf.setVertex(new Planet[] { (Planet)planetService.find(21L) });
@@ -2311,20 +2310,20 @@ public class PDFExporter {
 
 //----------булавка 45° 135° 180°
 
-//			code = "pin";
-//			confs = new ArrayList<>();
-//		    conf = (AspectConfiguration)service.find(code);
-//			conf.setVertex(new Planet[] { (Planet)planetService.find(20L) });
-//			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(30L) });
-//			conf.setRightFoot(new Planet[] { (Planet)planetService.find(33L), (Planet)planetService.find(31L) });
-//			confs.add(conf);
+			code = "pin";
+			confs = new ArrayList<>();
+		    conf = (AspectConfiguration)service.find(code);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(29L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(32L), (Planet)planetService.find(34L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(25L) });
+			confs.add(conf);
 
-//		    conf2 = (AspectConfiguration)service.find(code);
-//			conf2.setVertex(new Planet[] { (Planet)planetService.find(29L) });
-//			conf2.setLeftFoot(new Planet[] { (Planet)planetService.find(22L) });
-//			conf2.setRightFoot(new Planet[] { (Planet)planetService.find(21L) });
-//			confs.add(conf2);
-//			map.put(code, confs);
+		    conf = (AspectConfiguration)service.find(code);
+			conf.setVertex(new Planet[] { (Planet)planetService.find(30L) });
+			conf.setLeftFoot(new Planet[] { (Planet)planetService.find(22L) });
+			conf.setRightFoot(new Planet[] { (Planet)planetService.find(19L), (Planet)planetService.find(21L), (Planet)planetService.find(23L), (Planet)planetService.find(24L) });
+			confs.add(conf);
+			map.put(code, confs);
 
 //----------бульдозер 135° 90° 90° 135° 90°
 
@@ -2992,13 +2991,14 @@ public class PDFExporter {
 	 * @param writer обработчик генерации документа
 	 * @param chapter раздел
 	 * @param statistics объект статистики
+	 * @param event событие
 	 */
-	private void printElements(PdfWriter writer, Chapter chapter, EventStatistics statistics) {
+	private void printElements(PdfWriter writer, Chapter chapter, EventStatistics statistics, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Темперамент", null);
 			
 			Map<String, Double> planetMap = statistics.getPlanetElements();
-			Map<String, Double> houseMap = statistics.getHouseElements();
+			Map<String, Double> houseMap = event.isHousable() ? statistics.getHouseElements() : new HashMap<String, Double>();
 
 			String[] elements = new String[planetMap.size()];
 			Bar[] bars = new Bar[planetMap.size() + houseMap.size()];
@@ -3046,13 +3046,16 @@ public class PDFExporter {
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
 	        li.add(new Chunk("Категория \"в мыслях\" показывает вашу идеальную модель: "
+	        		+ "какой темперамент преобладает в вашем характере, "
 					+ "на чём мысленно вы сконцентрированы, какие проявления для вас важны, необходимы и естественны.", font));
 	        list.add(li);
 
-			li = new ListItem();
-	        li.add(new Chunk("Категория \"в поступках\" показывает, "
-					+ "как меняются ваши приоритеты в социуме, когда приходит время действовать.", font));
-	        list.add(li);
+	        if (event.isHousable()) {
+				li = new ListItem();
+		        li.add(new Chunk("Категория \"в поступках\" показывает, "
+	        		+ "какой темперамент начинает преобладать в вашем поведении, когда приходит время действовать.", font));
+		        list.add(li);
+	        }
 	        section.add(list);
 
 			iterator = houseMap.entrySet().iterator();
@@ -3098,8 +3101,9 @@ public class PDFExporter {
 	 * @param writer обработчик генерации документа
 	 * @param chapter раздел
 	 * @param statistics объект статистики
+	 * @param event событие
 	 */
-	private void printYinYang(PdfWriter writer, Chapter chapter, EventStatistics statistics) {
+	private void printYinYang(PdfWriter writer, Chapter chapter, EventStatistics statistics, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Мужское и женское начало", null);
 			
@@ -3142,9 +3146,11 @@ public class PDFExporter {
 	        li.add(new Chunk("Категория \"в мыслях\" показывает, насколько вы активны в мыслях и принятии решений наедине с самим собой.", font));
 	        list.add(li);
 
-			li = new ListItem();
-	        li.add(new Chunk("Категория \"в поступках\" показывает, как меняется ваша активность на событийном уровне, когда приходит время действовать.", font));
-	        list.add(li);
+	        if (event.isHousable()) {
+				li = new ListItem();
+		        li.add(new Chunk("Категория \"в поступках\" показывает, как меняется ваша активность на событийном уровне, когда приходит время действовать.", font));
+		        list.add(li);
+	        }
 			section.add(list);
 
 			iterator = houseMap.entrySet().iterator();
@@ -3886,14 +3892,14 @@ public class PDFExporter {
 		    	bar = new Bar();
 		    	bar.setName(planets.get(entry.getKey()).getLoyalty());
 			    bar.setValue(entry.getValue());
-		    	bar.setCategory("Лояльность");
+		    	bar.setCategory("лояльны");
 		    	bars2.add(bar);
 		    }
 		    for (Map.Entry<Long, Integer> entry : map2.entrySet()) {
 		    	bar = new Bar();
 		    	bar.setName(planets.get(entry.getKey()).getLoyalty());
 			    bar.setValue(entry.getValue());
-		    	bar.setCategory("Категоричность");
+		    	bar.setCategory("категоричны");
 		    	bars2.add(bar);
 		    }
 	    	section.add(Chunk.NEWLINE);
@@ -4214,6 +4220,7 @@ public class PDFExporter {
 					section.add(p);
 				}
 			}
+			chapter.add(Chunk.NEXTPAGE);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
