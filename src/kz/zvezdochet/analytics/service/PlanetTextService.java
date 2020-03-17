@@ -75,6 +75,7 @@ public class PlanetTextService extends GenderTextModelService {
 		dict = (PlanetText)super.init(rs, model);
 		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("planetid")));
 		dict.setType(rs.getString("type"));
+		dict.setTextDamaged(rs.getString("text_damaged"));
 		return dict;
 	}
 

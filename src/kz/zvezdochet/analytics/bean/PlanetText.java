@@ -40,4 +40,17 @@ public class PlanetText extends TextGenderModel {
 	public void setType(String type) {
 		this.type = type;
 	}
+
+	/**
+	 * Толкование поражённого объекта
+	 */
+	private String text_damaged;
+
+	public String getTextDamaged() {
+		return text_damaged;
+	}
+
+	public void setTextDamaged(String text_damaged) {
+		this.text_damaged = text_damaged;
+	}
 }
