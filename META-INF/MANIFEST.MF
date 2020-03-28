@@ -1,19 +1,22 @@
 Manifest-Version: 1.0
-Bundle-SymbolicName: kz.zvezdochet.analytics;singleton:=true
-Export-Package: kz.zvezdochet.analytics.bean,kz.zvezdochet.analytics.e
- xporter,kz.zvezdochet.analytics.provider,kz.zvezdochet.analytics.serv
- ice
-Bundle-Name: Analytics
-Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,kz.zvezdochet.
- core;bundle-version="1.0.0",org.eclipse.e4.ui.model.workbench;bundle-
- version="1.2.0.v20160229-1459",kz.zvezdochet.export;bundle-version="1
- .0.0",org.eclipse.e4.core.di,kz.zvezdochet;bundle-version=1.0.0
 Bundle-ManifestVersion: 2
+Bundle-Name: Analytics
+Bundle-SymbolicName: kz.zvezdochet.analytics;singleton:=true
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: kz.zvezdochet.analytics.Activator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Звездочёт
+Export-Package: kz.zvezdochet.analytics.bean,
+ kz.zvezdochet.analytics.exporter,
+ kz.zvezdochet.analytics.provider,
+ kz.zvezdochet.analytics.service
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ kz.zvezdochet.core;bundle-version="1.0.0",
+ org.eclipse.e4.ui.model.workbench;bundle-version="1.2.0.v20160229-1459",
+ kz.zvezdochet.export;bundle-version="1.0.0",
+ org.eclipse.e4.core.di,
+ kz.zvezdochet;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: javax.annotation;version="1.0.0";resolution:=optional,
  javax.inject;version="1.0.0",
  kz.zvezdochet,
@@ -28,4 +31,4 @@ Import-Package: javax.annotation;version="1.0.0";resolution:=optional,
  org.eclipse.e4.core.di.annotations,
  org.eclipse.e4.ui.workbench.modeling,
  org.eclipse.nebula.widgets.cdatetime
-
+Bundle-ActivationPolicy: lazy
