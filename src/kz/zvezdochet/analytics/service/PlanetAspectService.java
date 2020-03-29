@@ -31,22 +31,27 @@ public class PlanetAspectService extends GenderTextModelService {
 	/**
 	 * Поиск толкования аспекта
 	 * @param aspect аспект
+	 * @param aspectid аспект, с учётом которого необходимо произвести поиск
+	 * @param checkType проверка позитивных и негативных аспектов
 	 * @return толкование аспекта между планетами
 	 * @throws DataAccessException
 	 */
-	public Model find(SkyPointAspect aspect, boolean check) throws DataAccessException {
+	public Model find(SkyPointAspect aspect, long aspectid, boolean checkType) throws DataAccessException {
         PlanetAspectText dict = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
 		try {
-			AspectType type = check ? aspect.checkType(false) : aspect.getAspect().getType();
+			AspectType type = checkType ? aspect.checkType(false) : aspect.getAspect().getType();
 			sql = "select * from " + tableName + 
 				" where typeid = ?" +
 					" and ((planet1id = ? and planet2id = ?)" +
-						" or (planet1id = ? and planet2id = ?))" +
-					" and (aspectid is null" +
-						" or aspectid = ?)";
+						" or (planet1id = ? and planet2id = ?))";
+
+			sql += (aspectid > 0)
+				? " and aspectid = ?"
+				: " and (aspectid is null or aspectid = ?)";
+
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, type.getId());
 			long pid1 = aspect.getSkyPoint1().getId();
@@ -55,7 +60,7 @@ public class PlanetAspectService extends GenderTextModelService {
 			ps.setLong(3, pid2);
 			ps.setLong(4, pid2);
 			ps.setLong(5, pid1);
-			ps.setLong(6, aspect.getAspect().getId());
+			ps.setLong(6, (aspectid > 0) ? aspectid : aspect.getAspect().getId());
 			rs = ps.executeQuery();
 			if (rs.next())
 				dict = init(rs, null);
@@ -163,6 +168,8 @@ public class PlanetAspectService extends GenderTextModelService {
 		dict.setPlanet2((Planet)service.find(rs.getLong("Planet2ID")));
 		dict.setType((AspectType)new AspectTypeService().find(rs.getLong("TypeID")));
 		dict.setAspect((Aspect)new AspectService().find(rs.getLong("aspectID")));
+		dict.setDescription(rs.getString("description"));
+		dict.setCode(rs.getString("code"));
 		return dict;
 	}
 
@@ -236,6 +243,6 @@ and (aspectid is null or aspectid = 4)
 		a.setSkyPoint1(planet1);
 		a.setSkyPoint2(planet2);
 		a.setAspect(aspect);
-		return find(a, false);
+		return find(a, 0, false);
 	}
 }
