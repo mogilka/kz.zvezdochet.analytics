@@ -45,8 +45,7 @@ public class PlanetAspectService extends GenderTextModelService {
 			AspectType type = checkType ? aspect.checkType(false) : aspect.getAspect().getType();
 			sql = "select * from " + tableName + 
 				" where typeid = ?" +
-					" and ((planet1id = ? and planet2id = ?)" +
-						" or (planet1id = ? and planet2id = ?))";
+					" and planet1id = ? and planet2id = ?";
 
 			sql += (aspectid > 0)
 				? " and aspectid = ?"
@@ -58,9 +57,7 @@ public class PlanetAspectService extends GenderTextModelService {
 			long pid2 = aspect.getSkyPoint2().getId();
 			ps.setLong(2, pid1);
 			ps.setLong(3, pid2);
-			ps.setLong(4, pid2);
-			ps.setLong(5, pid1);
-			ps.setLong(6, (aspectid > 0) ? aspectid : aspect.getAspect().getId());
+			ps.setLong(4, (aspectid > 0) ? aspectid : aspect.getAspect().getId());
 			rs = ps.executeQuery();
 			if (rs.next())
 				dict = init(rs, null);
