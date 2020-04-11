@@ -51,6 +51,8 @@ public class PlanetAspectService extends GenderTextModelService {
 				? " and aspectid = ?"
 				: " and (aspectid is null or aspectid = ?)";
 
+			sql += " order by aspectid";
+
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, type.getId());
 			long pid1 = aspect.getSkyPoint1().getId();
