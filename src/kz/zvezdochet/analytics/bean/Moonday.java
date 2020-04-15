@@ -48,4 +48,16 @@ public class Moonday extends Model {
 	}
 	@Override
 	public void init(boolean mode) {}
+
+	/**
+	 * Признак позитивной картинки
+	 */
+	private boolean positive;
+
+	public boolean isPositive() {
+		return positive;
+	}
+	public void setPositive(boolean positive) {
+		this.positive = positive;
+	}
 }

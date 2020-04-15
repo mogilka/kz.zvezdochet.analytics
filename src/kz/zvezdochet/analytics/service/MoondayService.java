@@ -30,6 +30,7 @@ public class MoondayService extends ModelService {
 		dict.setSymbol(rs.getString("symbol"));
 		dict.setMineral(rs.getString("mineral"));
 		dict.setBirth(rs.getString("birth"));
+		dict.setPositive(rs.getBoolean("positive"));
 		return dict;
 	}
 

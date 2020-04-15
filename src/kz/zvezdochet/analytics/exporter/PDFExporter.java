@@ -753,12 +753,13 @@ public class PDFExporter {
 				    				: new Paragraph(PDFUtil.removeTags(object.getText(), font));
 				    			section.add(p);
 
+				    			PDFUtil.printGender(section, object, female, child, true);
+
 								Rule rule = EventRules.rulePlanetSign(planet, planet.getSign(), event, category);
 								if (rule != null) {
 									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 									section.add(Chunk.NEWLINE);
 								}
-				    			PDFUtil.printGender(section, object, female, child, true);
 				    		}
 				    }
 				}
@@ -1559,7 +1560,7 @@ public class PDFExporter {
 					String pretext = aspect.getAspect().getCode().equals("CONJUNCTION")
 							? "с планетой"
 							: "к планете";
-			    		p.add(new Paragraph(aspect.getAspect().getName() + " планеты " + dict.getPlanet1().getName() + " " + pretext + " " + dict.getPlanet2().getName(), PDFUtil.getAnnotationFont(true)));
+		    		p.add(new Paragraph(aspect.getAspect().getName() + " планеты " + dict.getPlanet1().getName() + " " + pretext + " " + dict.getPlanet2().getName(), PDFUtil.getAnnotationFont(true)));
 				}
 				section.addSection(p);
 
@@ -2751,18 +2752,16 @@ public class PDFExporter {
 					ilist = new com.itextpdf.text.List(false, false, 10);
 
 					li = new ListItem();
-			        li.add(new Chunk("Число рождения: ", bold));
 			        int number = Numerology.getNumber(event.getBirth());
-			        String text = String.valueOf(number);
+			        li.add(new Chunk("Число рождения – " + String.valueOf(number) + ": ", bold));
 			        Numerology numerology = (Numerology)new NumerologyService().find(number);
 			        if (numerology != null && numerology.getDescription() != null)
-			        	text += ". " + numerology.getDescription();
-			        li.add(new Chunk(text, font));
+			        	li.add(PDFUtil.removeTags(numerology.getDescription(), font));
 			        ilist.add(li);
 
 					li = new ListItem();
 					li.add(new Chunk("Счастливое число: ", bold));
-					text = sign.getNumbers() + ". Согласно Каббале, счастливые числа обладают особенной вибрацией, поэтому на них имеет смысл опираться при выборе даты, длительности или любого предмета, имеющего номер";
+					String text = sign.getNumbers() + ". Согласно Каббале, счастливые числа обладают особенной вибрацией, поэтому на них имеет смысл опираться при выборе даты, длительности или любого предмета, имеющего номер";
 			        li.add(new Chunk(text, font));
 			        ilist.add(li);
 
@@ -3280,9 +3279,11 @@ public class PDFExporter {
 						com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename);
 						section.add(image);
 					}
-					p = new Paragraph("Подобную иллюстрацию можно нарисовать и повесить в месте вашего вдохновения", font);
-					p.setSpacingBefore(10);
-					section.add(p);
+					if (moonday.isPositive()) {
+						p = new Paragraph("Подобную иллюстрацию можно нарисовать и повесить в месте вашего вдохновения", font);
+						p.setSpacingBefore(10);
+						section.add(p);
+					}
 				}
 			}
 			chapter.add(Chunk.NEXTPAGE);
