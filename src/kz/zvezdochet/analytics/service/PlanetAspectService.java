@@ -167,8 +167,6 @@ public class PlanetAspectService extends GenderTextModelService {
 		dict.setPlanet2((Planet)service.find(rs.getLong("Planet2ID")));
 		dict.setType((AspectType)new AspectTypeService().find(rs.getLong("TypeID")));
 		dict.setAspect((Aspect)new AspectService().find(rs.getLong("aspectID")));
-		dict.setDescription(rs.getString("description"));
-		dict.setCode(rs.getString("code"));
 		return dict;
 	}
 
