@@ -406,7 +406,8 @@ public class EventRules {
 		if (pcode.equals("Venus")) {
 			if (scode.equals("Taurus")) {
 				if (planet.isDamaged() && event.isFemale())
-					return (Rule)service.find(107L);
+					if (category.getCode().equals("love"))
+						return (Rule)service.find(107L);
 			}
 		} else if (pcode.equals("Mars")) {
 			if (scode.equals("Pisces")) {
