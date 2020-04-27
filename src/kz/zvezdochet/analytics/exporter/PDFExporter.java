@@ -21,6 +21,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.itextpdf.text.Anchor;
 import com.itextpdf.text.BaseColor;
@@ -318,6 +320,7 @@ public class PDFExporter {
 			printPlanetStrong(chapter, event);
 			printPlanetWeak(chapter, event);
 			printPlanetRetro(chapter, event);
+			chapter.add(Chunk.NEXTPAGE);
 
 			//аспекты
 			p = new Paragraph();
@@ -903,7 +906,6 @@ public class PDFExporter {
 	 * Генерация вида космограммы
 	 * @param chapter раздел
 	 * @param event событие
-	 * TODO фиктивные планеты при определении вида космограмм не считаются?
 	 */
 	private void printCardKind(Chapter chapter, Event event) {
 		try {
@@ -941,16 +943,30 @@ public class PDFExporter {
 //----------тигр
 
 			if (1 == id) {
-				PlanetTextService service = new PlanetTextService();
-				PlanetText planetText = (PlanetText)service.findByPlanet(20L, "positive");
-				if (planetText != null) {
-					section.add(new Paragraph("1) " + planetText.getPlanet().getPositive() + ":", bold));
-					section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
-				}
-				planetText = (PlanetText)service.findByPlanet(22L, "positive");
-				if (planetText != null) {
-					section.add(new Paragraph("2) " + planetText.getPlanet().getPositive() + ":", bold));
-					section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
+				try {
+				     JSONObject jsonObject = new JSONObject(event.getOptions());
+				     if (jsonObject != null) {
+				    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+				    	 if (obj != null) {
+				    		 long pid = obj.getLong("planet");
+				    		 long pid2 = obj.getLong("planet2");
+				    		 if (pid > 0 && pid2 > 0) {
+						    	 PlanetTextService service = new PlanetTextService();
+						    	 PlanetText planetText = (PlanetText)service.findByPlanet(pid, "positive");
+						    	 if (planetText != null) {
+						    		 section.add(new Paragraph("1) " + planetText.getPlanet().getPositive() + ":", bold));
+						    		 section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
+						    	 }
+						    	 planetText = (PlanetText)service.findByPlanet(pid2, "positive");
+						    	 if (planetText != null) {
+						    		 section.add(new Paragraph("2) " + planetText.getPlanet().getPositive() + ":", bold));
+						    		 section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
+						    	 }				    			 
+				    		 }
+				    	 }
+				     }
+				} catch (JSONException ex) {
+				     ex.printStackTrace();
 				}
 
 //----------праща
@@ -1028,12 +1044,26 @@ public class PDFExporter {
 				}
 				section.add(list);
 
-				kind.setDirection("down"); //TODO задать вручную
-				Rule rule = EventRules.ruleCardKind(kind);
-				if (rule != null) {
-					p = new Paragraph(PDFUtil.removeTags(rule.getText(), font));
-					p.setSpacingBefore(10);
-					section.add(p);
+				// down|top|left|right
+				try {
+				     JSONObject jsonObject = new JSONObject(event.getOptions());
+				     if (jsonObject != null) {
+				    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+				    	 if (obj != null) {
+				    		 String direction = obj.getString("direction");
+				    		 if (direction != null) {
+				 				kind.setDirection(direction);
+								Rule rule = EventRules.ruleCardKind(kind);
+								if (rule != null) {
+									p = new Paragraph(PDFUtil.removeTags(rule.getText(), font));
+									p.setSpacingBefore(10);
+									section.add(p);
+								}
+				    		 }
+				    	 }
+				     }
+				} catch (JSONException ex) {
+				     ex.printStackTrace();
 				}
 			}
 
@@ -1177,7 +1207,6 @@ public class PDFExporter {
 					}
 				}
 			}
-			chapter.add(Chunk.NEXTPAGE);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -1237,7 +1266,6 @@ public class PDFExporter {
 					}
 				}
 			}
-			chapter.add(Chunk.NEXTPAGE);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -1376,7 +1404,7 @@ public class PDFExporter {
 		        list.add(li);
 			}
 			if (map.containsKey("NEUTRAL") && map.get("NEUTRAL") > 0) {
-				text = "Чем больше насыщенности – тем больше масштабных изменений будет регулярно происходить в жизни за короткий период времени (в течение нескольких лет)";
+				text = "Чем больше насыщенности – тем больше событий и изменений будет регулярно происходить в жизни за короткий период времени";
 				li = new ListItem();
 		        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, new BaseColor(255, 153, 51))));
 		        list.add(li);
@@ -3916,7 +3944,6 @@ public class PDFExporter {
 					PDFUtil.printGender(section, planetText, female, child, true);
 				}
 			}
-			chapter.add(Chunk.NEXTPAGE);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
