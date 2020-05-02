@@ -192,10 +192,9 @@ public class PlanetAspectService extends GenderTextModelService {
 			Planet planet2 = reverse ? (Planet)aspect.getSkyPoint1() : (Planet)aspect.getSkyPoint2();
 			AspectType type = aspect.checkType(planet.isMain());
 			String acode = aspect.getAspect().getCode();
-			String wheretype = (acode != null) && acode.equals("KERNEL") ? "or typeid = 1" : "";
 
 			sql = "select * from " + tableName + 
-				" where (typeid = ? " + wheretype + ")" +
+				" where (typeid = ?)" +
 					" and (planet1id = ? and planet2id = ?)" +
 					" and (aspectid is null" +
 						" or aspectid = ?)";
