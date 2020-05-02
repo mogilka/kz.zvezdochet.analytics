@@ -1498,9 +1498,6 @@ public class PDFExporter {
 			}
 
 			for (Planet planet1 : planets.values()) {
-				if (!planet1.isMain() && !planet1.isFictived())
-					continue;
-
 				if (!event.isHousable() && planet1.getCode().equals("Moon"))
 					continue;
 
