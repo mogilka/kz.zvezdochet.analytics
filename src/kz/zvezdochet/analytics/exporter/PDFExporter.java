@@ -310,7 +310,7 @@ public class PDFExporter {
 			chapter.add(p); 
 
 			//вид космограммы
-			printCardKind(chapter, event);
+			printCardKind(doc, chapter, event);
 			chapter.add(Chunk.NEXTPAGE);
 
 			//тип космограммы
@@ -904,10 +904,11 @@ public class PDFExporter {
 
 	/**
 	 * Генерация вида космограммы
+	 * @param doc документ
 	 * @param chapter раздел
 	 * @param event событие
 	 */
-	private void printCardKind(Chapter chapter, Event event) {
+	private void printCardKind(Document doc, Chapter chapter, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Кармический потенциал", null);
 			Anchor anchor = new Anchor("Рисунок вашего гороскопа", fonta);
@@ -932,12 +933,7 @@ public class PDFExporter {
 				p.setSpacingAfter(10);
 				section.add(p);
 			}
-			String after_table = "На следующих трёх уровнях отражено направление вашего развития с точки зрения прошлых наработок: "
-				+ "три варианта развития внутри одного направления. Определите, на каком уровне вы находитесь. "
-				+ "Высокий уровень указывает на то, к чему полезно стремиться:";
-			String text = kind.getText();
-			text = text.replace("{after_table}", after_table);
-			section.add(new Paragraph(PDFUtil.html2pdf(text, font)));
+			section.add(new Paragraph(PDFUtil.html2pdf(kind.getText(), font)));
 			Font bold = new Font(baseFont, 12, Font.BOLD);
 
 //----------тигр
@@ -1065,6 +1061,28 @@ public class PDFExporter {
 				} catch (JSONException ex) {
 				     ex.printStackTrace();
 				}
+			}
+
+			if (kind.getHigh() != null) {
+				section.add(Chunk.NEWLINE);
+				section.add(new Paragraph("На следующих трёх уровнях отражено направление вашего развития с точки зрения прошлых наработок: "
+					+ "три варианта развития внутри одного направления. Определите, на каком уровне вы находитесь. "
+					+ "Высокий уровень указывает на то, к чему полезно стремиться:", font));
+	
+		        PdfPTable table = new PdfPTable(3);
+		        table.setTotalWidth(doc.getPageSize().getWidth() - PDFUtil.PAGEBORDERWIDTH * 2);
+		        table.setLockedWidth(true);
+		        table.setWidths(new float[] { 33, 33, 33 });
+		        table.setSpacingBefore(20);
+	
+				table.addCell(new PdfPCell(new Phrase("Низкий уровень", bold)));
+				table.addCell(new PdfPCell(new Phrase("Средний уровень", bold)));
+				table.addCell(new PdfPCell(new Phrase("Высокий уровень", bold)));
+
+				table.addCell(new PdfPCell(new Phrase(kind.getLow(), font)));
+				table.addCell(new PdfPCell(new Phrase(kind.getMedium(), font)));
+				table.addCell(new PdfPCell(new Phrase(kind.getHigh(), font)));
+				section.add(table);
 			}
 
 //			CardKind type = null;
@@ -1225,9 +1243,7 @@ public class PDFExporter {
 				if (!event.isHousable() && planet.getCode().equals("Moon"))
 					continue;
 
-				if (planet.inMine()
-						|| planet.isDamaged()
-						|| planet.isRetrograde())
+				if (planet.inMine() || planet.isDamaged())
 					weaks.add(planet);
 			}
 			if (weaks.isEmpty())
