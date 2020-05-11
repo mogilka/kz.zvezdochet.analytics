@@ -22,6 +22,7 @@ public class SynastryAspectService extends PlanetAspectService {
 		SynastryAspectText dict = (model != null) ? (SynastryAspectText)model : (SynastryAspectText)create();
 		dict = (SynastryAspectText)super.init(rs, model);
 		dict.setRoles(rs.getString("roles"));
+		dict.setLevel(rs.getInt("level"));
 		return dict;
 	}
 

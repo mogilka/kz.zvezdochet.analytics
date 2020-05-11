@@ -30,4 +30,17 @@ public class SynastryAspectText extends PlanetAspectText {
 	public ModelService getService() {
 		return new SynastryAspectService();
 	}
+
+	/**
+	 * Уровень критичности аспекта
+	 */
+	private int level;
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
 }
