@@ -112,12 +112,6 @@ public class GraphicPart extends View {
 //		setData(new Date(1517206791), new Date(1517293190));
 	}
 
-	@Override
-	public boolean check(int mode) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	protected void setData(Date initDate, Date finalDate) {
 		try {
 //			for(Control control : group.getChildren())
