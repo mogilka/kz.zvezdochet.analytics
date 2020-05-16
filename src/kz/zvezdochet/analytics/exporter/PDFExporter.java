@@ -2015,6 +2015,7 @@ public class PDFExporter {
 					for (Planet planet : planets) {
 						boolean negative = planet.isDamaged()
 								|| planet.isLilithed()
+								|| planet.isKethued()
 								|| (planet.getCode().equals("Lilith")
 									&& !planet.isLord() && !planet.isPerfect());
 						String sign = negative ? "-" : "+";
