@@ -2015,8 +2015,8 @@ public class PDFExporter {
 					for (Planet planet : planets) {
 						boolean negative = planet.isDamaged()
 								|| planet.isLilithed()
-								|| planet.isKethued()
-								|| (planet.getCode().equals("Lilith")
+								|| ((planet.getCode().equals("Lilith")
+										|| planet.getCode().equals("Kethu"))
 									&& !planet.isLord() && !planet.isPerfect());
 						String sign = negative ? "-" : "+";
 
@@ -2049,6 +2049,7 @@ public class PDFExporter {
 	
 								Rule rule = EventRules.rulePlanetHouse(planet, house, female);
 								if (rule != null) {
+									section.add(Chunk.NEWLINE);
 									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 									section.add(Chunk.NEWLINE);
 								}
