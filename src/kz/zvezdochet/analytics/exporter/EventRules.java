@@ -148,6 +148,36 @@ public class EventRules {
 				if (planet.getSign().getCode().equals("Aquarius"))
 					return (Rule)service.find(26L);
 			}
+		} else if (hcode.equals("VI_2")) {
+			if (pcode.equals("Mars")) {
+				String scode = planet.getSign().getCode();
+				if (scode.equals("Aries"))
+					return (Rule)service.find(193L);
+				else if (scode.equals("Taurus"))
+					return (Rule)service.find(194L);
+				else if (scode.equals("Gemini"))
+					return (Rule)service.find(195L);
+				else if (scode.equals("Cancer"))
+					return (Rule)service.find(196L);
+				else if (scode.equals("Leo"))
+					return (Rule)service.find(197L);
+				else if (scode.equals("Virgo"))
+					return (Rule)service.find(198L);
+				else if (scode.equals("Libra"))
+					return (Rule)service.find(199L);
+				else if (scode.equals("Scorpio"))
+					return (Rule)service.find(200L);
+				else if (scode.equals("Ophiuchus"))
+					return (Rule)service.find(205L);
+				else if (scode.equals("Sagittarius"))
+					return (Rule)service.find(201L);
+				else if (scode.equals("Capricornus"))
+					return (Rule)service.find(202L);
+				else if (scode.equals("Aquarius"))
+					return (Rule)service.find(203L);
+				else if (scode.equals("Pisces"))
+					return (Rule)service.find(204L);
+			}
 		} else if (hcode.equals("VII")) {
 			if (pcode.equals("Rakhu")) {
 				if (female && !planet.isNegative())
