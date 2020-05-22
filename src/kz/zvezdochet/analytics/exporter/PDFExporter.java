@@ -1550,14 +1550,16 @@ public class PDFExporter {
 					} else if (aspectType.equals("POSITIVE")
 							&& tcode.contains("NEUTRAL")
 							&& !planet2.getCode().equals("Kethu")
-							&& !planet2.getCode().equals("Lilith"))
+							&& !planet2.getCode().equals("Lilith")
+							&& !planet2.isLilithed())
 						spas.add(aspect);
 
 					//в негативные добавляем пояс Солнца
 					else if (aspectType.equals("NEGATIVE")) {
 						if (tcode.equals("NEUTRAL")
 								&& (planet2.getCode().equals("Kethu")
-									|| planet2.getCode().equals("Lilith")))
+									|| planet2.getCode().equals("Lilith")
+									|| planet2.isLilithed() ))
 							spas.add(aspect);
 						else if (tcode.equals("NEGATIVE_BELT"))
 							spas.add(aspect);
@@ -1784,9 +1786,8 @@ public class PDFExporter {
 					Font bold = new Font(baseFont, 12, Font.BOLD);
 					int j = 0;
 					for (AspectConfiguration configuration : confs) {
-
+						++j;
 						if (code.equals("taucross")) {
-							++j;
 							String iteration = (confs.size() > 1) ? " №" + j : "";
 							appendix.add(new Paragraph("Напряжённые факторы треугольника" + iteration + ":", fonth5));
 
@@ -1827,7 +1828,8 @@ public class PDFExporter {
 									}
 								}
 							}
-							appendix.add(new Paragraph("Это касается следующих сфер жизни:", bold));
+							String iteration = (confs.size() > 1) ? " №" + j : "";
+							appendix.add(new Paragraph("Благоприятные сферы треугольника" + iteration + ":", fonth5));
 							for (House h : houses) {
 								if (h != null) {
 									ListItem li = new ListItem();
@@ -2084,6 +2086,7 @@ public class PDFExporter {
 
 					Rule rule = EventRules.ruleHouseSign(house, sign, event);
 					if (rule != null) {
+						section.add(Chunk.NEWLINE);
 						section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 						section.add(Chunk.NEWLINE);
 					}
@@ -3095,7 +3098,7 @@ public class PDFExporter {
 			com.itextpdf.text.Image image = null;
 			if (conf.getCode().equals("triangle")) {
 				if (conf.getElement() != null) {
-					String filename = PlatformUtil.getPath(Activator.PLUGIN_ID, "/icons/conf/" + conf.getElement().getCode() + ".gif").getPath();
+					String filename = PlatformUtil.getPath(kz.zvezdochet.Activator.PLUGIN_ID, "/icons/conf/" + conf.getElement().getCode() + ".gif").getPath();
 					image = com.itextpdf.text.Image.getInstance(filename);
 				}
 			} else
