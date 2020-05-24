@@ -2020,6 +2020,10 @@ public class PDFExporter {
 								|| ((planet.getCode().equals("Lilith")
 										|| planet.getCode().equals("Kethu"))
 									&& !planet.isLord() && !planet.isPerfect());
+						if (planet.isKethued() && house.isKethued())
+							negative = true;
+						if (planet.isLilithed() && house.isLilithed())
+							negative = true;
 						String sign = negative ? "-" : "+";
 
 						p = new Paragraph("", fonth5);
