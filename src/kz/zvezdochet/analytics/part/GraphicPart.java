@@ -45,7 +45,7 @@ import org.jfree.experimental.chart.swt.ChartComposite;
 import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Model;
-import kz.zvezdochet.core.ui.util.DialogUtil;
+import kz.zvezdochet.core.ui.util.GUIutil;
 import kz.zvezdochet.core.ui.view.View;
 import kz.zvezdochet.core.util.DateUtil;
 import kz.zvezdochet.service.EventService;
@@ -204,7 +204,7 @@ public class GraphicPart extends View {
                 }
 	            final Display display = Display.getDefault();
 	            Shell shell = new Shell(display);
-	            Point point = DialogUtil.getScreenSize();
+	            Point point = GUIutil.getScreenSize();
 	            shell.setSize(point.x - 800, point.y - 400);
 	            shell.setLayout(new FillLayout());
 	            shell.setText("Орбиты");

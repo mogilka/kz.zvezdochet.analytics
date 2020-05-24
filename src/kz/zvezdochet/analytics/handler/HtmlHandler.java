@@ -38,7 +38,7 @@ public class HtmlHandler extends Handler {
     		});
 			updateStatus("Экспорт завершён", false);
 		} catch (Exception e) {
-			DialogUtil.alertError(e.getMessage());
+			DialogUtil.alertError(e);
 			updateStatus("Ошибка экспорта", true);
 			e.printStackTrace();
 		}
