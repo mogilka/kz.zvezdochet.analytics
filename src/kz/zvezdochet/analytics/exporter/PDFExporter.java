@@ -760,6 +760,7 @@ public class PDFExporter {
 
 								Rule rule = EventRules.rulePlanetSign(planet, planet.getSign(), event, category);
 								if (rule != null) {
+									section.add(Chunk.NEWLINE);
 									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 									section.add(Chunk.NEWLINE);
 								}
@@ -1201,9 +1202,10 @@ public class PDFExporter {
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 
 						Rule rule = EventRules.rulePlanetSword(planet, female);
-						if (rule != null)
+						if (rule != null) {
+							section.add(Chunk.NEWLINE);
 							section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
-
+						}
 						PDFUtil.printGender(section, planetText, female, child, true);
 					}
 				} else if (planet.isShield()) {
@@ -1786,8 +1788,8 @@ public class PDFExporter {
 					Font bold = new Font(baseFont, 12, Font.BOLD);
 					int j = 0;
 					for (AspectConfiguration configuration : confs) {
-						++j;
 						if (code.equals("taucross")) {
+							++j;
 							String iteration = (confs.size() > 1) ? " №" + j : "";
 							appendix.add(new Paragraph("Напряжённые факторы треугольника" + iteration + ":", fonth5));
 
@@ -2045,6 +2047,7 @@ public class PDFExporter {
 								|| (planet.getCode().equals("Selena") && house.isLilithed())) {
 							Rule rule = EventRules.ruleMoonsHouse(house);
 							if (rule != null) {
+								section.add(Chunk.NEWLINE);
 								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 								section.add(Chunk.NEWLINE);
 							}
