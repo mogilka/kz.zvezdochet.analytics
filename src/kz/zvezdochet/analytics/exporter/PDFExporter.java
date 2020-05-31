@@ -1454,7 +1454,7 @@ public class PDFExporter {
 						text = "Кармические аспекты зашкаливают, значит продвижению вперёд помешает частый возврат к прошлому. Старайтесь вовремя завершать начатое и не оставлять проблемы на потом";
 					} else if (code.equals("CREATIVE")) {
 						color = new BaseColor(0, 102, 51);
-						text = "Творческие аспекты зашкаливают, так что у вас в распоряжении будет достаточно свободы и возможности преображать мир. Вы достаточно свободны в своих проявлениях, сможете жить, действовать и принимать решения независимо от других";
+						text = "Творческие аспекты зашкаливают, так что у вас в распоряжении достаточно свободы и возможности преображать мир! Это очень редкая комбинация, которая говорит о том, что вы не ограничены в своих проявлениях, сможете жить, действовать и принимать решения независимо от других";
 					} else if (code.equals("NEGATIVE")) {
 						text = "Уровень стресса зашкаливает, значит отток энергии будет сильнее, чем приток. Развивайте силу духа, учитесь управлять конфликтами и рисками и преуменьшать их";
 					} else if (code.equals("POSITIVE")) {
@@ -2038,8 +2038,9 @@ public class PDFExporter {
 		    				p.add(new Chunk(" " + planet.getName() + " в " + house.getDesignation() + " доме", fonth5));
 		    				p.add(Chunk.NEWLINE);
 		    			} else {
-		    				String pname = negative ? planet.getNegative() : planet.getPositive();
-		    				p.add(new Chunk(house.getName() + " " + sign + " " + pname, fonth5));
+		    				boolean pnegative = (planet.isKethued() && house.isKethued())
+								|| (planet.isLilithed() && house.isLilithed());
+		    				p.add(new Chunk(house.getName() + " " + sign + " " + (pnegative ? planet.getNegative() : planet.getPositive()), fonth5));
 		    			}
 		    			section.addSection(p);
 
