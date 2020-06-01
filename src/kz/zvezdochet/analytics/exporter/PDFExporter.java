@@ -1570,7 +1570,7 @@ public class PDFExporter {
 			}
 
 			for (SkyPointAspect aspect : spas) {
-				List<Model> dicts = service.finds(aspect, false);
+				List<Model> dicts = service.finds(aspect);
 				Planet aspl1 = planets.get(aspect.getSkyPoint1().getId());
 				Planet aspl2 = planets.get(aspect.getSkyPoint2().getId());
 				AspectType type = aspect.getAspect().getType();

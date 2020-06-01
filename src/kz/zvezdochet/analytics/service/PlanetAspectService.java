@@ -178,19 +178,16 @@ public class PlanetAspectService extends GenderTextModelService {
 	/**
 	 * Поиск толкования аспекта
 	 * @param aspect аспект
-	 * @param reverse true порядок планет, указанных в аспекте не меняется
 	 * @return список толкований аспектов между планетами
 	 * @throws DataAccessException
 	 */
-	public List<Model> finds(SkyPointAspect aspect, boolean reverse) throws DataAccessException {
+	public List<Model> finds(SkyPointAspect aspect) throws DataAccessException {
         List<Model> list = new ArrayList<Model>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 		String sql;
 		try {
-			Planet planet = reverse ? (Planet)aspect.getSkyPoint2() : (Planet)aspect.getSkyPoint1();
-			Planet planet2 = reverse ? (Planet)aspect.getSkyPoint1() : (Planet)aspect.getSkyPoint2();
-			AspectType type = aspect.checkType(planet.isMain());
+			AspectType type = aspect.checkType(false);
 			String acode = aspect.getAspect().getCode();
 
 			sql = "select * from " + tableName + 
@@ -201,8 +198,8 @@ public class PlanetAspectService extends GenderTextModelService {
 				+ "order by aspectid";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, type.getId());
-			ps.setLong(2, planet.getId());
-			ps.setLong(3, planet2.getId());
+			ps.setLong(2, aspect.getSkyPoint1().getId());
+			ps.setLong(3, aspect.getSkyPoint2().getId());
 			ps.setLong(4, null == acode ? java.sql.Types.NULL : aspect.getAspect().getId());
 //			System.out.println(ps);
 			rs = ps.executeQuery();
@@ -219,12 +216,6 @@ public class PlanetAspectService extends GenderTextModelService {
 			}
 		}
 		return list;
-/*
-select * from synastryaspects
-where typeid = 2
-and ((planet1id = 19 and planet2id = 33) or (planet1id = 33 and planet2id = 19))
-and (aspectid is null or aspectid = 4)
- */
 	}
 
 	/**
