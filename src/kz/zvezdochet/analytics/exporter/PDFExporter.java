@@ -1456,10 +1456,10 @@ public class PDFExporter {
 						color = new BaseColor(0, 102, 51);
 						text = "Творческие аспекты зашкаливают, так что у вас в распоряжении достаточно свободы и возможности преображать мир! Это очень редкая комбинация, которая говорит о том, что вы не ограничены в своих проявлениях, сможете жить, действовать и принимать решения независимо от других";
 					} else if (code.equals("NEGATIVE")) {
-						text = "Уровень стресса зашкаливает, значит отток энергии будет сильнее, чем приток. Развивайте силу духа, учитесь управлять конфликтами и рисками и преуменьшать их";
+						text = "Уровень стресса зашкаливает, значит отток энергии будет довольно сильным. Развивайте силу духа, научитесь управлять конфликтами и рисками и преуменьшать их";
 					} else if (code.equals("POSITIVE")) {
 						color = BaseColor.RED;
-						text = "Уровень позитива зашкаливает, значит приток энергии будет сильнее, чем отток. Вы счастливчик!";
+						text = "Уровень позитива зашкаливает, значит приток энергии будет довольно сильным. Вы счастливчик!";
 					} else if (code.equals("POSITIVE_HIDDEN")) {
 						color = new BaseColor(153, 102, 102);
 						text = "Уровень скрытого позитива зашкаливает, значит внутренняя мотивация очень сильна! Внутри себя вы будете полны энергии, несмотря на внешние обстоятельства и проявления";
@@ -3110,9 +3110,11 @@ public class PDFExporter {
 					String filename = PlatformUtil.getPath(kz.zvezdochet.Activator.PLUGIN_ID, "/icons/conf/" + conf.getElement().getCode() + ".gif").getPath();
 					image = com.itextpdf.text.Image.getInstance(filename);
 				}
-			} else
-				image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = new PdfPCell(image);
+			} else {
+				String url = conf.getImageUrl();
+				image = (null == url) ? null : com.itextpdf.text.Image.getInstance(conf.getImageUrl());
+			}
+			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
@@ -3235,7 +3237,7 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = new PdfPCell(image);
+			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
@@ -3513,7 +3515,7 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = new PdfPCell(image);
+			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
@@ -3657,7 +3659,7 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = new PdfPCell(image);
+			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
@@ -3833,7 +3835,7 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = new PdfPCell(image);
+			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
