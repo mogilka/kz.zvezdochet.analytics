@@ -1386,15 +1386,18 @@ public class PDFExporter {
 			}
 			if (map.containsKey("KARMIC") && map.containsKey("CREATIVE")) {
 				text = null;
+				BaseColor color = BaseColor.BLUE;
 				if (map.get("KARMIC") > map.get("CREATIVE"))
 					text = "Воздаяния за ошибки больше, чем свободы, значит вы столкнётесь с ограничениями, "
 						+ "и не всегда будет возможность самостоятельно сделать выбор";
-				else if (map.get("CREATIVE") > map.get("KARMIC"))
+				else if (map.get("CREATIVE") > map.get("KARMIC")) {
 					text = "Свободы больше, чем воздаяния за ошибки, значит ограничения вам не страшны, "
 						+ "и будет возможность самостоятельно сделать выбор";
+					color = new BaseColor(0, 102, 51);
+				}
 				if (text != null) {
 					li = new ListItem();
-			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, new BaseColor(0, 102, 51))));
+			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, color)));
 			        list.add(li);
 				}
 			}
@@ -1465,7 +1468,7 @@ public class PDFExporter {
 						text = "Уровень скрытого позитива зашкаливает, значит внутренняя мотивация очень сильна! Внутри себя вы будете полны энергии, несмотря на внешние обстоятельства и проявления";
 					} else if (code.equals("NEGATIVE_HIDDEN")) {
 						color = BaseColor.GRAY;
-						text = "Уровень скрытого негатива зашкаливает, старайтесь не растрачивать собственную энергию, не зацикливаться на внутренних проблемах, а решать их и преуменьшать";
+						text = "Уровень переживаний зашкаливает, значит накоплено много скрытого негатива. Старайтесь не растрачивать энергию на неприятные мысли, не зацикливайтесь на внутренних проблемах, а вытаскивайте их на поверхность и решайте";
 					}
 					li = new ListItem();
 			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, color)));
