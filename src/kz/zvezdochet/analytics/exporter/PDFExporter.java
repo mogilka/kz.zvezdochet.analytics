@@ -1216,7 +1216,7 @@ public class PDFExporter {
 						PDFUtil.printGender(section, planetText, female, child, true);
 					}
 				}
-				if (planet.isPerfect() && !planet.isBroken()) {
+				if ((planet.isPerfect() || planet.isKing()) && !planet.isBroken()) {
 					if (planet.inMine())
 						section.add(new Paragraph("Планета " + planet.getName() + " не вызывает напряжения, так что вы сумеете проработать недостатки, описанные в разделе «" + planet.getShortName() + " в шахте»", fonth5));
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "perfect");
@@ -1515,6 +1515,7 @@ public class PDFExporter {
 				String amoon = sun.getAspectMap().get("Moon");
 				if (null == amoon) {
 					SkyPointAspect spa = new SkyPointAspect(sun, planets.get(20L), new Aspect((AspectType)new AspectTypeService().find(16L)));
+					spa.setTexts(service.finds(spa));
 					spas.add(spa);
 				}
 			}
@@ -1528,12 +1529,21 @@ public class PDFExporter {
 					continue;
 
 				for (SkyPointAspect aspect : aspects) {
+					if (!planet1.isMain()
+							&& !aspect.getAspect().getCode().equals("CONJUNCTION"))
+						continue;
+
 					long asplanetid = aspect.getAspect().getPlanetid();
 					if (asplanetid > 0 && asplanetid != planet1.getId())
 						continue;
 
 					Planet planet2 = (Planet)aspect.getSkyPoint2();
 					if (!event.isHousable() && planet2.getCode().equals("Moon"))
+						continue;
+
+					if (aspect.getAspect().getPoints() < 2
+							&& !(planet1.getCode().equals("Sun")
+								&& planet2.getCode().equals("Moon")))
 						continue;
 
 					if (planet1.getNumber() > planet2.getNumber())
@@ -1544,37 +1554,22 @@ public class PDFExporter {
 								|| planet2.getCode().equals("Rakhu")))
 						continue;
 
-					AspectType type = aspect.checkType(planet1.isMain());
-					String tcode = type.getCode();
-
-					//аспект соответствует заявленному (негативному или позитивному)
-					if (tcode.equals(aspectType)) {
-						if (planet1.isMain())
-							spas.add(aspect);
-
-					//в позитивные добавляем нейтральные соединения и ядро Солнца
-					} else if (aspectType.equals("POSITIVE")
-							&& tcode.contains("NEUTRAL")
-							&& !planet2.getCode().equals("Kethu")
-							&& !planet2.getCode().equals("Lilith")
-							&& !planet2.isLilithed())
-						spas.add(aspect);
-
-					//в негативные добавляем пояс Солнца
-					else if (aspectType.equals("NEGATIVE")) {
-						if (tcode.equals("NEUTRAL")
-								&& (planet2.getCode().equals("Kethu")
-									|| planet2.getCode().equals("Lilith")
-									|| planet2.isLilithed() ))
-							spas.add(aspect);
-						else if (tcode.equals("NEGATIVE_BELT"))
-							spas.add(aspect);
+					boolean positive = true;
+					List<Model> dicts = service.finds(aspect);
+					if (dicts != null && !dicts.isEmpty()) {
+						PlanetAspectText dict = (PlanetAspectText)dicts.get(0);
+						positive = dict.isPositive();
+						aspect.setTexts(dicts);
 					}
+					if (positive && aspectType.equals("POSITIVE"))
+						spas.add(aspect);
+					else if (!positive && aspectType.equals("NEGATIVE"))
+						spas.add(aspect);
 				}
 			}
 
 			for (SkyPointAspect aspect : spas) {
-				List<Model> dicts = service.finds(aspect);
+				List<Model> dicts = aspect.getTexts();
 				Planet aspl1 = planets.get(aspect.getSkyPoint1().getId());
 				Planet aspl2 = planets.get(aspect.getSkyPoint2().getId());
 				AspectType type = aspect.getAspect().getType();
@@ -1630,19 +1625,20 @@ public class PDFExporter {
 					section.add(new Paragraph(aspect.getMark() + " " + aspect.getMarkDescr(), markFont));
 				}
 
-				for (Model model : dicts) {
-					dict = (PlanetAspectText)model;
-
-					if (dict != null) {
-						exists = true;
-						section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
-	
-						Rule rule = EventRules.rulePlanetAspect(aspect, female);
-						if (rule != null) {
-		    				section.add(Chunk.NEWLINE);
-							section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+				if (dicts != null) {
+					for (Model model : dicts) {
+						dict = (PlanetAspectText)model;
+						if (dict != null) {
+							exists = true;
+							section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
+		
+							Rule rule = EventRules.rulePlanetAspect(aspect, female);
+							if (rule != null) {
+			    				section.add(Chunk.NEWLINE);
+								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+							}
+							PDFUtil.printGender(section, dict, female, child, true);
 						}
-						PDFUtil.printGender(section, dict, female, child, true);
 					}
 				}
 			}

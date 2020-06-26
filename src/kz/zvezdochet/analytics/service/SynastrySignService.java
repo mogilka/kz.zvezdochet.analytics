@@ -110,6 +110,7 @@ public class SynastrySignService extends ModelService {
 	public SynastryText init(ResultSet rs, Model model) throws DataAccessException, SQLException {
 		SynastryText dict = (model != null) ? (SynastryText)model : (SynastryText)create();
 		SignService service = new SignService();
+		dict.setId(rs.getLong("ID"));
 		dict.setSign1((Sign)service.find(rs.getLong("Sign1ID")));
 		dict.setSign2((Sign)service.find(rs.getLong("Sign2ID")));
 		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
