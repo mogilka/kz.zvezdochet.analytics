@@ -71,7 +71,24 @@ public class EventStatistics {
 		if (event.getPlanets() != null) {
 			event.initSigns();
 			planetSigns = new HashMap<String, Double>();
-			signPlanets = new HashMap<String, Integer>();
+			signPlanets = new HashMap<String, Integer>() {
+				private static final long serialVersionUID = -4875478645892262769L;
+				{
+			        put("Aries", 0);
+			        put("Taurus", 0);
+			        put("Gemini", 0);
+			        put("Cancer", 0);
+			        put("Leo", 0);
+			        put("Virgo", 0);
+			        put("Libra", 0);
+			        put("Scorpio", 0);
+			        put("Ophiuchus", 0);
+			        put("Sagittarius", 0);
+			        put("Capricornus", 0);
+			        put("Aquarius", 0);
+			        put("Pisces", 0);
+			    }
+			};
 			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				if (main && !planet.isMain())
@@ -138,12 +155,12 @@ public class EventStatistics {
 	 */
 	public void initPlanetDivisions() throws DataAccessException {
 		if (planetSigns != null) {
-			planetElements = new HashMap<String, Double>();
-			planetYinYangs = new HashMap<String, Double>();
-			planetHalfspheres = new HashMap<String, Double>();
-			planetSquares = new HashMap<String, Double>();
-			planetCrosses = new HashMap<String, Double>();
-			planetZones = new HashMap<String, Double>();
+			planetElements = Element.getMap();
+			planetYinYangs = YinYang.getMap();
+			planetHalfspheres = Halfsphere.getMap();
+			planetSquares = Square.getMap();
+			planetCrosses = Cross.getMap();
+			planetZones = Zone.getMap();
 			
 			Iterator<Map.Entry<String, Double>> iterator = planetSigns.entrySet().iterator();
 		    while (iterator.hasNext()) {
@@ -271,12 +288,12 @@ public class EventStatistics {
 	 */
 	public void initHouseDivisions() throws DataAccessException {
 		if (planetHouses != null) {
-			houseElements = new HashMap<String, Double>();
-			houseYinYangs = new HashMap<String, Double>();
-			houseHalfspheres = new HashMap<String, Double>();
-			houseSquares = new HashMap<String, Double>();
-			houseCrosses = new HashMap<String, Double>();
-			houseZones = new HashMap<String, Double>();
+			houseElements = Element.getMap();
+			houseYinYangs = YinYang.getMap();
+			houseHalfspheres = Halfsphere.getMap();
+			houseSquares = Square.getMap();
+			houseCrosses = Cross.getMap();
+			houseZones = Zone.getMap();
 			
 			Iterator<Map.Entry<String, Double>> iterator = planetHouses.entrySet().iterator();
 		    while (iterator.hasNext()) {

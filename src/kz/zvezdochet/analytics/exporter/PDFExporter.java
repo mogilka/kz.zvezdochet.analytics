@@ -1,5 +1,6 @@
 package kz.zvezdochet.analytics.exporter;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -13,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -191,7 +193,9 @@ public class PDFExporter {
 		saveCard(event);
 		Document doc = new Document();
 		try {
-			String filename = PlatformUtil.getPath(Activator.PLUGIN_ID, "/out/horoscope.pdf").getPath();
+			String filename = "/Users/natalie/workspace/kz.zvezdochet.analytics/out/horoscope.pdf";
+			File file = new File(filename);
+	        file.getParentFile().mkdirs();
 			PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(filename));
 			PageEventHandler handler = new PageEventHandler();
 	        writer.setPageEvent(handler);
@@ -286,7 +290,6 @@ public class PDFExporter {
 			printSymbols(chapter, event);
 			doc.add(chapter);
 
-
 			chapter = new ChapterAutoNumber(PDFUtil.printHeader(new Paragraph(), "Общий типаж", "commontype"));
 			chapter.setNumberDepth(0);
 			chapter.add(new Paragraph("Общий типаж – это общая характеристика поколения людей, рождённых вблизи " + DateUtil.sdf.format(event.getBirth()), PDFUtil.getWarningFont()));
@@ -334,13 +337,13 @@ public class PDFExporter {
 			chapter.add(p);
 
 			printAspects(chapter, event, "Позитивные сочетания", "POSITIVE");
+			chapter.add(Chunk.NEXTPAGE);
 			printAspects(chapter, event, "Негативные сочетания", "NEGATIVE");
 			chapter.add(Chunk.NEXTPAGE);
 
 			//конфигурации аспектов
 			printConfigurations(doc, chapter, event);
-
-			doc.add(chapter);
+			doc.add(chapter); 
 
 			chapter = new ChapterAutoNumber(PDFUtil.printHeader(new Paragraph(), "Реализация личности", "planethouses"));
 			chapter.setNumberDepth(0);
@@ -576,24 +579,22 @@ public class PDFExporter {
 			Iterator<Map.Entry<String, Double>> iterator = signMap.entrySet().iterator();
 			int i = -1;
 			SignService service = new SignService();
-			double maxval = 0;
+
 		    while (iterator.hasNext()) {
 		    	i++;
 		    	Entry<String, Double> entry = iterator.next();
 		    	double val = entry.getValue();
-		    	if (val > maxval)
-		    		maxval = val;
 
 		    	Bar bar = new Bar();
 		    	Sign sign = (Sign)service.find(entry.getKey());
 		    	bar.setName(sign.getName());
-		    	bar.setValue(entry.getValue());
+		    	bar.setValue(val);
 		    	bar.setColor(sign.getColor());
 		    	bars[i] = bar;
 	
 		    	bar = new Bar();
 		    	bar.setName(sign.getDescription());
-		    	bar.setValue(entry.getValue());
+		    	bar.setValue(val);
 		    	bar.setColor(sign.getColor());
 		    	bar.setCategory("Кредо");
 		    	bars2[i] = bar;		    	
@@ -603,7 +604,7 @@ public class PDFExporter {
 	
 			//кредо
 			section = PDFUtil.printSection(chapter, "Кредо вашей жизни", null);
-		    PdfPTable table = PDFUtil.printTableChart(writer, maxval, bars2, "Кредо вашей жизни");
+		    PdfPTable table = PDFUtil.printTableChart(writer, bars2, "Кредо вашей жизни", true);
 			section.add(table);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -626,7 +627,7 @@ public class PDFExporter {
 				House house = event.getHouses().get(142L);
 				if (null == house) return;
 				int value = (int)house.getLongitude();
-				Model model = new DegreeService().find(new Long(String.valueOf(value)));
+				Model model = new DegreeService().find((long)value);
 			    if (model != null) {
 			    	Degree degree = (Degree)model;
 			    	String text = degree.getText();
@@ -945,6 +946,15 @@ public class PDFExporter {
 				     if (jsonObject != null) {
 				    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
 				    	 if (obj != null) {
+					    	 section.add(Chunk.NEWLINE);
+					    	 Font boldred = new Font(baseFont, 12, Font.BOLD, PDFUtil.FONTCOLORED);
+				    		 section.add(new Paragraph("Пустая область рисунка — это ваша «мёртвая зона».", boldred));
+				    		 section.add(new Paragraph("Две краевые точки мёртвой зоны указывают на то, "
+					    		 	+ "чем вам необходимо овладеть в этом воплощении, "
+					    		 	+ "что будет способствовать целостности вашей натуры "
+					    		 	+ "и что нужно научиться сочетать:", font));
+					    	 section.add(Chunk.NEWLINE);
+
 				    		 long pid = obj.getLong("planet");
 				    		 long pid2 = obj.getLong("planet2");
 				    		 if (pid > 0 && pid2 > 0) {
@@ -954,11 +964,37 @@ public class PDFExporter {
 						    		 section.add(new Paragraph("1) " + planetText.getPlanet().getPositive() + ":", bold));
 						    		 section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
 						    	 }
+					    		 section.add(new Paragraph("На факторы, указанные в данном пункте, сделайте особый упор. "
+					    		 	+ "Они станут главной точкой приложения ваших сил.", PDFUtil.getSuccessFont()));
+						    	 section.add(Chunk.NEWLINE);
 						    	 planetText = (PlanetText)service.findByPlanet(pid2, "positive");
 						    	 if (planetText != null) {
 						    		 section.add(new Paragraph("2) " + planetText.getPlanet().getPositive() + ":", bold));
 						    		 section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
-						    	 }				    			 
+						    	 }
+				    		 }
+
+				    		 section.add(new Paragraph("Пустые знаки Зодиака", boldred));
+				    		 section.add(new Paragraph("Указанные ниже знаки Зодиака не заполнены в вашем гороскопе, "
+				    		 	+ "значит вы ощутите недостаток свойств и черт характера, "
+				    		 	+ "которые они олицетворяют:", font));
+				    		 String signs = obj.getString("signs");
+				    		 if (signs != null) {
+				    			 String[] arr = signs.split(",");
+				    			 if (arr.length > 0) {
+				    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				    				 SignService signService = new SignService();
+				    				 for (String sid : arr) {
+				    					 Sign sign = (Sign)signService.find(Long.valueOf(sid));
+				    					 if (sign != null) {
+				    						ListItem li = new ListItem();
+				    						li.add(new Chunk(sign.getName() + ": ", bold));
+				    						li.add(new Chunk(sign.getKeyword(), font));
+				    						list.add(li);
+				    					}
+				    				 }
+				    				 section.add(list);
+						    	 }
 				    		 }
 				    	 }
 				     }
@@ -1216,7 +1252,8 @@ public class PDFExporter {
 						PDFUtil.printGender(section, planetText, female, child, true);
 					}
 				}
-				if ((planet.isPerfect() || planet.isKing()) && !planet.isBroken()) {
+				if ((planet.isPerfect() || planet.isKing() || planet.isLord()) 
+						&& !planet.isBroken()) {
 					if (planet.inMine())
 						section.add(new Paragraph("Планета " + planet.getName() + " не вызывает напряжения, так что вы сумеете проработать недостатки, описанные в разделе «" + planet.getShortName() + " в шахте»", fonth5));
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "perfect");
@@ -1351,9 +1388,8 @@ public class PDFExporter {
 		    	bars[i] = bar;
 		    	map.put(bar.getCode(), bar.getValue());
 		    }
-		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "Соотношение аспектов планет", "Аспекты", "Баллы", bars, 500, 300, false, false, true);
 			Section section = PDFUtil.printSection(chapter, "Соотношение аспектов планет", null);
-			section.add(image);
+			section.add(PDFUtil.printBars(writer, "Соотношение аспектов планет", "Аспекты", "Баллы", bars, 500, 300, false, false, true));
 
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
@@ -1419,7 +1455,7 @@ public class PDFExporter {
 			}
 
 			if (map.containsKey("SPIRITUAL") && map.get("SPIRITUAL") > 0) {
-				text = "Чем больше духовности – тем более высокого уровня развития вы достигли (больше нуля – уже хорошо)";
+				text = "Чем больше духовности – тем более высокого уровня развития вы достигли";
 				li = new ListItem();
 		        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, BaseColor.MAGENTA)));
 		        list.add(li);
@@ -1465,7 +1501,7 @@ public class PDFExporter {
 						text = "Уровень позитива зашкаливает, значит приток энергии будет довольно сильным. Вы счастливчик!";
 					} else if (code.equals("POSITIVE_HIDDEN")) {
 						color = new BaseColor(153, 102, 102);
-						text = "Уровень скрытого позитива зашкаливает, значит внутренняя мотивация очень сильна! Внутри себя вы будете полны энергии, несмотря на внешние обстоятельства и проявления";
+						text = "Уровень скрытого позитива зашкаливает, значит внутренняя мотивация очень сильна. Внутри себя вы будете полны энергии, несмотря на внешние обстоятельства и проявления";
 					} else if (code.equals("NEGATIVE_HIDDEN")) {
 						color = BaseColor.GRAY;
 						text = "Уровень переживаний зашкаливает, значит накоплено много скрытого негатива. Старайтесь не растрачивать энергию на неприятные мысли, не зацикливайтесь на внутренних проблемах, а вытаскивайте их на поверхность и решайте";
@@ -1972,8 +2008,7 @@ public class PDFExporter {
 				bar.setCategory("Сферы жизни");
 				bars[++i] = (bar);
 		    }
-		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "", "Сферы жизни", "Баллы", bars, 500, 500, false, false, false);
-			section.add(image);
+			section.add(PDFUtil.printBars(writer, "", "Сферы жизни", "Баллы", bars, 500, 500, false, false, false));
 
 			Anchor anchor = new Anchor("Реализация личности", fonta);
             anchor.setReference("#planethouses");
@@ -2116,38 +2151,36 @@ public class PDFExporter {
 	private void printElements(PdfWriter writer, Chapter chapter, EventStatistics statistics, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Темперамент", null);
-			
+
 			Map<String, Double> planetMap = statistics.getPlanetElements();
 			Map<String, Double> houseMap = event.isHousable() ? statistics.getHouseElements() : new HashMap<String, Double>();
 
-			String[] elements = new String[planetMap.size()];
-			Bar[] bars = new Bar[planetMap.size() + houseMap.size()];
-			Iterator<Map.Entry<String, Double>> iterator = planetMap.entrySet().iterator();
-			int i = -1;
+			TreeSet<String> elements = new TreeSet<String>();
+			List<Bar> bars = new ArrayList<Bar>();
 			ElementService service = new ElementService();
-		    while (iterator.hasNext()) {
-		    	i++;
-		    	Entry<String, Double> entry = iterator.next();
-		    	elements[i] = entry.getKey();
+			for (Map.Entry<String, Double> entry : planetMap.entrySet()) {
+				String key = entry.getKey();
+				double val = planetMap.get(key);
+				if (val > 0)
+					elements.add(key);
 		    	Bar bar = new Bar();
-		    	kz.zvezdochet.bean.Element element = (kz.zvezdochet.bean.Element)service.find(entry.getKey());
+		    	kz.zvezdochet.bean.Element element = (kz.zvezdochet.bean.Element)service.find(key);
 		    	bar.setName(element.getTemperament());
-		    	bar.setValue(entry.getValue() * (-1));
+		    	bar.setValue(val * (-1));
 		    	bar.setColor(element.getColor());
 		    	bar.setCategory("в мыслях");
-		    	bars[i] = bar;
+		    	bars.add(bar);
 		    }
 		    
 			//определение выраженной стихии
-		    Arrays.sort(elements);
 		    kz.zvezdochet.bean.Element element = null;
 		    List<Model> elist = service.getList(false);
 		    for (Model model : elist) {
 		    	kz.zvezdochet.bean.Element e = (kz.zvezdochet.bean.Element)model;
 		    	String[] codes = e.getCode().split("_");
-		    	if (codes.length == elements.length) {
+		    	if (codes.length == elements.size()) {
 			    	Arrays.sort(codes);
-		    		boolean match = Arrays.equals(codes, elements);
+		    		boolean match = Arrays.equals(codes, elements.toArray());
 		    		if (match) {
 		    			element = e;
 		    			break;
@@ -2178,20 +2211,17 @@ public class PDFExporter {
 	        }
 	        section.add(list);
 
-			iterator = houseMap.entrySet().iterator();
-			i = planetMap.size() - 1;
-		    while (iterator.hasNext()) {
-		    	i++;
-		    	Entry<String, Double> entry = iterator.next();
+			for (Map.Entry<String, Double> entry : houseMap.entrySet()) {
+				String key = entry.getKey();
 		    	Bar bar = new Bar();
-		    	element = (kz.zvezdochet.bean.Element)service.find(entry.getKey());
+		    	element = (kz.zvezdochet.bean.Element)service.find(key);
 		    	bar.setName(element.getTemperament());
-		    	bar.setValue(entry.getValue());
+		    	bar.setValue(houseMap.get(key));
 		    	bar.setColor(element.getColor());
 		    	bar.setCategory("в поступках");
-		    	bars[i] = bar;
+		    	bars.add(bar);
 		    }
-		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Сравнение темпераментов", "Аспекты", "Баллы", bars, 500, 0, true);
+		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Сравнение темпераментов", "Аспекты", "Баллы", bars.toArray(new Bar[bars.size()]), 500, 0, true);
 			section.add(image);
 
 			list = new com.itextpdf.text.List(false, false, 10);
@@ -2245,6 +2275,7 @@ public class PDFExporter {
 		    	bar.setColor(element.getColor());
 		    	bar.setCategory("в мыслях");
 		    	bars[++i] = bar;
+
 		    	//определяем наиболее выраженный элемент
 		    	if (entry.getValue() > score) {
 		    		score = entry.getValue();
@@ -2664,7 +2695,6 @@ public class PDFExporter {
 				bar.setCategory("Планеты");
 				bars[++i] = (bar);
 		    }
-		    com.itextpdf.text.Image image = PDFUtil.printBars(writer, "", "Планеты", "Баллы", bars, 500, 500, false, false, false);
 		    String text = term ? "Соотношение силы планет" : "Соотношение силы качеств";
 			Section section = PDFUtil.printSection(chapter, text, null);
 		    text = term
@@ -2674,7 +2704,7 @@ public class PDFExporter {
 		    		+ "Но в соотношении с другими оно слабовыражено, имеет меньшую важность "
 		    			+ "или из-за некоторых негативных факторов гороскопа его ценность в итоге нивелировалась";
 	    	section.add(new Paragraph(text, font));
-			section.add(image);
+			section.add(PDFUtil.printBars(writer, "", "Планеты", "Баллы", bars, 500, 500, false, false, false));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -3021,8 +3051,8 @@ public class PDFExporter {
 		    	bars2.add(bar);
 		    }
 	    	section.add(Chunk.NEWLINE);
-		    image = PDFUtil.printStackChart(writer, "К кому вы лояльны, а к кому категоричны:", "Аспекты", "Баллы", bars2.toArray(new Bar[map.size() * 2]), 500, 0, true);
-			section.add(image);
+	    	section.add(new Paragraph("К кому вы лояльны:", font));
+			section.add(PDFUtil.printTableChart(writer, bars2.toArray(new Bar[map.size() * 2]), "К кому вы лояльны, а к кому категоричны:", false));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
