@@ -1,6 +1,5 @@
 package kz.zvezdochet.analytics.exporter;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -193,9 +192,7 @@ public class PDFExporter {
 		saveCard(event);
 		Document doc = new Document();
 		try {
-			String filename = "/Users/natalie/workspace/kz.zvezdochet.analytics/out/horoscope.pdf";
-			File file = new File(filename);
-	        file.getParentFile().mkdirs();
+			String filename = PlatformUtil.getPath(Activator.PLUGIN_ID, "/out/horoscope.pdf").getPath();
 			PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(filename));
 			PageEventHandler handler = new PageEventHandler();
 	        writer.setPageEvent(handler);
