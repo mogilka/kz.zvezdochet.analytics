@@ -96,6 +96,7 @@ import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.util.CalcUtil;
 import kz.zvezdochet.core.util.CoreUtil;
 import kz.zvezdochet.core.util.DateUtil;
+import kz.zvezdochet.core.util.OsUtil;
 import kz.zvezdochet.core.util.PlatformUtil;
 import kz.zvezdochet.core.util.StringUtil;
 import kz.zvezdochet.export.bean.Bar;
@@ -3048,8 +3049,12 @@ public class PDFExporter {
 		    	bars2.add(bar);
 		    }
 	    	section.add(Chunk.NEWLINE);
-	    	section.add(new Paragraph("К кому вы лояльны:", font));
-			section.add(PDFUtil.printTableChart(writer, bars2.toArray(new Bar[map.size() * 2]), "К кому вы лояльны, а к кому категоричны:", false));
+	    	if (OsUtil.getOS().equals(OsUtil.OS.LINUX))
+	    		section.add(PDFUtil.printStackChart(writer, "К кому вы лояльны, а к кому категоричны:", "Аспекты", "Баллы", bars2.toArray(new Bar[map.size() * 2]), 500, 0, true));
+	    	else {
+		    	section.add(new Paragraph("К кому вы лояльны:", font));
+	    		section.add(PDFUtil.printTableChart(writer, bars2.toArray(new Bar[map.size() * 2]), "К кому вы лояльны, а к кому категоричны:", false));
+	    	}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
