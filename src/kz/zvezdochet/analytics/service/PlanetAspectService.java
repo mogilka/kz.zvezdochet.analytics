@@ -189,7 +189,6 @@ public class PlanetAspectService extends GenderTextModelService {
         ResultSet rs = null;
 		String sql;
 		try {
-			AspectType type = aspect.checkType(false);
 			String acode = aspect.getAspect().getCode();
 
 			sql = "select * from " + tableName + 
@@ -199,7 +198,7 @@ public class PlanetAspectService extends GenderTextModelService {
 						" or aspectid = ?)"
 				+ "order by aspectid";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
-			ps.setLong(1, type.getId());
+			ps.setLong(1, aspect.getAspect().getTypeid());
 			ps.setLong(2, aspect.getSkyPoint1().getId());
 			ps.setLong(3, aspect.getSkyPoint2().getId());
 			ps.setLong(4, null == acode ? java.sql.Types.NULL : aspect.getAspect().getId());
