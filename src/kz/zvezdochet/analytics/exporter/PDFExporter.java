@@ -103,6 +103,7 @@ import kz.zvezdochet.export.bean.Bar;
 import kz.zvezdochet.export.handler.PageEventHandler;
 import kz.zvezdochet.export.util.PDFUtil;
 import kz.zvezdochet.service.AspectConfigurationService;
+import kz.zvezdochet.service.AspectService;
 import kz.zvezdochet.service.AspectTypeService;
 import kz.zvezdochet.service.CardKindService;
 import kz.zvezdochet.service.CrossService;
@@ -926,6 +927,27 @@ public class PDFExporter {
 
 			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(PlatformUtil.getPath(
 				Activator.PLUGIN_ID, "/icons/kind/" + kind.getCode() + ".png").getPath());
+
+			JSONObject jsonObject = new JSONObject(event.getOptions());
+			if (6 == id) { //поворачиваем лук
+				float angle = 0;
+				if (jsonObject != null) {
+					JSONObject obj = jsonObject.getJSONObject("cardkind");
+					if (obj != null) {
+						String direction = obj.getString("direction");
+						if (direction != null) {
+							if (direction.equals("down"))
+								angle = 180;
+							else if (direction.equals("right"))
+								angle = 270;
+							else if (direction.equals("left"))
+								angle = 90;
+						}
+					}
+				}
+				if (angle > 0)
+					image.setRotationDegrees(angle);
+			}
 			section.add(image);
 
 			if (term) {
@@ -940,7 +962,6 @@ public class PDFExporter {
 
 			if (1 == id) {
 				try {
-				     JSONObject jsonObject = new JSONObject(event.getOptions());
 				     if (jsonObject != null) {
 				    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
 				    	 if (obj != null) {
@@ -1058,44 +1079,46 @@ public class PDFExporter {
 //----------лук
 
 			} else if (6 == id) {
-				section.add(Chunk.NEWLINE);
-				Long pids[] = {30L}; //планеты на острие стрелы
-				PlanetService service = new PlanetService();
-				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-				for (Long pid : pids) {
-					Planet planet = (Planet)service.find(pid);
-					if (planet != null) {
-						ListItem li = new ListItem();
-						String s = planet.getDescription();
-						if (term)
-							s += " (" + planet.getName() + ")";
-				        li.add(new Chunk(s, font));
-				        list.add(li);
-					}
-				}
-				section.add(list);
+			     if (jsonObject != null) {
+			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+			    	 if (obj != null) {
+				    	 String pids = obj.getString("planet"); //планеты на острие стрелы
+				    	 if (pids != null) {
+				    		 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				    		 String[] arr = pids.split(",");
+				    		 for (String pid : arr) {
+				    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
+				    			 if (planet != null) {
+				    				 ListItem li = new ListItem();
+				    				 String s = term
+				    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
+				    					: planet.getShortName() + " + " + planet.getHouse().getName();
+				    				 anchor = new Anchor(s, fonta);
+				    				 anchor.setReference("#" + planet.getAnchor());
+				    				 li.add(anchor);
+				    				 list.add(li);
+				    			 }
+				    		 }
+				    		 section.add(list);
+				    	 }
 
-				// down|top|left|right
-				try {
-				     JSONObject jsonObject = new JSONObject(event.getOptions());
-				     if (jsonObject != null) {
-				    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
-				    	 if (obj != null) {
+				    	 // down|top|left|right куда направлена стрела лука
+				    	 try {
 				    		 String direction = obj.getString("direction");
 				    		 if (direction != null) {
-				 				kind.setDirection(direction);
-								Rule rule = EventRules.ruleCardKind(kind);
-								if (rule != null) {
-									p = new Paragraph(PDFUtil.removeTags(rule.getText(), font));
-									p.setSpacingBefore(10);
-									section.add(p);
-								}
+				    			 kind.setDirection(direction);
+				    			 Rule rule = EventRules.ruleCardKind(kind);
+				    			 if (rule != null) {
+				    				 p = new Paragraph(PDFUtil.removeTags(rule.getText(), font));
+				    				 p.setSpacingBefore(10);
+				    				 section.add(p);
+				    			 }
 				    		 }
+				    	 } catch (JSONException ex) {
+				    		 ex.printStackTrace();
 				    	 }
-				     }
-				} catch (JSONException ex) {
-				     ex.printStackTrace();
-				}
+			    	 }
+			     }
 			}
 
 			if (kind.getHigh() != null) {
@@ -1548,7 +1571,7 @@ public class PDFExporter {
 				Planet sun = planets.get(19L);
 				String amoon = sun.getAspectMap().get("Moon");
 				if (null == amoon) {
-					SkyPointAspect spa = new SkyPointAspect(sun, planets.get(20L), new Aspect((AspectType)new AspectTypeService().find(16L)));
+					SkyPointAspect spa = new SkyPointAspect(sun, planets.get(20L), (Aspect)new AspectService().find(46L));
 					spa.setTexts(service.finds(spa));
 					spas.add(spa);
 				}
@@ -2061,20 +2084,24 @@ public class PDFExporter {
 							negative = true;
 						String sign = negative ? "-" : "+";
 
-						p = new Paragraph("", fonth5);
+						Phrase ph = new Phrase("", fonth5);
 		    			if (term) {
 							String mark = planet.getMark("house");
 							if (mark.length() > 0) {
-			    				p.add(new Chunk(mark, fonth5));
-			    				p.add(new Chunk(planet.getSymbol() + " ", PDFUtil.getHeaderAstroFont()));
+			    				ph.add(new Chunk(mark, fonth5));
+			    				ph.add(new Chunk(planet.getSymbol() + " ", PDFUtil.getHeaderAstroFont()));
 							}
-		    				p.add(new Chunk(" " + planet.getName() + " в " + house.getDesignation() + " доме", fonth5));
-		    				p.add(Chunk.NEWLINE);
+		    				ph.add(new Chunk(" " + planet.getName() + " в " + house.getDesignation() + " доме", fonth5));
+		    				ph.add(Chunk.NEWLINE);
 		    			} else {
 		    				boolean pnegative = (planet.isKethued() && house.isKethued())
 								|| (planet.isLilithed() && house.isLilithed());
-		    				p.add(new Chunk(house.getName() + " " + sign + " " + (pnegative ? planet.getNegative() : planet.getPositive()), fonth5));
+		    				ph.add(new Chunk(house.getName() + " " + sign + " " + (pnegative ? planet.getNegative() : planet.getPositive()), fonth5));
 		    			}
+		            	Anchor anchorTarget = new Anchor(ph);
+		            	anchorTarget.setName(planet.getAnchor());
+		            	p = new Paragraph("", fonth5);
+		            	p.add(anchorTarget);
 		    			section.addSection(p);
 
 						if ((planet.getCode().equals("Lilith") && house.isSelened())
