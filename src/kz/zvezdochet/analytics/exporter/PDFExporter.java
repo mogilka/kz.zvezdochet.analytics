@@ -925,30 +925,32 @@ public class PDFExporter {
 			p = new Paragraph(kind.getName(), fonth5);
 			section.add(p);
 
-			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(PlatformUtil.getPath(
-				Activator.PLUGIN_ID, "/icons/kind/" + kind.getCode() + ".png").getPath());
-
 			JSONObject jsonObject = new JSONObject(event.getOptions());
-			if (6 == id) { //поворачиваем лук
-				float angle = 0;
-				if (jsonObject != null) {
-					JSONObject obj = jsonObject.getJSONObject("cardkind");
-					if (obj != null) {
-						String direction = obj.getString("direction");
-						if (direction != null) {
-							if (direction.equals("down"))
-								angle = 180;
-							else if (direction.equals("right"))
-								angle = 270;
-							else if (direction.equals("left"))
-								angle = 90;
+			URL filename = PlatformUtil.getPath(Activator.PLUGIN_ID, "/icons/kind/" + kind.getCode() + ".png");
+			if (filename != null) {
+				com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename.getPath());
+	
+				if (6 == id) { //поворачиваем лук
+					float angle = 0;
+					if (jsonObject != null) {
+						JSONObject obj = jsonObject.getJSONObject("cardkind");
+						if (obj != null) {
+							String direction = obj.getString("direction");
+							if (direction != null) {
+								if (direction.equals("down"))
+									angle = 180;
+								else if (direction.equals("right"))
+									angle = 270;
+								else if (direction.equals("left"))
+									angle = 90;
+							}
 						}
 					}
+					if (angle > 0)
+						image.setRotationDegrees(angle);
 				}
-				if (angle > 0)
-					image.setRotationDegrees(angle);
+				section.add(image);
 			}
-			section.add(image);
 
 			if (term) {
 				p = new Paragraph(kind.getDescription(), PDFUtil.getAnnotationFont(true));
@@ -1064,20 +1066,33 @@ public class PDFExporter {
 //----------Колыбель Ньютона
 
 			} else if (13 == id) {
-				PlanetTextService service = new PlanetTextService();
-				PlanetText planetText = (PlanetText)service.findByPlanet(26L, "positive");
-				if (planetText != null) {
-					section.add(new Paragraph(planetText.getPlanet().getShortName(), bold));
-					section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
-				}
-				planetText = (PlanetText)service.findByPlanet(21L, "positive");
-				if (planetText != null) {
-					section.add(new Paragraph(planetText.getPlanet().getShortName(), bold));
-					section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
-				}
+			     if (jsonObject != null) {
+			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+			    	 if (obj != null) {
+			    		 long pid1 = obj.getLong("planet");
+			    		 long pid2 = obj.getLong("planet2");
+			    		 if (pid1 > 0 && pid2 > 0) {
+			    			 long[] pids = {pid1, pid2};
+				    		 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				    		 for (long pid : pids) {
+				    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
+				    			 if (planet != null) {
+				    				 ListItem li = new ListItem();
+				    				 String s = term
+				    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
+				    					: planet.getShortName() + " + " + planet.getHouse().getName();
+				    				 anchor = new Anchor(s, fonta);
+				    				 anchor.setReference("#" + planet.getAnchor());
+				    				 li.add(anchor);
+				    				 list.add(li);
+				    			 }
+				    		 }
+				    		 section.add(list);
+			    		 }
+			    	 }
+			     }
 
 //----------лук
-
 			} else if (6 == id) {
 			     if (jsonObject != null) {
 			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
@@ -1116,6 +1131,33 @@ public class PDFExporter {
 				    		 }
 				    	 } catch (JSONException ex) {
 				    		 ex.printStackTrace();
+				    	 }
+			    	 }
+			     }
+
+//---------сгущение
+
+			} else if (15 == id) {
+				if (jsonObject != null) {
+					JSONObject obj = jsonObject.getJSONObject("cardkind");
+					if (obj != null) {
+						String hids = obj.getString("houses");
+						if (hids != null) {
+							com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+							String[] arr = hids.split(",");
+							for (String hid : arr) {
+								House house = event.getHouses().get(Long.valueOf(hid));
+								if (house != null) {
+									ListItem li = new ListItem();
+									String s = term ? house.getName() + ": " : "";
+				    				s += house.getDescription();
+				    				anchor = new Anchor(s, fonta);
+				    				anchor.setReference("#" + house.getCode());
+				    				li.add(anchor);
+				    				list.add(li);
+				    			 }
+				    		 }
+				    		 section.add(list);
 				    	 }
 			    	 }
 			     }
@@ -2070,7 +2112,7 @@ public class PDFExporter {
 				//Создаем информационный блок, только если дом не пуст
 				Section section = null;
 				if (planets.size() > 0) {
-					section = PDFUtil.printSection(chapter, house.getName(), null);
+					section = PDFUtil.printSection(chapter, house.getName(), house.getCode());
 			
 					for (Planet planet : planets) {
 						boolean negative = planet.isDamaged()
