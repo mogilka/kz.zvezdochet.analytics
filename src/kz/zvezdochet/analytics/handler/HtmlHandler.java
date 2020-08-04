@@ -22,7 +22,7 @@ public class HtmlHandler extends Handler {
 	public void execute(@Active MPart activePart) {
 		try {
 			final EventPart eventPart = (EventPart)activePart.getObject();
-			final Event event = (Event)eventPart.getModel(EventPart.MODE_CALC, true);
+			final Event event = (Event)eventPart.getModel(EventPart.MODE_ASPECT_PLANET_PLANET, true);
 			if (null == event) {
 				DialogUtil.alertWarning("Произведите расчёт");
 				return;
