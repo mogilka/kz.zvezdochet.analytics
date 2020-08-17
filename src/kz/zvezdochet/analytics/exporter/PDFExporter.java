@@ -1149,8 +1149,8 @@ public class PDFExporter {
 								House house = event.getHouses().get(Long.valueOf(hid));
 								if (house != null) {
 									ListItem li = new ListItem();
-									String s = term ? house.getName() + ": " : "";
-				    				s += house.getDescription();
+									String s = term ? house.getDesignation() + " дом: " : "";
+				    				s += house.getName();
 				    				anchor = new Anchor(s, fonta);
 				    				anchor.setReference("#" + house.getCode());
 				    				li.add(anchor);
@@ -1168,20 +1168,43 @@ public class PDFExporter {
 				section.add(new Paragraph("На следующих трёх уровнях отражено направление вашего развития с точки зрения прошлых наработок: "
 					+ "три варианта развития внутри одного направления. Определите, на каком уровне вы находитесь. "
 					+ "Высокий уровень указывает на то, к чему полезно стремиться:", font));
-	
+
+		        BaseColor bcolor = PDFUtil.BORDERCOLOR;
+		        float bwidth = PDFUtil.BORDERWIDTH;
+		        float padding = PDFUtil.CELLPADDING;
+
 		        PdfPTable table = new PdfPTable(3);
 		        table.setTotalWidth(doc.getPageSize().getWidth() - PDFUtil.PAGEBORDERWIDTH * 2);
 		        table.setLockedWidth(true);
 		        table.setWidths(new float[] { 33, 33, 33 });
 		        table.setSpacingBefore(20);
-	
-				table.addCell(new PdfPCell(new Phrase("Низкий уровень", bold)));
-				table.addCell(new PdfPCell(new Phrase("Средний уровень", bold)));
-				table.addCell(new PdfPCell(new Phrase("Высокий уровень", bold)));
 
-				table.addCell(new PdfPCell(new Phrase(kind.getLow(), font)));
-				table.addCell(new PdfPCell(new Phrase(kind.getMedium(), font)));
-				table.addCell(new PdfPCell(new Phrase(kind.getHigh(), font)));
+		        String[] texts = {"Низкий уровень", "Средний уровень", "Высокий уровень"};
+		        BaseColor[] colors = {new BaseColor(255, 153, 153), new BaseColor(153, 153, 204), new BaseColor(153, 204, 153)};
+		        int i = -1;
+		        for (String text : texts) {
+			        PdfPCell cell = new PdfPCell(new Phrase(text, bold));
+					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+					cell.setPadding(padding);
+					cell.setBackgroundColor(colors[++i]);
+					cell.setUseVariableBorders(true);
+					cell.setBorderColor(bcolor);
+					cell.setBorderWidth(bwidth);
+					table.addCell(cell);
+		        }
+
+		        texts = new String[] {kind.getLow(), kind.getMedium(), kind.getHigh()};
+		        colors = new BaseColor[] {new BaseColor(255, 204, 204), new BaseColor(204, 204, 255), new BaseColor(204, 255, 204)};
+		        i = -1;
+		        for (String text : texts) {
+			        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+					cell.setPadding(padding);
+					cell.setBackgroundColor(colors[++i]);
+					cell.setUseVariableBorders(true);
+					cell.setBorderColor(bcolor);
+					cell.setBorderWidth(bwidth);
+					table.addCell(cell);
+		        }
 				section.add(table);
 			}
 
