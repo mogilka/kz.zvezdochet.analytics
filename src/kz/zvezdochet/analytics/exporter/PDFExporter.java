@@ -396,7 +396,6 @@ public class PDFExporter {
 
 			//знаменитости
 			printSimilar(chapter, event);
-			chapter.add(Chunk.NEXTPAGE);
 
 			//координаты планет
 			printCoords(chapter, event);
@@ -556,6 +555,7 @@ public class PDFExporter {
 			        list.add(li);
 				}
 				section.add(list);
+				chapter.add(Chunk.NEXTPAGE);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -1180,7 +1180,7 @@ public class PDFExporter {
 		        table.setSpacingBefore(20);
 
 		        String[] texts = {"Низкий уровень", "Средний уровень", "Высокий уровень"};
-		        BaseColor[] colors = {new BaseColor(255, 153, 153), new BaseColor(153, 153, 204), new BaseColor(153, 204, 153)};
+		        BaseColor[] colors = {new BaseColor(193, 193, 215), new BaseColor(177, 177, 205), new BaseColor(162, 162, 195)};
 		        int i = -1;
 		        for (String text : texts) {
 			        PdfPCell cell = new PdfPCell(new Phrase(text, bold));
@@ -1194,7 +1194,7 @@ public class PDFExporter {
 		        }
 
 		        texts = new String[] {kind.getLow(), kind.getMedium(), kind.getHigh()};
-		        colors = new BaseColor[] {new BaseColor(255, 204, 204), new BaseColor(204, 204, 255), new BaseColor(204, 255, 204)};
+		        colors = new BaseColor[] {new BaseColor(240, 240, 245), new BaseColor(224, 224, 235), new BaseColor(208, 208, 225)};
 		        i = -1;
 		        for (String text : texts) {
 			        PdfPCell cell = new PdfPCell(new Phrase(text, font));
@@ -1338,7 +1338,7 @@ public class PDFExporter {
 						PDFUtil.printGender(section, planetText, female, child, true);
 					}
 				}
-				if ((planet.isPerfect() || planet.isKing() || planet.isLord()) 
+				if ((planet.isPerfect()) 
 						&& !planet.isBroken()) {
 					if (planet.inMine())
 						section.add(new Paragraph("Планета " + planet.getName() + " не вызывает напряжения, так что вы сумеете проработать недостатки, описанные в разделе «" + planet.getShortName() + " в шахте»", fonth5));
@@ -2129,6 +2129,11 @@ public class PDFExporter {
 				//Определяем количество планет в доме
 				List<Planet> planets = new ArrayList<Planet>();
 				for (Planet planet : cplanets) {
+					if ((planet.getCode().equals("Selena")
+							&& house.isSelened()
+							&& house.isLilithed()))
+						continue;
+
 					if (planet.getHouse().getId().equals(house.getId()))
 						planets.add(planet);
 				}
@@ -2169,8 +2174,9 @@ public class PDFExporter {
 		            	p.add(anchorTarget);
 		    			section.addSection(p);
 
-						if ((planet.getCode().equals("Lilith") && house.isSelened())
-								|| (planet.getCode().equals("Selena") && house.isLilithed())) {
+						if ((planet.getCode().equals("Lilith")
+								&& house.isSelened()
+								&& house.isLilithed())) {
 							Rule rule = EventRules.ruleMoonsHouse(house);
 							if (rule != null) {
 								section.add(Chunk.NEWLINE);

@@ -416,6 +416,8 @@ public class EventRules {
 		RuleService service = new RuleService();
 		if (house.getCode().equals("I"))
 			return (Rule)service.find(106L);
+		else if (house.getCode().equals("III_2"))
+			return (Rule)service.find(214L);
 		return null;
 	}
 
