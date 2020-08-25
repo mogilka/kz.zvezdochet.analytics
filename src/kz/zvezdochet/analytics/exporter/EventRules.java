@@ -414,10 +414,16 @@ public class EventRules {
 	 */
 	public static Rule ruleMoonsHouse(House house) throws DataAccessException {
 		RuleService service = new RuleService();
-		if (house.getCode().equals("I"))
-			return (Rule)service.find(106L);
-		else if (house.getCode().equals("III_2"))
-			return (Rule)service.find(214L);
+		if (house.isSelened()) {
+			if (house.getCode().equals("I"))
+				return (Rule)service.find(106L);
+			else if (house.getCode().equals("III_2"))
+				return (Rule)service.find(214L);
+		}
+		if (house.isRakhued()) {
+			if (house.getCode().equals("V"))
+				return (Rule)service.find(215L);
+		}
 		return null;
 	}
 

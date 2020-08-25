@@ -1595,6 +1595,29 @@ public class PDFExporter {
 					li = new ListItem();
 			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, color)));
 			        list.add(li);
+				} else if (0 == val) {
+					BaseColor color = BaseColor.BLACK;
+					if (code.equals("KARMIC")) {
+						color = BaseColor.BLUE;
+						text = "Кармические аспекты отсутствуют";
+					} else if (code.equals("CREATIVE")) {
+						color = new BaseColor(0, 102, 51);
+						text = "Творческие аспекты отсутствуют";
+					} else if (code.equals("NEGATIVE")) {
+						text = "Уровень стресса отсутствуют";
+					} else if (code.equals("POSITIVE")) {
+						color = BaseColor.RED;
+						text = "Уровень позитива отсутствуют";
+					} else if (code.equals("POSITIVE_HIDDEN")) {
+						color = new BaseColor(153, 102, 102);
+						text = "Уровень скрытого позитива отсутствуют";
+					} else if (code.equals("NEGATIVE_HIDDEN")) {
+						color = BaseColor.GRAY;
+						text = "Уровень переживаний отсутствуют";
+					}
+					li = new ListItem();
+			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, color)));
+			        list.add(li);					
 				}
 			}
 			li = new ListItem();
@@ -2134,6 +2157,11 @@ public class PDFExporter {
 							&& house.isLilithed()))
 						continue;
 
+					if ((planet.getCode().equals("Rakhu")
+							&& house.isRakhued()
+							&& house.isLilithed()))
+						continue;
+
 					if (planet.getHouse().getId().equals(house.getId()))
 						planets.add(planet);
 				}
@@ -2175,7 +2203,7 @@ public class PDFExporter {
 		    			section.addSection(p);
 
 						if ((planet.getCode().equals("Lilith")
-								&& house.isSelened()
+								&& (house.isSelened() || house.isRakhued())
 								&& house.isLilithed())) {
 							Rule rule = EventRules.ruleMoonsHouse(house);
 							if (rule != null) {
