@@ -1914,6 +1914,8 @@ public class PDFExporter {
 								shapes.add(shape);
 							}
 						}
+						if (confs.size() > 1)
+							PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
 					}
 					section.add(shapes);
 					section.add(Chunk.NEWLINE);
