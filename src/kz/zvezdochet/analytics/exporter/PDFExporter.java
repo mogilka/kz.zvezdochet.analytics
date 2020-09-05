@@ -93,6 +93,7 @@ import kz.zvezdochet.bean.YinYang;
 import kz.zvezdochet.bean.Zone;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
+import kz.zvezdochet.core.ui.util.DialogUtil;
 import kz.zvezdochet.core.util.CalcUtil;
 import kz.zvezdochet.core.util.CoreUtil;
 import kz.zvezdochet.core.util.DateUtil;
@@ -379,7 +380,7 @@ public class PDFExporter {
 			chapter.add(Chunk.NEXTPAGE);
 			
 			//полусферы
-			printHalfSpheres(writer, chapter, statistics);
+			printHalfSpheres(writer, chapter, statistics, event);
 			chapter.add(Chunk.NEXTPAGE);
 
 			//квадраты
@@ -391,7 +392,7 @@ public class PDFExporter {
 			chapter.add(Chunk.NEXTPAGE);
 			
 			//зоны
-			printZones(writer, chapter, statistics);
+			printZones(writer, chapter, statistics, event);
 			chapter.add(Chunk.NEXTPAGE);
 
 			//знаменитости
@@ -936,7 +937,10 @@ public class PDFExporter {
 						JSONObject obj = jsonObject.getJSONObject("cardkind");
 						if (obj != null) {
 							String direction = obj.getString("direction");
-							if (direction != null) {
+							if (null == direction) {
+								DialogUtil.alertWarning("Задайте направление лука");
+								return;
+							} else {
 								if (direction.equals("down"))
 									angle = 180;
 								else if (direction.equals("right"))
@@ -993,6 +997,9 @@ public class PDFExporter {
 						    		 section.add(new Paragraph("2) " + planetText.getPlanet().getPositive() + ":", bold));
 						    		 section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
 						    	 }
+				    		 } else {
+				    			 DialogUtil.alertWarning("Задайте обе планеты тигра");
+				    			 return;
 				    		 }
 
 				    		 section.add(new Paragraph("Пустые знаки Зодиака", boldred));
@@ -1000,7 +1007,10 @@ public class PDFExporter {
 				    		 	+ "значит вы ощутите недостаток свойств и черт характера, "
 				    		 	+ "которые они олицетворяют:", font));
 				    		 String signs = obj.getString("signs");
-				    		 if (signs != null) {
+				    		 if (null == signs) {
+				    			 DialogUtil.alertWarning("Задайте пустые знаки тигра");
+				    			 return;
+				    		 } else {
 				    			 String[] arr = signs.split(",");
 				    			 if (arr.length > 0) {
 				    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1088,6 +1098,9 @@ public class PDFExporter {
 				    			 }
 				    		 }
 				    		 section.add(list);
+			    		 } else {
+			    			 DialogUtil.alertWarning("Задайте обе планеты колыбели Ньютона");
+			    			 return;			    			 
 			    		 }
 			    	 }
 			     }
@@ -1098,7 +1111,10 @@ public class PDFExporter {
 			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
 			    	 if (obj != null) {
 				    	 String pids = obj.getString("planet"); //планеты на острие стрелы
-				    	 if (pids != null) {
+				    	 if (null == pids) {
+			    			 DialogUtil.alertWarning("Задайте планеты на острие лука (в виде текста)");
+			    			 return;
+				    	 } else {
 				    		 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 				    		 String[] arr = pids.split(",");
 				    		 for (String pid : arr) {
@@ -1120,7 +1136,10 @@ public class PDFExporter {
 				    	 // down|top|left|right куда направлена стрела лука
 				    	 try {
 				    		 String direction = obj.getString("direction");
-				    		 if (direction != null) {
+				    		 if (null == direction) {
+				    			 DialogUtil.alertWarning("Задайте направление лука");
+				    			 return;
+				    		 } else {
 				    			 kind.setDirection(direction);
 				    			 Rule rule = EventRules.ruleCardKind(kind);
 				    			 if (rule != null) {
@@ -1141,26 +1160,50 @@ public class PDFExporter {
 				if (jsonObject != null) {
 					JSONObject obj = jsonObject.getJSONObject("cardkind");
 					if (obj != null) {
-						String hids = obj.getString("houses");
-						if (hids != null) {
-							com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-							String[] arr = hids.split(",");
-							for (String hid : arr) {
-								House house = event.getHouses().get(Long.valueOf(hid));
-								if (house != null) {
-									ListItem li = new ListItem();
-									String s = term ? house.getDesignation() + " дом: " : "";
-				    				s += house.getName();
-				    				anchor = new Anchor(s, fonta);
-				    				anchor.setReference("#" + house.getCode());
-				    				li.add(anchor);
-				    				list.add(li);
+						if (event.isHousable()) {
+							String hids = obj.getString("houses");
+							if (null == hids) {
+								DialogUtil.alertWarning("Задайте дома сгущения");
+								return;
+							} else {
+								com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+								String[] arr = hids.split(",");
+								for (String hid : arr) {
+									House house = event.getHouses().get(Long.valueOf(hid));
+									if (house != null) {
+										ListItem li = new ListItem();
+										String s = term ? house.getDesignation() + " дом: " : "";
+					    				s += house.getName();
+					    				anchor = new Anchor(s, fonta);
+					    				anchor.setReference("#" + house.getCode());
+					    				li.add(anchor);
+					    				list.add(li);
+					    			 }
+					    		 }
+					    		 section.add(list);
+					    	 }
+				    	 } else {
+				    		 String pids = obj.getString("planet");
+				    		 if (null == pids) {
+				    			 DialogUtil.alertWarning("Задайте планеты сгущения");
+				    			 return;
+				    		 } else {
+				    			 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				    			 String[] arr = pids.split(",");
+				    			 for (String pid : arr) {
+				    				 Planet planet = event.getPlanets().get(Long.valueOf(pid));
+				    				 if (planet != null) {
+				    					 ListItem li = new ListItem();
+				    					 String s = term ? planet.getName() : planet.getDescription();
+				    					 li.add(new Chunk(s, font));
+				    					 list.add(li);
+				    				 }
 				    			 }
-				    		 }
-				    		 section.add(list);
+				    			 section.add(list);
+				    		 }				    		 
 				    	 }
-			    	 }
-			     }
+				     }
+				}
 			}
 
 			if (kind.getHigh() != null) {
@@ -1426,6 +1469,7 @@ public class PDFExporter {
 				"NEUTRAL", "NEGATIVE", "NEGATIVE_HIDDEN", "POSITIVE", "POSITIVE_HIDDEN", "CREATIVE", "KARMIC", "SPIRITUAL", "PROGRESSIVE"
 			};
 			List<Bar> items = new ArrayList<Bar>();
+			Map<String, Bar[]> pmap = new HashMap<String, Bar[]>();
 		    for (Model tmodel : types) {
 		    	AspectType mtype = null; 
 		    	AspectType type = (AspectType)tmodel;
@@ -1439,16 +1483,26 @@ public class PDFExporter {
 		    	if (null == mtype)
 		    		continue;
 
+				List<Bar> pitems = new ArrayList<Bar>();
+		    	String name = term ? mtype.getName() : mtype.getKeyword();
 		    	int value = 0;
 		    	for (Model model : planets) {
 		    		Planet planet = (Planet)model;
-					value += planet.getAspectCountMap().get(type.getCode());
+					int val = planet.getAspectCountMap().get(type.getCode());
+					value += val;
+
+			    	Bar bar = new Bar();
+			    	bar.setName(planet.getSymbol());
+			    	bar.setValue(val);
+					bar.setColor(mtype.getColor());
+					bar.setCategory(name);
+					pitems.add(bar);
 		    	}
+		    	pmap.put(name, pitems.toArray(new Bar[] {}));
 		    	if (0 == value)
 		    		continue;
 
 		    	boolean exists = false;
-		    	String name = term ? mtype.getName() : mtype.getKeyword();
 		    	for (Bar b : items) {
 		    		if (b.getName().equals(name)) {
 		    			exists = true;
@@ -1624,6 +1678,23 @@ public class PDFExporter {
 	        li.add(new Chunk("В остальном показатели среднестатистические", PDFUtil.getAnnotationFont(false)));
 	        list.add(li);
 			section.add(list);
+			chapter.add(Chunk.NEXTPAGE);
+
+			//планеты по типам аспектов TODO группировать на данном этапе по категориям - передавать в график мап
+			section = PDFUtil.printSection(chapter, "Аспекты планет по сферам жизни", null);
+		    com.itextpdf.text.Image image = PDFUtil.printMultiStackChart(writer, "", "Планеты", "Баллы", pmap, 500, 0, true);
+			section.add(image);
+
+			Font astrofont = new Font(PDFUtil.getAstroFont(), 12, Font.NORMAL);
+			list = new com.itextpdf.text.List(false, false, 10);
+	    	for (Model model : planets) {
+	    		Planet planet = (Planet)model;
+	    		li = new ListItem();
+	    		li.add(new Chunk(planet.getSymbol(), astrofont));
+	    		li.add(new Chunk(" – " + planet.getPositive(), font));
+	    		list.add(li);
+			}
+			section.add(list);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -1653,20 +1724,22 @@ public class PDFExporter {
 			Map<Long, Planet> planets = event.getPlanets();
 			boolean exists = false;
 			List<SkyPointAspect> spas = new ArrayList<>();
+			boolean housable = event.isHousable();
 
 			//отсутствие аспекта между светилами
-			if (aspectType.equals("NEGATIVE")) {
-				Planet sun = planets.get(19L);
-				String amoon = sun.getAspectMap().get("Moon");
-				if (null == amoon) {
-					SkyPointAspect spa = new SkyPointAspect(sun, planets.get(20L), (Aspect)new AspectService().find(46L));
-					spa.setTexts(service.finds(spa));
-					spas.add(spa);
+			if (housable)
+				if (aspectType.equals("NEGATIVE")) {
+					Planet sun = planets.get(19L);
+					String amoon = sun.getAspectMap().get("Moon");
+					if (null == amoon) {
+						SkyPointAspect spa = new SkyPointAspect(sun, planets.get(20L), (Aspect)new AspectService().find(46L));
+						spa.setTexts(service.finds(spa));
+						spas.add(spa);
+					}
 				}
-			}
 
 			for (Planet planet1 : planets.values()) {
-				if (!event.isHousable() && planet1.getCode().equals("Moon"))
+				if (!housable && planet1.getCode().equals("Moon"))
 					continue;
 
 				List<SkyPointAspect> aspects = planet1.getAspectList();
@@ -2039,7 +2112,7 @@ public class PDFExporter {
 									appendix.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
 								}
 							}
-						} else if (code.equals("necklace")) {
+						} else if (code.equals("necklace") && event.isHousable()) {
 							++j;
 							String iteration = (confs.size() > 1) ? " №" + j : "";
 							appendix.add(new Paragraph("Ниже перечислены этапы вашей жизни, которые будут последовательно активироваться под влиянием людей и факторов, указанных на рисунке" + iteration + ":", bold));
@@ -2423,26 +2496,29 @@ public class PDFExporter {
 	        li.add(new Chunk("Категория \"в мыслях\" показывает, насколько вы активны в мыслях и принятии решений наедине с самим собой.", font));
 	        list.add(li);
 
-	        if (event.isHousable()) {
+			boolean housable = event.isHousable();
+	        if (housable) {
 				li = new ListItem();
 		        li.add(new Chunk("Категория \"в поступках\" показывает, как меняется ваша активность на событийном уровне, когда приходит время действовать.", font));
 		        list.add(li);
 	        }
 			section.add(list);
 
-			iterator = houseMap.entrySet().iterator();
-			i = planetMap.size() - 1;
-			yinyang = null;
-		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
-		    	Bar bar = new Bar();
-		    	YinYang element = (YinYang)service.find(entry.getKey());
-		    	bar.setName(element.getDiaName());
-		    	bar.setValue(entry.getValue());
-		    	bar.setColor(element.getColor());
-		    	bar.setCategory("в поступках");
-		    	bars[++i] = bar;
-		    }
+			if (housable) {
+				iterator = houseMap.entrySet().iterator();
+				i = planetMap.size() - 1;
+				yinyang = null;
+			    while (iterator.hasNext()) {
+			    	Entry<String, Double> entry = iterator.next();
+			    	Bar bar = new Bar();
+			    	YinYang element = (YinYang)service.find(entry.getKey());
+			    	bar.setName(element.getDiaName());
+			    	bar.setValue(entry.getValue());
+			    	bar.setColor(element.getColor());
+			    	bar.setCategory("в поступках");
+			    	bars[++i] = bar;
+			    }
+			}
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Мужское (активное) и женское (пассивное) начало", "Аспекты", "Баллы", bars, 500, 150, true);
 			section.add(image);
 		} catch(Exception e) {
@@ -2455,8 +2531,9 @@ public class PDFExporter {
 	 * @param writer обработчик генерации документа
 	 * @param chapter раздел
 	 * @param statistics объект статистики
+	 * @param event событие
 	 */
-	private void printHalfSpheres(PdfWriter writer, Chapter chapter, EventStatistics statistics) {
+	private void printHalfSpheres(PdfWriter writer, Chapter chapter, EventStatistics statistics, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Тип личности", null);
 			
@@ -2502,19 +2579,21 @@ public class PDFExporter {
 	        list.add(li);
 			section.add(list);
 
-			iterator = houseMap.entrySet().iterator();
-			sphere = null;
-			i = 3;
-		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
-		    	Bar bar = new Bar();
-		    	Halfsphere element = (Halfsphere)service.find(entry.getKey());
-		    	bar.setName(element.getDiaName());
-		    	bar.setValue(entry.getValue());
-		    	bar.setColor(element.getColor());
-		    	bar.setCategory("в поступках");
-	    		bars[++i] = bar;
-		    }
+			if (event.isHousable()) {
+				iterator = houseMap.entrySet().iterator();
+				sphere = null;
+				i = 3;
+			    while (iterator.hasNext()) {
+			    	Entry<String, Double> entry = iterator.next();
+			    	Bar bar = new Bar();
+			    	Halfsphere element = (Halfsphere)service.find(entry.getKey());
+			    	bar.setName(element.getDiaName());
+			    	bar.setValue(entry.getValue());
+			    	bar.setColor(element.getColor());
+			    	bar.setCategory("в поступках");
+		    		bars[++i] = bar;
+			    }
+			}
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Открытость и закрытость", "Аспекты", "Баллы", bars, 500, 0, true);
 			section.add(image);
 		} catch(Exception e) {
@@ -2557,17 +2636,20 @@ public class PDFExporter {
 		    		square = element;
 		    	}
 		    }
-			iterator = houseMap.entrySet().iterator();
-			i = 3;
-		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
-		    	Bar bar = new Bar();
-		    	Square element = (Square)service.find(entry.getKey());
-		    	bar.setName(element.getDiaName());
-		    	bar.setValue(entry.getValue());
-		    	bar.setColor(element.getColor());
-		    	bar.setCategory("в поступках");
-		    	bars[++i] = bar;
+
+		    if (event.isHousable()) {
+				iterator = houseMap.entrySet().iterator();
+				i = 3;
+			    while (iterator.hasNext()) {
+			    	Entry<String, Double> entry = iterator.next();
+			    	Bar bar = new Bar();
+			    	Square element = (Square)service.find(entry.getKey());
+			    	bar.setName(element.getDiaName());
+			    	bar.setValue(entry.getValue());
+			    	bar.setColor(element.getColor());
+			    	bar.setCategory("в поступках");
+			    	bars[++i] = bar;
+			    }
 		    }
 		    if (square != null) {
 		    	if (term) {
@@ -2664,18 +2746,21 @@ public class PDFExporter {
 		    		cross = element;
 		    	}
 		    }
-			crossMap = statistics.getHouseCrosses();
-			iterator = crossMap.entrySet().iterator();
-			i = 2;
-		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
-		    	Bar bar = new Bar();
-		    	Cross element = (Cross)service.find(entry.getKey());
-		    	bar.setName(element.getDiaName());
-		    	bar.setValue(entry.getValue());
-		    	bar.setColor(element.getColor());
-		    	bar.setCategory("в поступках");
-		    	bars[++i] = bar;
+
+		    if (event.isHousable()) {
+				crossMap = statistics.getHouseCrosses();
+				iterator = crossMap.entrySet().iterator();
+				i = 2;
+			    while (iterator.hasNext()) {
+			    	Entry<String, Double> entry = iterator.next();
+			    	Bar bar = new Bar();
+			    	Cross element = (Cross)service.find(entry.getKey());
+			    	bar.setName(element.getDiaName());
+			    	bar.setValue(entry.getValue());
+			    	bar.setColor(element.getColor());
+			    	bar.setCategory("в поступках");
+			    	bars[++i] = bar;
+			    }
 		    }
 		    if (cross != null) {
 		    	if (term) {
@@ -2744,8 +2829,9 @@ public class PDFExporter {
 	 * @param writer обработчик генерации документа
 	 * @param chapter раздел
 	 * @param statistics объект статистики
+	 * @param event событие
 	 */
-	private void printZones(PdfWriter writer, Chapter chapter, EventStatistics statistics) {
+	private void printZones(PdfWriter writer, Chapter chapter, EventStatistics statistics, Event event) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Развитие духа", null);
 			
@@ -2771,18 +2857,21 @@ public class PDFExporter {
 		    		zone = element;
 		    	}
 		    }
-			zoneMap = statistics.getHouseZones();
-			iterator = zoneMap.entrySet().iterator();
-			i = 2;
-		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
-		    	Bar bar = new Bar();
-		    	Zone element = (Zone)service.find(entry.getKey());
-		    	bar.setName(element.getDiaName());
-		    	bar.setValue(entry.getValue());
-		    	bar.setColor(element.getColor());
-		    	bar.setCategory("в поступках");
-		    	bars[++i] = bar;
+
+		    if (event.isHousable()) {
+				zoneMap = statistics.getHouseZones();
+				iterator = zoneMap.entrySet().iterator();
+				i = 2;
+			    while (iterator.hasNext()) {
+			    	Entry<String, Double> entry = iterator.next();
+			    	Bar bar = new Bar();
+			    	Zone element = (Zone)service.find(entry.getKey());
+			    	bar.setName(element.getDiaName());
+			    	bar.setValue(entry.getValue());
+			    	bar.setColor(element.getColor());
+			    	bar.setCategory("в поступках");
+			    	bars[++i] = bar;
+			    }
 		    }
 		    if (zone != null) {
 		    	if (term) {
@@ -3074,8 +3163,9 @@ public class PDFExporter {
 			Map<Long, Integer> map2 = new HashMap<Long, Integer>();
 
 			Map<Long, Planet> planets = event.getPlanets();
+			boolean housable = event.isHousable();
 			for (Planet planet : planets.values()) {
-				if (event.isHousable()) {
+				if (housable) {
 					boolean loyal2 = planet.getHouse().getElement().isLoyalty();
 			    	if (loyal2)
 			    		++loyalty2;
@@ -3134,29 +3224,31 @@ public class PDFExporter {
 	    	bar.setCategory("в мыслях");
 	    	bars[1] = bar;
 
-	    	bar = new Bar();
-	    	bar.setName("Лояльность");
-		    bar.setValue(loyalty2);
-	    	bar.setCategory("в поступках");
-	    	bars[2] = bar;
-
-	    	bar = new Bar();
-	    	bar.setName("Категоричность");
-		    bar.setValue(flatness2);
-	    	bar.setCategory("в поступках");
-	    	bars[3] = bar;
-
+	    	if (housable) {
+		    	bar = new Bar();
+		    	bar.setName("Лояльность");
+			    bar.setValue(loyalty2);
+		    	bar.setCategory("в поступках");
+		    	bars[2] = bar;
+	
+		    	bar = new Bar();
+		    	bar.setName("Категоричность");
+			    bar.setValue(flatness2);
+		    	bar.setCategory("в поступках");
+		    	bars[3] = bar;
+	    	}
 	    	section.add(Chunk.NEWLINE);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
 	        li.add(new Chunk("Категория \"в мыслях\" показывает вашу привычную модель: насколько лояльно вы относитесь к миру.", font));
 	        list.add(li);
 
-			li = new ListItem();
-	        li.add(new Chunk("Категория \"в поступках\" показывает, как уровень лояльности меняется на практике, когда приходит время действовать.", font));
-	        list.add(li);
+	        if (housable) {
+				li = new ListItem();
+		        li.add(new Chunk("Категория \"в поступках\" показывает, как уровень лояльности меняется на практике, когда приходит время действовать.", font));
+		        list.add(li);
+	        }
 	        section.add(list);
-
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Сравнение лояльности и категоричности", "Аспекты", "Баллы", bars, 500, 0, true);
 			section.add(image);
 
