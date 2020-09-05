@@ -1492,7 +1492,7 @@ public class PDFExporter {
 					value += val;
 
 			    	Bar bar = new Bar();
-			    	bar.setName(planet.getSymbol());
+			    	bar.setName(planet.getName().substring(0, 3));
 			    	bar.setValue(val);
 					bar.setColor(mtype.getColor());
 					bar.setCategory(name);
@@ -1685,13 +1685,12 @@ public class PDFExporter {
 		    com.itextpdf.text.Image image = PDFUtil.printMultiStackChart(writer, "", "Планеты", "Баллы", pmap, 500, 0, true);
 			section.add(image);
 
-			Font astrofont = new Font(PDFUtil.getAstroFont(), 12, Font.NORMAL);
+			section.add(Chunk.NEWLINE);
 			list = new com.itextpdf.text.List(false, false, 10);
 	    	for (Model model : planets) {
 	    		Planet planet = (Planet)model;
 	    		li = new ListItem();
-	    		li.add(new Chunk(planet.getSymbol(), astrofont));
-	    		li.add(new Chunk(" – " + planet.getPositive(), font));
+	    		li.add(new Chunk(planet.getName() + " – " + planet.getPositive(), font));
 	    		list.add(li);
 			}
 			section.add(list);
