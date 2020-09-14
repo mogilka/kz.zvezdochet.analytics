@@ -2007,8 +2007,8 @@ public class PDFExporter {
 					Font bold = new Font(baseFont, 12, Font.BOLD);
 					int j = 0;
 					for (AspectConfiguration configuration : confs) {
+						++j;
 						if (code.equals("taucross")) {
-							++j;
 							String iteration = (confs.size() > 1) ? " №" + j : "";
 							appendix.add(new Paragraph("Напряжённые факторы треугольника" + iteration + ":", fonth5));
 
