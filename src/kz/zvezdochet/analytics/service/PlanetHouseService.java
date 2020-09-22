@@ -42,9 +42,7 @@ public class PlanetHouseService extends GenderTextModelService {
 
 		AspectTypeService service = new AspectTypeService();
 		if (null == aspectType) {
-			if ((planet.isDamaged() || planet.isLilithed() || planet.getCode().equals("Lilith") || planet.getCode().equals("Kethu"))
-					|| (planet.isKethued() && house.isKethued())
-					|| (planet.isLilithed() && house.isLilithed()))
+			if (planet.isDamaged() || planet.getCode().equals("Lilith") || planet.getCode().equals("Kethu"))
 				aspectType = (AspectType)service.find("NEGATIVE");
 			else
 				aspectType = (AspectType)service.find("POSITIVE");

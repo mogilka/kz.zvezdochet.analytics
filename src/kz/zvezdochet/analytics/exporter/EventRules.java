@@ -407,7 +407,7 @@ public class EventRules {
 	}
 
 	/**
-	 * Селена и Лилит в одном доме
+	 * Селена, Лилит и лунные узлы в одном доме
 	 * @param house дом
 	 * @return правило
 	 * @throws DataAccessException 
@@ -423,6 +423,8 @@ public class EventRules {
 		if (house.isRakhued()) {
 			if (house.getCode().equals("V"))
 				return (Rule)service.find(215L);
+			else if (house.getCode().equals("XII_2"))
+				return (Rule)service.find(216L);
 		}
 		return null;
 	}

@@ -58,8 +58,7 @@ public class SynastryAspectService extends PlanetAspectService {
 			if (aspect.getAspect().getType().getCode().equals("NEUTRAL")
 					&& !planet2.getCode().equals("Kethu")
 					&& !planet2.getCode().equals("Lilith")) {
-				if (planet.isLilithed() || planet.isKethued()
-						|| planet2.isLilithed() || planet2.isKethued()) {
+				if (planet.isLilithed()	|| planet2.isLilithed()) {
 					type = (AspectType)new AspectTypeService().find("NEGATIVE");
 				}
 			}
