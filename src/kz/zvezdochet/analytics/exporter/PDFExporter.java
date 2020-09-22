@@ -931,21 +931,23 @@ public class PDFExporter {
 			if (filename != null) {
 				com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename.getPath());
 	
-				if (6 == id) { //поворачиваем лук
+				if (4 == id || 6 == id) { //поворачиваем лук и чашу
 					float angle = 0;
 					if (jsonObject != null) {
 						JSONObject obj = jsonObject.getJSONObject("cardkind");
 						if (obj != null) {
 							String direction = obj.getString("direction");
 							if (null == direction) {
-								DialogUtil.alertWarning("Задайте направление лука");
+								DialogUtil.alertWarning(6 == id
+									? "Задайте направление лука top|down|right|left"
+									: "Задайте направление чаши East|West|North|South");
 								return;
 							} else {
-								if (direction.equals("down"))
+								if (direction.equals("down") || direction.equals("North"))
 									angle = 180;
-								else if (direction.equals("right"))
+								else if (direction.equals("right") || direction.equals("West"))
 									angle = 270;
-								else if (direction.equals("left"))
+								else if (direction.equals("left") || direction.equals("East"))
 									angle = 90;
 							}
 						}
@@ -963,6 +965,7 @@ public class PDFExporter {
 			}
 			section.add(new Paragraph(PDFUtil.html2pdf(kind.getText(), font)));
 			Font bold = new Font(baseFont, 12, Font.BOLD);
+			Font boldred = new Font(baseFont, 12, Font.BOLD, PDFUtil.FONTCOLORED);
 
 //----------тигр
 
@@ -972,7 +975,6 @@ public class PDFExporter {
 				    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
 				    	 if (obj != null) {
 					    	 section.add(Chunk.NEWLINE);
-					    	 Font boldred = new Font(baseFont, 12, Font.BOLD, PDFUtil.FONTCOLORED);
 				    		 section.add(new Paragraph("Пустая область рисунка — это ваша «мёртвая зона».", boldred));
 				    		 section.add(new Paragraph("Две краевые точки мёртвой зоны указывают на то, "
 					    		 	+ "чем вам необходимо овладеть в этом воплощении, "
@@ -1007,7 +1009,7 @@ public class PDFExporter {
 				    		 	+ "значит вы ощутите недостаток свойств и черт характера, "
 				    		 	+ "которые они олицетворяют:", font));
 				    		 String signs = obj.getString("signs");
-				    		 if (null == signs) {
+				    		 if (null == signs || signs.isEmpty()) {
 				    			 DialogUtil.alertWarning("Задайте пустые знаки тигра");
 				    			 return;
 				    		 } else {
@@ -1137,13 +1139,101 @@ public class PDFExporter {
 				    	 try {
 				    		 String direction = obj.getString("direction");
 				    		 if (null == direction) {
-				    			 DialogUtil.alertWarning("Задайте направление лука");
+				    			 DialogUtil.alertWarning("Задайте направление лука top|down|right|left");
 				    			 return;
 				    		 } else {
 				    			 kind.setDirection(direction);
 				    			 Rule rule = EventRules.ruleCardKind(kind);
 				    			 if (rule != null) {
 				    				 p = new Paragraph(PDFUtil.removeTags(rule.getText(), font));
+				    				 p.setSpacingBefore(10);
+				    				 section.add(p);
+				    			 }
+				    		 }
+				    	 } catch (JSONException ex) {
+				    		 ex.printStackTrace();
+				    	 }
+			    	 }
+			     }
+
+//----------чаша
+			} else if (4 == id) {
+			     if (jsonObject != null) {
+			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+			    	 if (obj != null) {
+				    	 int pid1 = obj.getInt("planet"); //левая планета чаши
+				    	 if (0 == pid1) {
+			    			 DialogUtil.alertWarning("Задайте левую планету чаши");
+			    			 return;
+				    	 }
+				    	 int pid2 = obj.getInt("planet2"); //правая планета чаши
+				    	 if (0 == pid2) {
+			    			 DialogUtil.alertWarning("Задайте правую планету чаши");
+			    			 return;
+				    	 }
+				    	 String pids = obj.getString("planet3"); //планета или соединение на дне чаши
+				    	 if (null == pids) {
+			    			 DialogUtil.alertWarning("Задайте планеты на дне чаши");
+			    			 return;
+				    	 }
+
+			    		 section.add(new Paragraph("Чего вам не хватает:", boldred));
+				    	 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				    	 list.setNumbered(true);
+				    	 ListItem li = new ListItem();
+	    				 li.add(new Chunk("Слабое место, требующее основательной проработки: ", font));
+				    	 String[] arr = pids.split(",");
+				    	 int i = 0;
+			    		 for (String pid : arr) {
+			    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
+			    			 if (planet != null) {
+			    				 String s = term
+			    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
+			    					: planet.getShortName() + " + " + planet.getHouse().getName();
+			    				 anchor = new Anchor(s, fonta);
+			    				 anchor.setReference("#" + planet.getAnchor());
+			    				 li.add(anchor);
+			    				 if (++i < arr.length)
+			    					 li.add(", ");
+			    			 }
+			    		 }
+	    				 list.add(li);
+
+				    	 Planet planet = event.getPlanets().get(Long.valueOf(pid2));
+	    				 li = new ListItem();
+	    				 String s = term
+	    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
+	    					: planet.getShortName() + " + " + planet.getHouse().getName();
+	    				 anchor = new Anchor(s, fonta);
+	    				 anchor.setReference("#" + planet.getAnchor());
+	    				 li.add(anchor);
+	    				 li.add(new Chunk(" — данный фактор связан с тем, к чему вы будете стремиться и что будете накапливать по мере своей жизни", font));
+	    				 list.add(li);
+
+				    	 planet = event.getPlanets().get(Long.valueOf(pid1));
+	    				 li = new ListItem();
+	    				 s = term
+	    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
+	    					: planet.getShortName() + " + " + planet.getHouse().getName();
+	    				 anchor = new Anchor(s, fonta);
+	    				 anchor.setReference("#" + planet.getAnchor());
+	    				 li.add(anchor);
+	    				 li.add(new Chunk(" — данный фактор поможет вам направить основной импульс в нужное русло", font));
+	    				 list.add(li);
+			    		 section.add(list);
+			    		 section.add(Chunk.NEWLINE);
+
+				    	 // down|top|left|right какое полушарие занимает чаша
+			    		 section.add(new Paragraph("Располжение чаши на космограмме:", boldred));
+				    	 try {
+				    		 String direction = obj.getString("direction");
+				    		 if (null == direction) {
+				    			 DialogUtil.alertWarning("Задайте полушарие чаши East|West|North|South");
+				    			 return;
+				    		 } else {
+				    			 Halfsphere halfsphere = (Halfsphere)new HalfsphereService().find(direction);
+				    			 if (halfsphere != null) {
+				    				 p = new Paragraph(PDFUtil.removeTags(halfsphere.getCup(), font));
 				    				 p.setSpacingBefore(10);
 				    				 section.add(p);
 				    			 }
@@ -1534,6 +1624,12 @@ public class PDFExporter {
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
 			String text = "";
+			if (map.containsKey("PROGRESSIVE") && map.get("PROGRESSIVE") > 10) {
+				text = "Количество испытаний велико, значит нужно научиться противодействовать соблазнам, "
+					+ "не быть слишком наивным и податливым для искушений, которые духовно ослабят вас и подтолкнут к ошибке";
+		        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, new BaseColor(51, 153, 153))));
+		        list.add(li);
+			}
 			if (map.containsKey("NEGATIVE_HIDDEN") && map.containsKey("NEGATIVE")) {
 				if (map.get("NEGATIVE_HIDDEN") > map.get("NEGATIVE")) {
 					text = "Переживаний у вас больше, чем стресса, значит нужно искать разрядку своим негативным эмоциям, "
@@ -1682,6 +1778,8 @@ public class PDFExporter {
 
 			//планеты по типам аспектов TODO группировать на данном этапе по категориям - передавать в график мап
 			section = PDFUtil.printSection(chapter, "Аспекты планет по сферам жизни", null);
+			section.add(new Paragraph("Диаграмма показывает, в какой сфере будет больше стресса, лёгкости, свободы, переживаний и испытаний:", font));
+
 		    com.itextpdf.text.Image image = PDFUtil.printMultiStackChart(writer, "", "Планеты", "Баллы", pmap, 500, 0, true);
 			section.add(image);
 
@@ -2037,30 +2135,31 @@ public class PDFExporter {
 
 						} else if (code.equals("triangle")) {
 							appendix.add(Chunk.NEWLINE);
-							com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-							Planet[] tplanets = {configuration.getVertex()[0], configuration.getLeftFoot()[0], configuration.getRightFoot()[0]};
-							House[] houses = new House[3];
-							Collection<Planet> planets = event.getPlanets().values();
-							for (int i = 0; i < 3; i++) {
-								 Planet tp = tplanets[i];
-								for (Planet planet : planets) {
-									if (tp.getCode().equals(planet.getCode())) {
-										houses[i] = planet.getHouse(); break;
+							if (event.isHousable()) {
+								com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+								Planet[] tplanets = {configuration.getVertex()[0], configuration.getLeftFoot()[0], configuration.getRightFoot()[0]};
+								House[] houses = new House[3];
+								Collection<Planet> planets = event.getPlanets().values();
+								for (int i = 0; i < 3; i++) {
+									 Planet tp = tplanets[i];
+									for (Planet planet : planets) {
+										if (tp.getCode().equals(planet.getCode())) {
+											houses[i] = planet.getHouse(); break;
+										}
 									}
 								}
-							}
-							String iteration = (confs.size() > 1) ? " №" + j : "";
-							appendix.add(new Paragraph("Благоприятные сферы треугольника" + iteration + ":", fonth5));
-							for (House h : houses) {
-								if (h != null) {
-									ListItem li = new ListItem();
-									li.add(new Chunk(h.getDescription(), font));
-									list.add(li);
+								String iteration = (confs.size() > 1) ? " №" + j : "";
+								appendix.add(new Paragraph("Благоприятные сферы треугольника" + iteration + ":", fonth5));
+								for (House h : houses) {
+									if (h != null) {
+										ListItem li = new ListItem();
+										li.add(new Chunk(h.getDescription(), font));
+										list.add(li);
+									}
 								}
-							}
-							appendix.add(list);
-							appendix.add(Chunk.NEWLINE);
-							
+								appendix.add(list);
+								appendix.add(Chunk.NEWLINE);
+							}							
 							if (configuration.getElement() != null) {
 								if (term)
 									appendix.add(new Paragraph(configuration.getElement().getDescription(), fonth5));
@@ -2246,14 +2345,9 @@ public class PDFExporter {
 			
 					for (Planet planet : planets) {
 						boolean negative = planet.isDamaged()
-								|| planet.isLilithed()
 								|| ((planet.getCode().equals("Lilith")
 										|| planet.getCode().equals("Kethu"))
 									&& !planet.isLord() && !planet.isPerfect());
-						if (planet.isKethued() && house.isKethued())
-							negative = true;
-						if (planet.isLilithed() && house.isLilithed())
-							negative = true;
 						String sign = negative ? "-" : "+";
 
 						Phrase ph = new Phrase("", fonth5);
@@ -2266,9 +2360,7 @@ public class PDFExporter {
 		    				ph.add(new Chunk(" " + planet.getName() + " в " + house.getDesignation() + " доме", fonth5));
 		    				ph.add(Chunk.NEWLINE);
 		    			} else {
-		    				boolean pnegative = (planet.isKethued() && house.isKethued())
-								|| (planet.isLilithed() && house.isLilithed());
-		    				ph.add(new Chunk(house.getName() + " " + sign + " " + (pnegative ? planet.getNegative() : planet.getPositive()), fonth5));
+		    				ph.add(new Chunk(house.getName() + " " + sign + " " + (negative ? planet.getNegative() : planet.getPositive()), fonth5));
 		    			}
 		            	Anchor anchorTarget = new Anchor(ph);
 		            	anchorTarget.setName(planet.getAnchor());
@@ -3764,8 +3856,13 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			table.addCell(cell);
 
-			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
+			String url = conf.getImageUrl();
+			if (null == url)
+				cell = new PdfPCell();
+			else {
+				com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(url);
+				cell = new PdfPCell(image);
+			}
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
