@@ -938,16 +938,14 @@ public class PDFExporter {
 						if (obj != null) {
 							String direction = obj.getString("direction");
 							if (null == direction) {
-								DialogUtil.alertWarning(6 == id
-									? "Задайте направление лука top|down|right|left"
-									: "Задайте направление чаши East|West|North|South");
+								DialogUtil.alertWarning("Задайте направление чаши East|West|North|South");
 								return;
 							} else {
-								if (direction.equals("down") || direction.equals("North"))
+								if (direction.equals("North"))
 									angle = 180;
-								else if (direction.equals("right") || direction.equals("West"))
+								else if (direction.equals("West"))
 									angle = 270;
-								else if (direction.equals("left") || direction.equals("East"))
+								else if (direction.equals("East"))
 									angle = 90;
 							}
 						}
@@ -1135,17 +1133,16 @@ public class PDFExporter {
 				    		 section.add(list);
 				    	 }
 
-				    	 // down|top|left|right куда направлена стрела лука
+				    	 //куда направлена стрела лука
 				    	 try {
 				    		 String direction = obj.getString("direction");
 				    		 if (null == direction) {
-				    			 DialogUtil.alertWarning("Задайте направление лука top|down|right|left");
+				    			 DialogUtil.alertWarning("Задайте направление чаши East|West|North|South");
 				    			 return;
 				    		 } else {
-				    			 kind.setDirection(direction);
-				    			 Rule rule = EventRules.ruleCardKind(kind);
-				    			 if (rule != null) {
-				    				 p = new Paragraph(PDFUtil.removeTags(rule.getText(), font));
+				    			 Halfsphere halfsphere = (Halfsphere)new HalfsphereService().find(direction);
+				    			 if (halfsphere != null) {
+				    				 p = new Paragraph(PDFUtil.removeTags(halfsphere.getBow(), font));
 				    				 p.setSpacingBefore(10);
 				    				 section.add(p);
 				    			 }
@@ -2047,11 +2044,12 @@ public class PDFExporter {
 	    				section.add(new Paragraph(conf.getDescription(), PDFUtil.getAnnotationFont(true)));
 	    				section.add(Chunk.NEWLINE);
 					}
-
+					
 					//изображения
 					Paragraph shapes = new Paragraph();
 					for (AspectConfiguration configuration : confs) {
-						if (configuration.getShape().equals("triangle")) {
+						String shape = configuration.getShape();
+						if (shape.equals("triangle")) {
 							if (code.equals("triangle")) {
 								Planet vertex = configuration.getVertex()[0];
 								vertex.setSign(event.getPlanets().get(vertex.getId()).getSign());
@@ -2060,15 +2058,15 @@ public class PDFExporter {
 									configuration.setElement(element);
 							}
 							shapes.add(printTriangle(configuration));
-						} else if (configuration.getShape().equals("rhombus"))
+						} else if (shape.equals("rhombus"))
 							shapes.add(printRhombus(configuration));
-						else if (configuration.getShape().equals("tetragon"))
+						else if (shape.equals("tetragon"))
 							shapes.add(printTetragon(configuration));
-						else if (configuration.getShape().equals("pentagon"))
+						else if (shape.equals("pentagon"))
 							shapes.add(printPentagon(configuration));
-						else if (configuration.getShape().equals("hexagon"))
+						else if (shape.equals("hexagon"))
 							shapes.add(printHexagon(configuration));
-						else if (configuration.getShape().equals("octagon"))
+						else if (shape.equals("octagon"))
 							shapes.add(printOctagon(configuration));
 						else if (code.equals("stellium")) {
 							com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(configuration.getImageUrl());
@@ -2079,9 +2077,9 @@ public class PDFExporter {
 								float x = (doc.right() - doc.left()) / 2 - (sidex / 2);
 								image.setIndentationLeft(x);
 
-								Paragraph shape = new Paragraph();
-								shape.add(image);
-								shapes.add(shape);
+								Paragraph par = new Paragraph();
+								par.add(image);
+								shapes.add(par);
 							}
 						}
 						if (confs.size() > 1)
@@ -2090,7 +2088,12 @@ public class PDFExporter {
 					section.add(shapes);
 					section.add(Chunk.NEWLINE);
 
-			    	//текст
+			    	//индивидуальное описание
+					if (!code.equals("stellium") && !code.equals("necklace"))
+						for (AspectConfiguration configuration : confs)
+							section.add(new Paragraph(configuration.getDescription(), font));
+
+					//описание из справочника
 			    	String text = conf.getText();
 					if (code.equals("stellium")) {
 						if (sign != null) {
