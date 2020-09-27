@@ -2090,9 +2090,13 @@ public class PDFExporter {
 
 			    	//индивидуальное описание
 					if (!code.equals("stellium") && !code.equals("necklace"))
-						for (AspectConfiguration configuration : confs)
-							section.add(new Paragraph(configuration.getDescription(), font));
-
+						for (AspectConfiguration configuration : confs) {
+							String descr = configuration.getDescription();
+							if (descr != null) {
+								section.add(new Paragraph(descr, font));
+								section.add(Chunk.NEWLINE);
+							}
+						}
 					//описание из справочника
 			    	String text = conf.getText();
 					if (code.equals("stellium")) {
