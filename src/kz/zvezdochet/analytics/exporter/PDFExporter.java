@@ -1573,8 +1573,7 @@ public class PDFExporter {
 				List<Bar> pitems = new ArrayList<Bar>();
 		    	String name = term ? mtype.getName() : mtype.getKeyword();
 		    	int value = 0;
-		    	for (Model model : planets) {
-		    		Planet planet = (Planet)model;
+		    	for (Planet planet : planets) {
 					int val = planet.getAspectCountMap().get(type.getCode());
 					value += val;
 
@@ -1773,7 +1772,6 @@ public class PDFExporter {
 			section.add(list);
 			chapter.add(Chunk.NEXTPAGE);
 
-			//планеты по типам аспектов TODO группировать на данном этапе по категориям - передавать в график мап
 			section = PDFUtil.printSection(chapter, "Аспекты планет по сферам жизни", null);
 			section.add(new Paragraph("Диаграмма показывает, в какой сфере будет больше стресса, лёгкости, свободы, переживаний и испытаний:", font));
 
