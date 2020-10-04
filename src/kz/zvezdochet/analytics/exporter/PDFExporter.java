@@ -937,7 +937,7 @@ public class PDFExporter {
 						JSONObject obj = jsonObject.getJSONObject("cardkind");
 						if (obj != null) {
 							String direction = obj.getString("direction");
-							if (null == direction) {
+							if (null == direction || direction.isEmpty()) {
 								DialogUtil.alertWarning("Задайте направление чаши East|West|North|South");
 								return;
 							} else {
@@ -1110,13 +1110,15 @@ public class PDFExporter {
 			     if (jsonObject != null) {
 			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
 			    	 if (obj != null) {
-				    	 String pids = obj.getString("planet"); //планеты на острие стрелы
-				    	 if (null == pids) {
-			    			 DialogUtil.alertWarning("Задайте планеты на острие лука (в виде текста)");
+				    	 Object pids = obj.get("planet"); //планеты на острие стрелы
+				    	 if (null == pids
+				    			 || pids.toString().isEmpty()
+				    			 || pids.toString().equals("0")) {
+			    			 DialogUtil.alertWarning("Задайте планеты на острие лука");
 			    			 return;
 				    	 } else {
 				    		 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-				    		 String[] arr = pids.split(",");
+				    		 String[] arr = pids.toString().split(",");
 				    		 for (String pid : arr) {
 				    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
 				    			 if (planet != null) {
@@ -1136,7 +1138,7 @@ public class PDFExporter {
 				    	 //куда направлена стрела лука
 				    	 try {
 				    		 String direction = obj.getString("direction");
-				    		 if (null == direction) {
+				    		 if (null == direction || direction.isEmpty()) {
 				    			 DialogUtil.alertWarning("Задайте направление чаши East|West|North|South");
 				    			 return;
 				    		 } else {
@@ -1224,7 +1226,7 @@ public class PDFExporter {
 			    		 section.add(new Paragraph("Располжение чаши на космограмме:", boldred));
 				    	 try {
 				    		 String direction = obj.getString("direction");
-				    		 if (null == direction) {
+				    		 if (null == direction || direction.isEmpty()) {
 				    			 DialogUtil.alertWarning("Задайте полушарие чаши East|West|North|South");
 				    			 return;
 				    		 } else {
