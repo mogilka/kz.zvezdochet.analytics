@@ -1123,12 +1123,15 @@ public class PDFExporter {
 				    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
 				    			 if (planet != null) {
 				    				 ListItem li = new ListItem();
+				    				 boolean negative = planet.isNegative();
+				    				 String sign = negative ? " - " : " + ";
 				    				 String s = term
 				    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
-				    					: planet.getShortName() + " + " + planet.getHouse().getName();
+				    					: planet.getShortName() + sign + planet.getHouse().getName();
 				    				 anchor = new Anchor(s, fonta);
 				    				 anchor.setReference("#" + planet.getAnchor());
 				    				 li.add(anchor);
+				    				 li.add(new Chunk(negative ? " (ваша негативная стрела)" : " (ваша позитивная стрела)", font));
 				    				 list.add(li);
 				    			 }
 				    		 }
@@ -1722,50 +1725,43 @@ public class PDFExporter {
 				}
 				if (val >= max) {
 					BaseColor color = BaseColor.BLACK;
+					Font lifont = new Font(baseFont, 12, Font.NORMAL, color);
+					Phrase phrase = new Phrase();
 					if (code.equals("KARMIC")) {
 						color = BaseColor.BLUE;
-						text = "Кармические аспекты зашкаливают, значит многое неизбежное, что происходит в вашей жизни, обусловлено ошибками прошлых воплощений. Это отражено в синих фигурах в разделе «Фигуры гороскопа». Чтобы возврат к прошлому не мешал продвижению вперёд, старайтесь вовремя завершать начатое, не копить проблемы, чтобы повторно не тратить на них своё драгоценное время";
+						lifont = new Font(baseFont, 12, Font.NORMAL, color);
+						phrase.add(new Chunk("Кармические аспекты зашкаливают, значит многое неизбежное, что происходит в вашей жизни, обусловлено ошибками прошлых воплощений. Это отражено в синих фигурах в разделе ", lifont));
+						Anchor anchor = new Anchor("Фигуры гороскопа", fonta);
+						anchor.setReference("#aspectconfiguration");
+						phrase.add(anchor);
+						phrase.add(new Chunk(". Чтобы возврат к прошлому не мешал продвижению вперёд, старайтесь вовремя завершать начатое, не копить проблемы, чтобы повторно не тратить на них своё драгоценное время", lifont));
 					} else if (code.equals("CREATIVE")) {
 						color = new BaseColor(0, 102, 51);
+						lifont = new Font(baseFont, 12, Font.NORMAL, color);
 						text = "Творческие аспекты зашкаливают, так что у вас в распоряжении достаточно свободы и возможности преображать мир! Это очень редкая комбинация, которая говорит о том, что вы не ограничены в своих проявлениях, сможете жить, действовать и принимать решения независимо от других";
+						phrase = new Phrase(text, lifont);
 					} else if (code.equals("NEGATIVE")) {
 						text = "Уровень стресса зашкаливает, значит отток энергии будет довольно сильным. Развивайте силу духа, научитесь управлять конфликтами и рисками и преуменьшать их";
+						phrase = new Phrase(text, lifont);
 					} else if (code.equals("POSITIVE")) {
 						color = BaseColor.RED;
+						lifont = new Font(baseFont, 12, Font.NORMAL, color);
 						text = "Уровень позитива зашкаливает, значит приток энергии будет довольно сильным. Вы счастливчик!";
+						phrase = new Phrase(text, lifont);
 					} else if (code.equals("POSITIVE_HIDDEN")) {
 						color = new BaseColor(153, 102, 102);
+						lifont = new Font(baseFont, 12, Font.NORMAL, color);
 						text = "Уровень скрытого позитива зашкаливает, значит внутренняя мотивация очень сильна. Внутри себя вы будете полны энергии, несмотря на внешние обстоятельства и проявления";
+						phrase = new Phrase(text, lifont);
 					} else if (code.equals("NEGATIVE_HIDDEN")) {
 						color = BaseColor.GRAY;
+						lifont = new Font(baseFont, 12, Font.NORMAL, color);
 						text = "Уровень переживаний зашкаливает, значит накоплено много скрытого негатива. Старайтесь не растрачивать энергию на неприятные мысли, не зацикливайтесь на внутренних проблемах, а вытаскивайте их на поверхность и решайте";
+						phrase = new Phrase(text, lifont);
 					}
 					li = new ListItem();
-			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, color)));
+			        li.add(phrase);
 			        list.add(li);
-				} else if (0 == val) {
-					BaseColor color = BaseColor.BLACK;
-					if (code.equals("KARMIC")) {
-						color = BaseColor.BLUE;
-						text = "Кармические аспекты отсутствуют";
-					} else if (code.equals("CREATIVE")) {
-						color = new BaseColor(0, 102, 51);
-						text = "Творческие аспекты отсутствуют";
-					} else if (code.equals("NEGATIVE")) {
-						text = "Уровень стресса отсутствуют";
-					} else if (code.equals("POSITIVE")) {
-						color = BaseColor.RED;
-						text = "Уровень позитива отсутствуют";
-					} else if (code.equals("POSITIVE_HIDDEN")) {
-						color = new BaseColor(153, 102, 102);
-						text = "Уровень скрытого позитива отсутствуют";
-					} else if (code.equals("NEGATIVE_HIDDEN")) {
-						color = BaseColor.GRAY;
-						text = "Уровень переживаний отсутствуют";
-					}
-					li = new ListItem();
-			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, color)));
-			        list.add(li);					
 				}
 			}
 			li = new ListItem();
@@ -1861,10 +1857,15 @@ public class PDFExporter {
 					if (planet1.getNumber() > planet2.getNumber())
 						continue;
 
-					if (aspect.getAspect().getCode().equals("OPPOSITION")
-							&& (planet2.getCode().equals("Kethu")
-								|| planet2.getCode().equals("Rakhu")))
-						continue;
+					if (aspect.getAspect().getCode().equals("OPPOSITION")) {
+						if (planet1.isKethued()
+								&& planet2.getCode().equals("Rakhu"))
+							continue;
+
+						if (planet1.isRakhued()
+								&& planet2.getCode().equals("Kethu"))
+							continue;
+					}
 
 					boolean positive = true;
 					List<Model> dicts = service.finds(aspect);
@@ -2022,7 +2023,7 @@ public class PDFExporter {
 		    }
 
 			if (map.size() > 0) {
-				Section section = PDFUtil.printSection(chapter, "Фигуры гороскопа", null);
+				Section section = PDFUtil.printSection(chapter, "Фигуры гороскопа", "aspectconfiguration");
 			    Paragraph p = new Paragraph("Рисунок вашего гороскопа состоит из геометрических фигур, "
 			    	+ "которые отражают взаимосвязи планет между собой. У всех людей они разные. "
 			    	+ "Каждая фигура обобщает ваши сильные и слабые стороны, показывает главные источники роста и напряжения", font);
@@ -4307,6 +4308,9 @@ public class PDFExporter {
 			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				if (!event.isHousable() && planet.getCode().equals("Moon"))
+					continue;
+
+				if (planet.isFictitious())
 					continue;
 
 				if (planet.isRetrograde())
