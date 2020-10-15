@@ -53,4 +53,17 @@ public class PlanetText extends TextGenderModel {
 	public void setTextDamaged(String text_damaged) {
 		this.text_damaged = text_damaged;
 	}
+
+    /**
+     * URL публикации
+     */
+    private String url;
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
 }

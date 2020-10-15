@@ -76,6 +76,7 @@ public class PlanetTextService extends GenderTextModelService {
 		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("planetid")));
 		dict.setType(rs.getString("type"));
 		dict.setTextDamaged(rs.getString("text_damaged"));
+		dict.setUrl(rs.getString("url"));
 		return dict;
 	}
 
