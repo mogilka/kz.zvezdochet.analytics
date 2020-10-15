@@ -213,6 +213,11 @@ public class PDFExporter {
 			PDFUtil.printHeader(p, "Натальная карта", null);
 			chapter.add(p);
 
+			if (term) {
+				p = new Paragraph("с профессиональными терминами", font);
+		        p.setAlignment(Element.ALIGN_CENTER);
+				chapter.add(p);
+			}
 			String text = event.getCallname() + " – ";
 			text += DateUtil.fulldtf.format(event.getBirth());
 			p = new Paragraph(text, font);
@@ -957,7 +962,8 @@ public class PDFExporter {
 			}
 
 			if (term) {
-				p = new Paragraph(kind.getDescription(), PDFUtil.getAnnotationFont(true));
+				String text = kind.getDegree() + ". " + kind.getDescription();
+				p = new Paragraph(text, PDFUtil.getAnnotationFont(true));
 				p.setSpacingAfter(10);
 				section.add(p);
 			}
@@ -2041,7 +2047,16 @@ public class PDFExporter {
 			    	conf = (AspectConfiguration)service.find(code);
 					section.addSection(new Paragraph(conf.getName(), fonth5));
 					if (term) {
-	    				section.add(new Paragraph("Конфигурация аспектов: " + conf.getDegree(), PDFUtil.getAnnotationFont(true)));
+						String text = "";
+						if (conf.getDegree() != null)
+							text += conf.getDegree();
+						if (conf.getElementid() > 0) {
+							kz.zvezdochet.bean.Element element = (kz.zvezdochet.bean.Element)new ElementService().find(conf.getElementid());
+							if (element != null)
+								text += " Стихия: " + element.getName();
+						}
+						if (!text.isEmpty())
+							section.add(new Paragraph("Конфигурация аспектов: " + text, PDFUtil.getAnnotationFont(true)));
 	    				section.add(new Paragraph(conf.getDescription(), PDFUtil.getAnnotationFont(true)));
 	    				section.add(Chunk.NEWLINE);
 					}
@@ -2412,7 +2427,7 @@ public class PDFExporter {
 					if (null == section)
 						section = PDFUtil.printSection(chapter, house.getName(), null);
 					if (term)
-						section.addSection(new Paragraph(house.getDesignation() + " дом в созвездии " + sign.getName(), fonth5));
+						section.addSection(new Paragraph("Куспид " + house.getDesignation() + " дома в созвездии " + sign.getName(), fonth5));
 					else
 						section.addSection(new Paragraph(house.getName() + " + " + sign.getShortname(), fonth5));
 
@@ -4319,10 +4334,10 @@ public class PDFExporter {
 			if (retro.isEmpty())
 				return;
 
-			Section section = PDFUtil.printSection(chapter, "Нестандартные качества", null);
+			Section section = PDFUtil.printSection(chapter, term ? "Ретроградные планеты" : "Нестандартные качества", null);
 			PlanetTextService service = new PlanetTextService();
 			for (Planet planet : retro) {
-				section.addSection(new Paragraph((term ? planet.getName() + "-ретроград" : planet.getShortName()), fonth5));
+				section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()), fonth5));
 				PlanetText planetText = (PlanetText)service.findByPlanet(planet.getId(), "retro");
 				if (planetText != null && planetText.getText() != null) {
 					section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
