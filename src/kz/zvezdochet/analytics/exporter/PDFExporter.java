@@ -1252,6 +1252,43 @@ public class PDFExporter {
 			    	 }
 			     }
 
+//----------табуретка
+			} else if (14 == id) {
+			     if (jsonObject != null) {
+			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+			    	 if (obj != null) {
+				    	 int pid1 = obj.getInt("planet"); //левая планета
+				    	 if (0 == pid1) {
+			    			 DialogUtil.alertWarning("Задайте левую ножку табуретки");
+			    			 return;
+				    	 }
+				    	 int pid2 = obj.getInt("planet2"); //правая планета
+				    	 if (0 == pid2) {
+			    			 DialogUtil.alertWarning("Задайте правую правую ножку табуретки");
+			    			 return;
+				    	 }
+
+			    		 section.add(new Paragraph("Ваша опора в жизни:", bold));
+				    	 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				    	 int[] arr = new int[] {pid1, pid2};
+			    		 for (int pid : arr) {
+					    	 ListItem li = new ListItem();
+			    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
+			    			 if (planet != null) {
+			    				 String s = term
+			    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
+			    					: planet.getShortName() + " + " + planet.getHouse().getName();
+			    				 anchor = new Anchor(s, fonta);
+			    				 anchor.setReference("#" + planet.getAnchor());
+			    				 li.add(anchor);
+			    			 }
+		    				 list.add(li);
+			    		 }
+			    		 section.add(list);
+			    		 section.add(Chunk.NEWLINE);
+			    	 }
+			     }
+
 //---------сгущение
 
 			} else if (15 == id) {
@@ -3417,8 +3454,10 @@ public class PDFExporter {
 			PdfPCell cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			if (headOverHeels) {
-				for (Planet planet : conf.getLeftFoot())
-					text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getLeftFoot()) {
+					text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_RIGHT);
 				cell.addElement(p);
@@ -3429,8 +3468,10 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			if (!headOverHeels) {
 				text = "";
-				for (Planet planet : conf.getVertex())
-					text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getVertex()) {
+					text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_CENTER);
 				cell.addElement(p);
@@ -3441,8 +3482,10 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			if (headOverHeels) {
 				text = "";
-				for (Planet planet : conf.getRightFoot())
-					text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getRightFoot()) {
+					text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				cell.addElement(p);
 			}
@@ -3477,8 +3520,10 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			if (!headOverHeels) {
 				text = "";
-				for (Planet planet : conf.getLeftFoot())
-					text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getLeftFoot()) {
+					text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_RIGHT);
 				cell = new PdfPCell();
@@ -3491,8 +3536,10 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			if (headOverHeels) {
 				text = "";
-				for (Planet planet : conf.getVertex())
-					text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getVertex()) {
+					text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_CENTER);
 				cell.addElement(p);
@@ -3503,8 +3550,10 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			text = "";
 			if (!headOverHeels) {
-				for (Planet planet : conf.getRightFoot())
-					text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getRightFoot()) {
+					text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				cell.addElement(p);
 			}
@@ -3540,8 +3589,10 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			String text = "";
-			for (Planet planet : conf.getVertex())
-				text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getVertex()) {
+				text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			Paragraph p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_CENTER);
 			cell = new PdfPCell();
@@ -3555,8 +3606,10 @@ public class PDFExporter {
 
 			//основание
 			text = "";
-			for (Planet planet : conf.getLeftFoot())
-				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getLeftFoot()) {
+				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_RIGHT);
 			cell = new PdfPCell();
@@ -3572,8 +3625,10 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			text = "";
-			for (Planet planet : conf.getRightFoot())
-				text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getRightFoot()) {
+				text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			p = new Paragraph(text, font);
 			cell = new PdfPCell();
 			cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
@@ -3587,8 +3642,10 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			text = "";
-			for (Planet planet : conf.getBase())
-				text += term ? planet.getName() : conf.isBasePositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getBase()) {
+				text += term ? planet.getName() : conf.isBasePositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_CENTER);
 			cell = new PdfPCell();
@@ -3685,8 +3742,10 @@ public class PDFExporter {
 
 	        //верх
 			String text = "";
-			for (Planet planet : conf.getLeftHand())
-				text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getLeftHand()) {
+				text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			Paragraph p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_RIGHT);
 			PdfPCell cell = new PdfPCell();
@@ -3699,8 +3758,10 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			text = "";
-			for (Planet planet : conf.getRightHand())
-				text += term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getRightHand()) {
+				text += term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			p = new Paragraph(text, font);
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
@@ -3729,8 +3790,10 @@ public class PDFExporter {
 
 			//низ
 			text = "";
-			for (Planet planet : conf.getLeftFoot())
-				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getLeftFoot()) {
+				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_RIGHT);
 			cell = new PdfPCell();
@@ -3743,8 +3806,10 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			text = "";
-			for (Planet planet : conf.getRightFoot())
-				text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getRightFoot()) {
+				text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			p = new Paragraph(text, font);
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
@@ -3785,8 +3850,10 @@ public class PDFExporter {
 			Paragraph p = null;
 			cell = new PdfPCell();
 			if (!headOverHeels) {
-				for (Planet planet : conf.getVertex())
-					text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getVertex()) {
+					text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_CENTER);
 				cell.addElement(p);
@@ -3802,8 +3869,10 @@ public class PDFExporter {
 			text = "";
 			cell = new PdfPCell();
 			if (conf.getLeftHand() != null) {
-				for (Planet planet : conf.getLeftHand())
-					text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getLeftHand()) {
+					text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_RIGHT);
 				cell.addElement(p);
@@ -3825,8 +3894,10 @@ public class PDFExporter {
 			text = "";
 			cell = new PdfPCell();
 			if (conf.getRightHand() != null) {
-				for (Planet planet : conf.getRightHand())
-					text += term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getRightHand()) {
+					text += term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				p = new Paragraph(text, font);
 				cell.addElement(p);
 			}
@@ -3837,8 +3908,10 @@ public class PDFExporter {
 			text = "";
 			cell = new PdfPCell();
 			if (conf.getLeftFoot() != null) {
-				for (Planet planet : conf.getLeftFoot())
-					text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getLeftFoot()) {
+					text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_RIGHT);
 				cell.addElement(p);
@@ -3850,8 +3923,10 @@ public class PDFExporter {
 			cell = new PdfPCell();
 			if (headOverHeels) {
 				if (conf.getBase() != null) {
-					for (Planet planet : conf.getBase())
-						text += term ? planet.getName() : conf.isBasePositive() ? planet.getPositive() : planet.getNegative() + "\n";
+					for (Planet planet : conf.getBase()) {
+						text += term ? planet.getName() : conf.isBasePositive() ? planet.getPositive() : planet.getNegative();
+						text += "\n";
+					}
 					p = new Paragraph(text, font);
 					p.setAlignment(Element.ALIGN_CENTER);
 					cell.addElement(p);
@@ -3863,8 +3938,10 @@ public class PDFExporter {
 			text = "";
 			cell = new PdfPCell();
 			if (conf.getRightFoot() != null) {
-				for (Planet planet : conf.getRightFoot())
-					text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getRightFoot()) {
+					text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				p = new Paragraph(text, font);
 				cell.addElement(p);
 			}
@@ -3897,9 +3974,10 @@ public class PDFExporter {
 
 	        //верх
 	        String text = "";
-			for (Planet planet : conf.getLeftHorn())
-				text += term ? planet.getName() : conf.isLeftHornPositive() ? planet.getPositive() : planet.getNegative() + "\n";
-
+			for (Planet planet : conf.getLeftHorn()) {
+				text += term ? planet.getName() : conf.isLeftHornPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			Paragraph p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_RIGHT);
 			PdfPCell cell = new PdfPCell();
@@ -3913,10 +3991,8 @@ public class PDFExporter {
 
 			text = "";
 			for (Planet planet : conf.getRightHorn()) {
-				String s = conf.isRightHornPositive() ? planet.getPositive() : planet.getNegative();
-				if (term)
-					s += " (" + planet.getName() + ")";
-				text += s + "\n";
+				text += term ? planet.getName() : conf.isRightHornPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
 			}
 			p = new Paragraph(text, font);
 			cell = new PdfPCell();
@@ -3927,10 +4003,8 @@ public class PDFExporter {
 	        //середина
 			text = "";
 			for (Planet planet : conf.getLeftHand()) {
-				String s = conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative();
-				if (term)
-					s += " (" + planet.getName() + ")";
-				text += s + "\n";
+				text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
 			}
 			p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_RIGHT);
@@ -3949,10 +4023,8 @@ public class PDFExporter {
 
 			text = "";
 			for (Planet planet : conf.getRightHand()) {
-				String s = conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative();
-				if (term)
-					s += " (" + planet.getName() + ")";
-				text += s + "\n";
+				text += term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
 			}
 			p = new Paragraph(text, font);
 			cell = new PdfPCell();
@@ -3964,10 +4036,8 @@ public class PDFExporter {
 			//низ
 			text = "";
 			for (Planet planet : conf.getLeftFoot()) {
-				String s = conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
-				if (term)
-					s += " (" + planet.getName() + ")";
-				text += s + "\n";
+				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
 			}
 			p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_RIGHT);
@@ -3982,10 +4052,8 @@ public class PDFExporter {
 
 			text = "";
 			for (Planet planet : conf.getRightFoot()) {
-				String s = conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
-				if (term)
-					s += " (" + planet.getName() + ")";
-				text += s + "\n";
+				text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
 			}
 			p = new Paragraph(text, font);
 			cell = new PdfPCell();
@@ -4029,8 +4097,10 @@ public class PDFExporter {
 	        String text = "";
 			cell = new PdfPCell();
 	        if (conf.getVertex() != null) {
-				for (Planet planet : conf.getVertex())
-					text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getVertex()) {
+					text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_CENTER);
 				cell.addElement(p);
@@ -4054,8 +4124,10 @@ public class PDFExporter {
 			text = "";
 			cell = new PdfPCell();
 			if (conf.getLeftHorn() != null) {
-				for (Planet planet : conf.getLeftHorn())
-					text += term ? planet.getName() : conf.isLeftHornPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getLeftHorn()) {
+					text += term ? planet.getName() : conf.isLeftHornPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_RIGHT);
 				cell.addElement(p);
@@ -4070,8 +4142,10 @@ public class PDFExporter {
 			text = "";
 			cell = new PdfPCell();
 			if (conf.getRightHorn() != null) {
-				for (Planet planet : conf.getRightHorn())
-					text += term ? planet.getName() : conf.isRightHornPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getRightHorn()) {
+					text += term ? planet.getName() : conf.isRightHornPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				cell.addElement(p);
 			}
@@ -4087,8 +4161,10 @@ public class PDFExporter {
 			cell = new PdfPCell();
 			float fontSize = font.getSize();
 			if (conf.getLeftHand() != null) {
-				for (Planet planet : conf.getLeftHand())
-					text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getLeftHand()) {
+					text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				p.setAlignment(Element.ALIGN_RIGHT);
 				cell.addElement(p);
@@ -4114,8 +4190,10 @@ public class PDFExporter {
 			text = "";
 			cell = new PdfPCell();
 			if (conf.getRightHand() != null) {
-				for (Planet planet : conf.getRightHand())
-					text += term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+				for (Planet planet : conf.getRightHand()) {
+					text += term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative();
+					text += "\n";
+				}
 				Paragraph p = new Paragraph(text, font);
 				cell.addElement(p);
 				PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
@@ -4129,8 +4207,10 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			text = "";
-			for (Planet planet : conf.getLeftFoot())
-				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getLeftFoot()) {
+				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			Paragraph p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_RIGHT);
 			cell = new PdfPCell();
@@ -4143,8 +4223,10 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			text = "";
-			for (Planet planet : conf.getRightFoot())
-				text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getRightFoot()) {
+				text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			p = new Paragraph(text, font);
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
@@ -4165,8 +4247,10 @@ public class PDFExporter {
 			table.addCell(cell);
 
 	        text = "";
-			for (Planet planet : conf.getBase())
-				text += term ? planet.getName() : conf.isBasePositive() ? planet.getPositive() : planet.getNegative() + "\n";
+			for (Planet planet : conf.getBase()) {
+				text += term ? planet.getName() : conf.isBasePositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
 			p = new Paragraph(text, font);
 			p.setAlignment(Element.ALIGN_CENTER);
 			cell = new PdfPCell();
