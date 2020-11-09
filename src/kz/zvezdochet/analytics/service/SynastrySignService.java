@@ -128,23 +128,21 @@ public class SynastrySignService extends ModelService {
 	 * @param planet планета
 	 * @param sign знак первого партнёра
 	 * @param sign2 знак второго партнёра
+	 * @param reverse true - первым идёт знак партнёра
 	 * @return толкование
 	 * @throws DataAccessException
 	 */
-	public SynastryText find(Planet planet, Sign sign, Sign sign2) throws DataAccessException {
+	public SynastryText find(Planet planet, Sign sign, Sign sign2, boolean reverse) throws DataAccessException {
         PreparedStatement ps = null;
         ResultSet rs = null;
 		try {
 			String sql = "select * from " + tableName +
 				" where planetid = ? " +
-					"and ((sign1id = ? and sign2id = ?)" +
-						"or (sign2id = ? and sign1id = ?))";
+					"and sign1id = ? and sign2id = ?";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 			ps.setLong(1, planet.getId());
-			ps.setLong(2, sign.getId());
-			ps.setLong(3, sign2.getId());
-			ps.setLong(4, sign.getId());
-			ps.setLong(5, sign2.getId());
+			ps.setLong(2, reverse ? sign2.getId() : sign.getId());
+			ps.setLong(3, reverse ? sign.getId() : sign2.getId());
 			rs = ps.executeQuery();
 			if (rs.next()) 
 				return init(rs, null);
