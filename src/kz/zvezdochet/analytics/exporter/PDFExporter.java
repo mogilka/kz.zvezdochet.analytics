@@ -1969,7 +1969,7 @@ public class PDFExporter {
 					int markPoints = aspect.getMarkPoints();
 					if (aspectType.equals("POSITIVE")) {
 						if (markPoints < 0)
-							markFont = PDFUtil.getWarningFont();
+							markFont = PDFUtil.getSuccessFont();
 						else if (markPoints > 0)
 							markFont = PDFUtil.getDangerFont();
 					} else if (aspectType.equals("NEGATIVE")) {
