@@ -3,7 +3,7 @@ package kz.zvezdochet.analytics.bean;
 import java.util.Date;
 
 import kz.zvezdochet.analytics.service.DegreeService;
-import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.bean.TextGenderModel;
 import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.util.DateUtil;
 
@@ -11,7 +11,7 @@ import kz.zvezdochet.core.util.DateUtil;
  * Нумерологическое толкование
  * @author Natalie Didenko
  */
-public class Numerology extends Model {
+public class Numerology extends TextGenderModel {
 	private static final long serialVersionUID = -3797987279024365454L;
 
 	private int number;
