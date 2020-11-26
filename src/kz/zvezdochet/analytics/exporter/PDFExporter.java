@@ -970,6 +970,8 @@ public class PDFExporter {
 			section.add(new Paragraph(PDFUtil.html2pdf(kind.getText(), font)));
 			Font bold = new Font(baseFont, 12, Font.BOLD);
 			Font boldred = new Font(baseFont, 12, Font.BOLD, PDFUtil.FONTCOLORED);
+			Font red = new Font(baseFont, 12, Font.NORMAL, PDFUtil.FONTCOLORED);
+			Font boldgreen = new Font(baseFont, 12, Font.BOLD, PDFUtil.FONTCOLORGREEN);
 
 //----------тигр
 
@@ -1339,6 +1341,98 @@ public class PDFExporter {
 				    	 }
 				     }
 				}
+
+//----------качели
+
+			} else if (7 == id) {
+			     if (jsonObject != null) {
+			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+			    	 if (obj != null) {
+			    		 if (event.isHousable()) {
+				    		 section.add(new Paragraph("Главные противоположности вашей жизни:", boldred));
+			    			 String hids = obj.getString("houses");
+			    			 if (null == hids) {
+			    				 DialogUtil.alertWarning("Задайте дома, из которых исходят оппозиции");
+			    				 return;
+			    			 } else {
+			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+			    				 String[] arr = hids.split(",");
+			    				 for (String hid : arr) {
+		    						 ListItem li = new ListItem();
+			    					 House house = event.getHouses().get(Long.valueOf(hid));
+			    					 if (house != null) {
+			    						 String s = term ? house.getDesignation() + " дом: " : "";
+			    						 s += house.getName();
+			    						 anchor = new Anchor(s, fonta);
+			    						 anchor.setReference("#" + house.getCode());
+			    						 li.add(anchor);
+			    						 li.add(" – ");
+			    					 }
+			    					 long hid2 = house.getOppositeId();
+			    					 house = event.getHouses().get(hid2);
+			    					 if (house != null) {
+			    						 String s = term ? house.getDesignation() + " дом: " : "";
+			    						 s += house.getName();
+			    						 anchor = new Anchor(s, fonta);
+			    						 anchor.setReference("#" + house.getCode());
+			    						 li.add(anchor);
+			    					 }
+			    					 list.add(li);
+			    				 }
+			    				 section.add(list);
+			    			 }
+
+			    			 section.add(Chunk.NEWLINE);
+				    		 section.add(new Paragraph("Что изначально будет вне ваших интересов:", bold));
+			    			 hids = obj.getString("houses2");
+			    			 if (null == hids) {
+			    				 DialogUtil.alertWarning("Задайте вершины пустых домов");
+			    				 return;
+			    			 } else {
+			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+			    				 list.setNumbered(true);
+			    				 String[] arr = hids.split(",");
+			    				 for (String hid : arr) {
+			    					 House house = event.getHouses().get(Long.valueOf(hid));
+			    					 if (house != null) {
+			    						 ListItem li = new ListItem();
+			    						 String s = term ? house.getDesignation() + " дом: " : "";
+			    						 s += house.getGeneral();
+			    						 li.add(new Chunk(s, font));
+				    					 list.add(li);
+			    					 }
+			    				 }
+			    				 section.add(list);
+					    		 section.add(new Paragraph("Если в этих сферах имеются надуманные проблемы, то они тоже не дадут вам расслабиться.", red));
+			    			 }
+			    		 }
+			    		 
+		    			 section.add(Chunk.NEWLINE);
+			    		 section.add(new Paragraph("Факторы, которые смягчат ситуацию:", boldgreen));
+			    		 String pids = obj.get("planet").toString();
+			    		 if (null == pids) {
+			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций");
+			    			 return;
+			    		 } else {
+			    			 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+			    			 String[] arr = pids.split(",");
+			    			 for (String pid : arr) {
+			    				 Planet planet = event.getPlanets().get(Long.valueOf(pid));
+			    				 if (planet != null) {
+		    						 ListItem li = new ListItem();
+				    				 String s = term
+				    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
+				    					: planet.getShortName() + " + " + planet.getHouse().getName();
+				    				 anchor = new Anchor(s, fonta);
+				    				 anchor.setReference("#" + planet.getAnchor());
+				    				 li.add(anchor);
+			    					 list.add(li);
+			    				 }
+			    			 }
+			    			 section.add(list);
+			    		 }				    		 
+			    	 }
+			     }
 			}
 
 			if (kind.getHigh() != null) {
