@@ -1182,7 +1182,7 @@ public class PDFExporter {
 			    			 return;
 				    	 }
 				    	 String pids = obj.getString("planet3"); //планета или соединение на дне чаши
-				    	 if (null == pids) {
+				    	 if (null == pids || pids.isEmpty()) {
 			    			 DialogUtil.alertWarning("Задайте планеты на дне чаши");
 			    			 return;
 				    	 }
@@ -1299,7 +1299,7 @@ public class PDFExporter {
 					if (obj != null) {
 						if (event.isHousable()) {
 							String hids = obj.getString("houses");
-							if (null == hids) {
+							if (null == hids || hids.isEmpty()) {
 								DialogUtil.alertWarning("Задайте дома сгущения");
 								return;
 							} else {
@@ -1321,7 +1321,7 @@ public class PDFExporter {
 					    	 }
 				    	 } else {
 				    		 String pids = obj.getString("planet");
-				    		 if (null == pids) {
+				    		 if (null == pids || pids.isEmpty()) {
 				    			 DialogUtil.alertWarning("Задайте планеты сгущения");
 				    			 return;
 				    		 } else {
@@ -1351,7 +1351,7 @@ public class PDFExporter {
 			    		 if (event.isHousable()) {
 				    		 section.add(new Paragraph("Главные противоположности вашей жизни:", boldred));
 			    			 String hids = obj.getString("houses");
-			    			 if (null == hids) {
+			    			 if (null == hids || hids.isEmpty()) {
 			    				 DialogUtil.alertWarning("Задайте дома, из которых исходят оппозиции");
 			    				 return;
 			    			 } else {
@@ -1385,7 +1385,7 @@ public class PDFExporter {
 			    			 section.add(Chunk.NEWLINE);
 				    		 section.add(new Paragraph("Что изначально будет вне ваших интересов:", bold));
 			    			 hids = obj.getString("houses2");
-			    			 if (null == hids) {
+			    			 if (null == hids || hids.isEmpty()) {
 			    				 DialogUtil.alertWarning("Задайте вершины пустых домов");
 			    				 return;
 			    			 } else {
@@ -1410,7 +1410,9 @@ public class PDFExporter {
 		    			 section.add(Chunk.NEWLINE);
 			    		 section.add(new Paragraph("Факторы, которые смягчат ситуацию:", boldgreen));
 			    		 String pids = obj.get("planet").toString();
-			    		 if (null == pids) {
+			    		 if (null == pids
+			    				 || pids.isEmpty()
+				    			 || pids.equals("0")) {
 			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций");
 			    			 return;
 			    		 } else {
