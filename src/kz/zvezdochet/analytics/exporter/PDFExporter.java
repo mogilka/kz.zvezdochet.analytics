@@ -994,11 +994,11 @@ public class PDFExporter {
 						    	 PlanetTextService service = new PlanetTextService();
 						    	 PlanetText planetText = (PlanetText)service.findByPlanet(pid, "positive");
 						    	 if (planetText != null) {
-						    		 section.add(new Paragraph("1) " + planetText.getPlanet().getPositive() + ":", bold));
+						    		 section.add(new Paragraph("1) " + planetText.getPlanet().getPositive(), boldgreen));
+						    		 section.add(new Paragraph("На факторы, указанные в данном пункте, сделайте особый упор. "
+						    		 	+ "Они станут главной точкой приложения ваших сил:", PDFUtil.getSuccessFont()));
 						    		 section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
 						    	 }
-					    		 section.add(new Paragraph("На факторы, указанные в данном пункте, сделайте особый упор. "
-					    		 	+ "Они станут главной точкой приложения ваших сил.", PDFUtil.getSuccessFont()));
 						    	 section.add(Chunk.NEWLINE);
 						    	 planetText = (PlanetText)service.findByPlanet(pid2, "positive");
 						    	 if (planetText != null) {
@@ -1406,7 +1406,7 @@ public class PDFExporter {
 					    		 section.add(new Paragraph("Если в этих сферах имеются надуманные проблемы, то они тоже не дадут вам расслабиться.", red));
 			    			 }
 			    		 }
-			    		 
+
 		    			 section.add(Chunk.NEWLINE);
 			    		 section.add(new Paragraph("Факторы, которые смягчат ситуацию:", boldgreen));
 			    		 String pids = obj.get("planet").toString();
@@ -1437,6 +1437,8 @@ public class PDFExporter {
 			     }
 			}
 
+			if (1 == id)
+				section.add(Chunk.NEXTPAGE);
 			if (kind.getHigh() != null) {
 				section.add(Chunk.NEWLINE);
 				section.add(new Paragraph("На следующих трёх уровнях отражено направление вашего развития с точки зрения прошлых наработок: "
