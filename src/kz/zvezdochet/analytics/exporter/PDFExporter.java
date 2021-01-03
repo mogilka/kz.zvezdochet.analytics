@@ -1028,7 +1028,7 @@ public class PDFExporter {
 				    					 if (sign != null) {
 				    						ListItem li = new ListItem();
 				    						li.add(new Chunk(sign.getName() + ": ", bold));
-				    						li.add(new Chunk(sign.getKeyword(), font));
+				    						li.add(new Chunk(sign.getShortname(), font));
 				    						list.add(li);
 				    					}
 				    				 }
@@ -2365,7 +2365,6 @@ public class PDFExporter {
 								}
 							}
 						} else if (code.equals("necklace") && event.isHousable()) {
-							++j;
 							String iteration = (confs.size() > 1) ? " №" + j : "";
 							appendix.add(new Paragraph("Ниже перечислены этапы вашей жизни, которые будут последовательно активироваться под влиянием людей и факторов, указанных на рисунке" + iteration + ":", bold));
 							com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
