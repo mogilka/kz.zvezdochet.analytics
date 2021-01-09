@@ -1437,7 +1437,7 @@ public class PDFExporter {
 			     }
 			}
 
-			if (1 == id)
+			if (1 == id || 3 == id)
 				section.add(Chunk.NEXTPAGE);
 			if (kind.getHigh() != null) {
 				section.add(Chunk.NEWLINE);
@@ -1559,7 +1559,7 @@ public class PDFExporter {
 						type = (max > 2) ? "planetary" : "scattered";
 					}
 				}
-			
+
 				if (type.length() > 0) {
 				    Model model = new CardTypeService().find(type);
 				    if (model != null) {
