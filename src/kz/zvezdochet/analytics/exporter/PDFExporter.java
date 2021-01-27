@@ -665,11 +665,6 @@ public class PDFExporter {
 						com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename);
 						section.add(image);
 					}
-					if (degree.isPositive()) {
-						Paragraph p = new Paragraph("Подобную иллюстрацию можно нарисовать и повесить в месте вашего вдохновения", font);
-						p.setSpacingBefore(10);
-						section.add(p);
-					}
 			    }
 			}
 		} catch(Exception e) {
@@ -1352,7 +1347,7 @@ public class PDFExporter {
 				    		 section.add(new Paragraph("Главные противоположности вашей жизни:", boldred));
 			    			 String hids = obj.getString("houses");
 			    			 if (null == hids || hids.isEmpty()) {
-			    				 DialogUtil.alertWarning("Задайте дома, из которых исходят оппозиции");
+			    				 DialogUtil.alertWarning("Задайте дома одной зоны, из которых исходят оппозиции");
 			    				 return;
 			    			 } else {
 			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1386,7 +1381,7 @@ public class PDFExporter {
 				    		 section.add(new Paragraph("Что изначально будет вне ваших интересов:", bold));
 			    			 hids = obj.getString("houses2");
 			    			 if (null == hids || hids.isEmpty()) {
-			    				 DialogUtil.alertWarning("Задайте вершины пустых домов");
+			    				 DialogUtil.alertWarning("Задайте вершины пустых домов в пустых зонах");
 			    				 return;
 			    			 } else {
 			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1413,7 +1408,7 @@ public class PDFExporter {
 			    		 if (null == pids
 			    				 || pids.isEmpty()
 				    			 || pids.equals("0")) {
-			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций");
+			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций. А если таковых нет, укажите планеты без оппозиций ");
 			    			 return;
 			    		 } else {
 			    			 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -2058,23 +2053,23 @@ public class PDFExporter {
 		    			p.add(new Chunk(aspect.getAspect().getCode().equals("CONJUNCTION") ? " с " : " к ", PDFUtil.getAnnotationFont(true)));
 		    		p.add(new Chunk(aspl2.getSymbol(), afont));
 		    		section.add(p);
-				}
 
-				if (aspect.getAspect().getId() != null) {
-					Font markFont = PDFUtil.getWarningFont();
-					int markPoints = aspect.getMarkPoints();
-					if (aspectType.equals("POSITIVE")) {
-						if (markPoints < 0)
-							markFont = PDFUtil.getSuccessFont();
-						else if (markPoints > 0)
-							markFont = PDFUtil.getDangerFont();
-					} else if (aspectType.equals("NEGATIVE")) {
-						if (markPoints <= 0)
-							markFont = PDFUtil.getDangerFont();
-						else if (markPoints > 0)
-							markFont = PDFUtil.getSuccessFont();
-					}					
-					section.add(new Paragraph(aspect.getMark() + " " + aspect.getMarkDescr(), markFont));
+					if (aspect.getAspect().getId() != null) {
+						Font markFont = PDFUtil.getWarningFont();
+						int markPoints = aspect.getMarkPoints();
+						if (aspectType.equals("POSITIVE")) {
+							if (markPoints < 0)
+								markFont = PDFUtil.getSuccessFont();
+							else if (markPoints > 0)
+								markFont = PDFUtil.getDangerFont();
+						} else if (aspectType.equals("NEGATIVE")) {
+							if (markPoints <= 0)
+								markFont = PDFUtil.getDangerFont();
+							else if (markPoints > 0)
+								markFont = PDFUtil.getSuccessFont();
+						}					
+						section.add(new Paragraph(aspect.getMark() + " " + aspect.getMarkDescr(), markFont));
+					}
 				}
 
 				if (dicts != null) {
@@ -2215,6 +2210,8 @@ public class PDFExporter {
 							shapes.add(printPentagon(configuration));
 						else if (shape.equals("hexagon"))
 							shapes.add(printHexagon(configuration));
+						else if (shape.equals("hexahedron"))
+							shapes.add(printHexahedron(configuration));
 						else if (shape.equals("octagon"))
 							shapes.add(printOctagon(configuration));
 						else if (code.equals("stellium")) {
@@ -3721,8 +3718,13 @@ public class PDFExporter {
 			cell.addElement(p);
 			table.addCell(cell);
 
-			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
+			String url = conf.getImageUrl();
+			if (null == url)
+				cell = new PdfPCell();
+			else {
+				com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(url);
+				cell = new PdfPCell(image);
+			}
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
@@ -4063,7 +4065,7 @@ public class PDFExporter {
 	}
 
 	/**
-	 * Отрисовка шестиугольной конфигурации
+	 * Отрисовка шестиугольной конфигурации с вершинами
 	 * @param conf конфигурация аспектов
 	 * @return параграф с инфографикой
 	 */
@@ -4076,34 +4078,27 @@ public class PDFExporter {
 	        font.setColor(color.getRed(), color.getGreen(), color.getBlue());
 
 	        //верх
+	        PdfPCell cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
 	        String text = "";
-			for (Planet planet : conf.getLeftHorn()) {
-				text += term ? planet.getName() : conf.isLeftHornPositive() ? planet.getPositive() : planet.getNegative();
+			for (Planet planet : conf.getVertex()) {
+				text += term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative();
 				text += "\n";
 			}
 			Paragraph p = new Paragraph(text, font);
-			p.setAlignment(Element.ALIGN_RIGHT);
-			PdfPCell cell = new PdfPCell();
-			cell.setBorder(Rectangle.NO_BORDER);
-			cell.addElement(p);
-			table.addCell(cell);
-
-	        cell = new PdfPCell();
-			cell.setBorder(Rectangle.NO_BORDER);
-			table.addCell(cell);
-
-			text = "";
-			for (Planet planet : conf.getRightHorn()) {
-				text += term ? planet.getName() : conf.isRightHornPositive() ? planet.getPositive() : planet.getNegative();
-				text += "\n";
-			}
-			p = new Paragraph(text, font);
+			p.setAlignment(Element.ALIGN_CENTER);
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.addElement(p);
 			table.addCell(cell);
 
-	        //середина
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
+	        //верхняя середина
 			text = "";
 			for (Planet planet : conf.getLeftHand()) {
 				text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative();
@@ -4118,10 +4113,16 @@ public class PDFExporter {
 			PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
 			table.addCell(cell);
 
-			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
+			String url = conf.getImageUrl();
+			if (null == url)
+				cell = new PdfPCell();
+			else {
+				com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(url);
+				cell = new PdfPCell(image);
+			}
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setRowspan(2);
 			table.addCell(cell);
 
 			text = "";
@@ -4136,7 +4137,7 @@ public class PDFExporter {
 			PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
 			table.addCell(cell);
 
-			//низ
+			//нижняя середина
 			text = "";
 			for (Planet planet : conf.getLeftFoot()) {
 				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
@@ -4147,10 +4148,7 @@ public class PDFExporter {
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.addElement(p);
-			table.addCell(cell);
-
-			cell = new PdfPCell();
-			cell.setBorder(Rectangle.NO_BORDER);
+			PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
 			table.addCell(cell);
 
 			text = "";
@@ -4162,6 +4160,28 @@ public class PDFExporter {
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.addElement(p);
+			PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
+			table.addCell(cell);
+
+	        //низ
+	        cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
+	        text = "";
+			for (Planet planet : conf.getBase()) {
+				text += term ? planet.getName() : conf.isBasePositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
+			p = new Paragraph(text, font);
+			p.setAlignment(Element.ALIGN_CENTER);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
 			table.addCell(cell);
 
 			Paragraph paragraph = new Paragraph();
@@ -4280,8 +4300,13 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			table.addCell(cell);
 
-			com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(conf.getImageUrl());
-			cell = (null == image) ? new PdfPCell() : new PdfPCell(image);
+			String url = conf.getImageUrl();
+			if (null == url)
+				cell = new PdfPCell();
+			else {
+				com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(url);
+				cell = new PdfPCell(image);
+			}
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
@@ -4417,5 +4442,123 @@ public class PDFExporter {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Отрисовка шестиугольной конфигурации без вершин
+	 * @param conf конфигурация аспектов
+	 * @return параграф с инфографикой
+	 */
+	private Paragraph printHexahedron(AspectConfiguration conf) {
+		try {
+	        PdfPTable table = new PdfPTable(3);
+	        table.setWidthPercentage(100);
+	        Font font = PDFUtil.getSmallFont();
+	        Color color = conf.getColor();
+	        font.setColor(color.getRed(), color.getGreen(), color.getBlue());
+
+	        //верх
+	        String text = "";
+			for (Planet planet : conf.getLeftHorn()) {
+				text += term ? planet.getName() : conf.isLeftHornPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
+			Paragraph p = new Paragraph(text, font);
+			p.setAlignment(Element.ALIGN_RIGHT);
+			PdfPCell cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+	        cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
+			text = "";
+			for (Planet planet : conf.getRightHorn()) {
+				text += term ? planet.getName() : conf.isRightHornPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
+			p = new Paragraph(text, font);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+	        //середина
+			text = "";
+			for (Planet planet : conf.getLeftHand()) {
+				text += term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
+			p = new Paragraph(text, font);
+			p.setAlignment(Element.ALIGN_RIGHT);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			float fontSize = font.getSize();
+			PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
+			table.addCell(cell);
+
+			String url = conf.getImageUrl();
+			if (null == url)
+				cell = new PdfPCell();
+			else {
+				com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(url);
+				cell = new PdfPCell(image);
+			}
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			table.addCell(cell);
+
+			text = "";
+			for (Planet planet : conf.getRightHand()) {
+				text += term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
+			p = new Paragraph(text, font);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			PDFUtil.setCellVertical(cell, fontSize, font.getBaseFont().getFontDescriptor(BaseFont.CAPHEIGHT, fontSize));
+			table.addCell(cell);
+
+			//низ
+			text = "";
+			for (Planet planet : conf.getLeftFoot()) {
+				text += term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
+			p = new Paragraph(text, font);
+			p.setAlignment(Element.ALIGN_RIGHT);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			table.addCell(cell);
+
+			text = "";
+			for (Planet planet : conf.getRightFoot()) {
+				text += term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative();
+				text += "\n";
+			}
+			p = new Paragraph(text, font);
+			cell = new PdfPCell();
+			cell.setBorder(Rectangle.NO_BORDER);
+			cell.addElement(p);
+			table.addCell(cell);
+
+			Paragraph paragraph = new Paragraph();
+			paragraph.setSpacingBefore(10);
+			paragraph.setSpacingAfter(10);
+			paragraph.add(table);
+			return paragraph;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
