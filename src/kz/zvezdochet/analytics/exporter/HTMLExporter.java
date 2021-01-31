@@ -1118,7 +1118,7 @@ public class HTMLExporter {
 				}
 				//Создаем информационный блок только если дом не пуст
 				if (planets.size() > 0 || house.isExportOnSign()) {
-					a = new Tag("a", "href=#" + house.getLinkName());
+					a = new Tag("a", "href=#" + house.getCode());
 					a.add(house.getName());
 					td.add(a);
 					td.add(new Tag("/br"));
@@ -1290,7 +1290,7 @@ public class HTMLExporter {
 				House house = (House)event.getHouses().get(142L);
 				if (null == house) return;
 				int value = (int)house.getLongitude();
-				Model model = new DegreeService().find(new Long(String.valueOf(value)));
+				Model model = new DegreeService().find((long)value);
 			    if (model != null) {
 			    	TextGenderDictionary degree = (TextGenderDictionary)model;
 					Tag div = new Tag("div");
