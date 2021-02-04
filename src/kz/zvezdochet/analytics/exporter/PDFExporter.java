@@ -295,9 +295,9 @@ public class PDFExporter {
 			printSymbols(chapter, event);
 			doc.add(chapter);
 
-			chapter = new ChapterAutoNumber(PDFUtil.printHeader(new Paragraph(), "Общий типаж", "commontype"));
+			chapter = new ChapterAutoNumber(PDFUtil.printHeader(new Paragraph(), "Ваш архетип", "commontype"));
 			chapter.setNumberDepth(0);
-			chapter.add(new Paragraph("Общий типаж – это общая характеристика поколения людей, рождённых вблизи " + DateUtil.sdf.format(event.getBirth()), PDFUtil.getWarningFont()));
+			chapter.add(new Paragraph("Архетип – это обобщённый образ людей, рождённых вблизи " + DateUtil.sdf.format(event.getBirth()), PDFUtil.getWarningFont()));
 
 			//планеты в знаках
 			printPlanetSign(chapter, event);
@@ -307,7 +307,7 @@ public class PDFExporter {
 			chapter.setNumberDepth(0);
 
 			Font greenfont = PDFUtil.getSuccessFont();
-			Anchor anchor = new Anchor("Общий типаж", fonta);
+			Anchor anchor = new Anchor("Ваш архетип", fonta);
             anchor.setReference("#commontype");
 			p = new Paragraph();
 			p.add(new Chunk("В разделе ", greenfont));
