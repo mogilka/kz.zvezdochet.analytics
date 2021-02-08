@@ -1756,7 +1756,7 @@ public class PDFExporter {
 		    	map.put(bar.getCode(), bar.getValue());
 		    }
 			Section section = PDFUtil.printSection(chapter, "Соотношение аспектов планет", null);
-			section.add(PDFUtil.printBars(writer, "Соотношение аспектов планет", "Аспекты", "Баллы", bars, 500, 300, false, false, true));
+			section.add(PDFUtil.printBars(writer, "Соотношение аспектов планет", null, "Аспекты", "Баллы", bars, 500, 300, false, false, true));
 
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
@@ -2446,7 +2446,7 @@ public class PDFExporter {
 				bar.setCategory("Сферы жизни");
 				bars[++i] = (bar);
 		    }
-			section.add(PDFUtil.printBars(writer, "", "Сферы жизни", "Баллы", bars, 500, 500, false, false, false));
+			section.add(PDFUtil.printBars(writer, "", null, "Сферы жизни", "Баллы", bars, 500, 500, false, false, false));
 
 			Anchor anchor = new Anchor("Реализация личности", fonta);
             anchor.setReference("#planethouses");
@@ -3166,7 +3166,7 @@ public class PDFExporter {
 		    		+ "Но в соотношении с другими оно слабовыражено, имеет меньшую важность "
 		    			+ "или из-за некоторых негативных факторов гороскопа его ценность в итоге нивелировалась";
 	    	section.add(new Paragraph(text, font));
-			section.add(PDFUtil.printBars(writer, "", "Планеты", "Баллы", bars, 500, 500, false, false, false));
+			section.add(PDFUtil.printBars(writer, "", null, "Планеты", "Баллы", bars, 500, 500, false, false, false));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
