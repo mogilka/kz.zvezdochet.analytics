@@ -756,7 +756,7 @@ public class PDFExporter {
 				    				? new Paragraph(PDFUtil.html2pdf(object.getText(), font))
 				    				: new Paragraph(PDFUtil.removeTags(object.getText(), font));
 				    			section.add(p);
-
+				    			section.add(Chunk.NEWLINE);
 				    			PDFUtil.printGender(section, object, female, child, true);
 
 								Rule rule = EventRules.rulePlanetSign(planet, planet.getSign(), event, category);
@@ -1432,7 +1432,7 @@ public class PDFExporter {
 			     }
 			}
 
-			if (1 == id || 3 == id)
+			if (id < 4)
 				section.add(Chunk.NEXTPAGE);
 			if (kind.getHigh() != null) {
 				section.add(Chunk.NEWLINE);
@@ -1593,6 +1593,7 @@ public class PDFExporter {
 					if (planetText != null) {
 						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-меч", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
+						section.add(Chunk.NEWLINE);
 
 						Rule rule = EventRules.rulePlanetSword(planet, female);
 						if (rule != null) {
@@ -1606,6 +1607,7 @@ public class PDFExporter {
 					if (planetText != null) {
 						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-щит", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
+						section.add(Chunk.NEWLINE);
 						PDFUtil.printGender(section, planetText, female, child, true);
 					}
 				}
@@ -1617,6 +1619,7 @@ public class PDFExporter {
 					if (planetText != null) {
 						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-гармония", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
+						section.add(Chunk.NEWLINE);
 						PDFUtil.printGender(section, planetText, female, child, true);
 					}
 				}
@@ -2078,6 +2081,7 @@ public class PDFExporter {
 						if (dict != null) {
 							exists = true;
 							section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
+							section.add(Chunk.NEWLINE);
 		
 							Rule rule = EventRules.rulePlanetAspect(aspect, female);
 							if (rule != null) {
@@ -2537,6 +2541,7 @@ public class PDFExporter {
 							PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, null);
 							if (dict != null) {
 								section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
+								section.add(Chunk.NEWLINE);
 	
 								Rule rule = EventRules.rulePlanetHouse(planet, house, female);
 								if (rule != null) {
@@ -2581,6 +2586,8 @@ public class PDFExporter {
 					}
 					PDFUtil.printGender(section, dict, female, child, true);
 				}
+				if (section != null)
+					section.add(Chunk.NEWLINE);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -4436,6 +4443,7 @@ public class PDFExporter {
 					section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 					if (planet.isDamaged() && planetText.getTextDamaged() != null)
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getTextDamaged(), font)));
+					section.add(Chunk.NEWLINE);
 					PDFUtil.printGender(section, planetText, female, child, true);
 				}
 			}
