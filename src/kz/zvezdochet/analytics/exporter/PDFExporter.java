@@ -722,6 +722,7 @@ public class PDFExporter {
 	 * Генерация планет в знаках
 	 * @param chapter раздел
 	 * @param event событие
+	 * @todo искать на базе категорий, потому что для категории может не быть ещё текста
 	 */
 	private void printPlanetSign(Chapter chapter, Event event) {
 		try {
@@ -750,21 +751,22 @@ public class PDFExporter {
 				    				section.add(new Chunk(planet.getSymbol(), PDFUtil.getHeaderAstroFont()));
 				    				section.add(new Chunk(" " + planet.getName() + " в созвездии " + planet.getSign().getName() + " ", fonth5));
 				    				section.add(new Chunk(planet.getSign().getSymbol(), PDFUtil.getHeaderAstroFont()));
-				    				section.add(Chunk.NEWLINE);
 				    			}
-				    			Paragraph p = category.getCode().equals("profession")
-				    				? new Paragraph(PDFUtil.html2pdf(object.getText(), font))
-				    				: new Paragraph(PDFUtil.removeTags(object.getText(), font));
-				    			section.add(p);
-				    			section.add(Chunk.NEWLINE);
-				    			PDFUtil.printGender(section, object, female, child, true);
-
+				    			String text = object.getText();
+				    			if (text != null) {
+					    			Paragraph p = category.getCode().equals("profession")
+					    				? new Paragraph(PDFUtil.html2pdf(text, font))
+					    				: new Paragraph(PDFUtil.removeTags(text, font));
+					    			section.add(p);
+					    			PDFUtil.printGender(section, object, female, child, true);
+				    			}
 								Rule rule = EventRules.rulePlanetSign(planet, planet.getSign(), event, category);
 								if (rule != null) {
 									section.add(Chunk.NEWLINE);
 									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 									section.add(Chunk.NEWLINE);
 								}
+								section.add(Chunk.NEWLINE);
 				    		}
 				    }
 				}
@@ -1432,7 +1434,7 @@ public class PDFExporter {
 			     }
 			}
 
-			if (id < 4)
+			if (id > 1 && id < 4)
 				section.add(Chunk.NEXTPAGE);
 			if (kind.getHigh() != null) {
 				section.add(Chunk.NEWLINE);
@@ -1565,6 +1567,7 @@ public class PDFExporter {
 							section.add(new Paragraph(cardType.getDescription(), PDFUtil.getAnnotationFont(true)));
 						}
 						section.add(new Paragraph(PDFUtil.removeTags(cardType.getText(), font)));
+						section.add(Chunk.NEWLINE);
 				    }
 				}
 			}
@@ -1593,7 +1596,6 @@ public class PDFExporter {
 					if (planetText != null) {
 						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-меч", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
-						section.add(Chunk.NEWLINE);
 
 						Rule rule = EventRules.rulePlanetSword(planet, female);
 						if (rule != null) {
@@ -1601,26 +1603,35 @@ public class PDFExporter {
 							section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 						}
 						PDFUtil.printGender(section, planetText, female, child, true);
+						section.add(Chunk.NEWLINE);
 					}
 				} else if (planet.isShield()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "shield");
 					if (planetText != null) {
 						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-щит", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
-						section.add(Chunk.NEWLINE);
 						PDFUtil.printGender(section, planetText, female, child, true);
+						section.add(Chunk.NEWLINE);
 					}
 				}
-				if ((planet.isPerfect()) 
-						&& !planet.isBroken()) {
+				if (planet.isPerfect() && !planet.isBroken()) {
 					if (planet.inMine())
 						section.add(new Paragraph("Планета " + planet.getName() + " не вызывает напряжения, так что вы сумеете проработать недостатки, описанные в разделе «" + planet.getShortName() + " в шахте»", fonth5));
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "perfect");
 					if (planetText != null) {
 						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-гармония", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
-						section.add(Chunk.NEWLINE);
 						PDFUtil.printGender(section, planetText, female, child, true);
+						section.add(Chunk.NEWLINE);
+					}
+				}
+				if (planet.isLord()) {
+					planetText = (PlanetText)service.findByPlanet(planet.getId(), "strong");
+					if (planetText != null) {
+						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-сила", fonth5));
+						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
+						PDFUtil.printGender(section, planetText, female, child, true);
+						section.add(Chunk.NEWLINE);
 					}
 				}
 			}
@@ -1671,6 +1682,7 @@ public class PDFExporter {
 							}
 						}
 						PDFUtil.printGender(section, planetText, female, child, true);
+						section.add(Chunk.NEWLINE);
 					}
 				} else if (planet.isDamaged()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "damaged");
@@ -1678,6 +1690,7 @@ public class PDFExporter {
 						section.addSection(new Paragraph(term ? planet.getName() : planet.getShortName() + "-дисгармония", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 						PDFUtil.printGender(section, planetText, female, child, true);
+						section.add(Chunk.NEWLINE);
 					}
 				}
 			}
@@ -1787,13 +1800,28 @@ public class PDFExporter {
 			        list.add(li);
 				}
 			}
+			if (map.containsKey("POSITIVE_HIDDEN") && map.containsKey("NEGATIVE_HIDDEN")) {
+				if (map.get("POSITIVE_HIDDEN") + map.get("NEGATIVE_HIDDEN") < 10) {
+					text = "У вас низкий процент скрытых реакций и переживаний, и это хорошо, потому что эмоции не засядут глубоко в душе. "
+						+ "И горестями и радостями вы будете сразу делиться, что поможет быстрей разрешить конфликт и даст ощущение реализованности";
+					li = new ListItem();
+			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, BaseColor.RED)));
+			        list.add(li);
+				}
+			}
 			if (map.containsKey("KARMIC") && map.containsKey("NEGATIVE")) {
 				if (map.get("KARMIC") > map.get("NEGATIVE")) {
-					text = "Воздаяния за ошибки больше, чем стресса, значит непоняток в жизни будет больше, чем реальных конфликтов. "
+					Phrase phrase = new Phrase();
+					Font lifont = new Font(baseFont, 12, Font.NORMAL, BaseColor.BLUE);
+					phrase.add(new Chunk("Воздаяния за ошибки больше, чем стресса, значит непоняток в жизни будет больше, чем реальных конфликтов. "
 						+ "Причины многих неудач таятся в вашем прошлом поведении и мышлении. "
-						+ "Испытания даны вам для того, чтобы очиститься от старых грехов и обременяющих установок, но отыскать и осознать их будет непросто";
+						+ "Испытания даны вам для того, чтобы очиститься от старых грехов и обременяющих установок, но отыскать и осознать их будет непросто. "
+						+ "Подсказкой здесь послужат синие фигуры в разделе ", lifont));
+					Anchor anchor = new Anchor("Фигуры гороскопа", fonta);
+					anchor.setReference("#aspectconfiguration");
+					phrase.add(anchor);
 					li = new ListItem();
-			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, BaseColor.BLUE)));
+			        li.add(phrase);
 			        list.add(li);
 				}
 			}
@@ -2081,7 +2109,6 @@ public class PDFExporter {
 						if (dict != null) {
 							exists = true;
 							section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
-							section.add(Chunk.NEWLINE);
 		
 							Rule rule = EventRules.rulePlanetAspect(aspect, female);
 							if (rule != null) {
@@ -2089,6 +2116,7 @@ public class PDFExporter {
 								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 							}
 							PDFUtil.printGender(section, dict, female, child, true);
+							section.add(Chunk.NEWLINE);
 						}
 					}
 				}
@@ -2481,6 +2509,11 @@ public class PDFExporter {
 		try {
 			PlanetHouseService service = new PlanetHouseService();
 			HouseSignService hservice = new HouseSignService();
+
+			AspectTypeService atservice = new AspectTypeService();
+			AspectType negativeType = (AspectType)atservice.find("NEGATIVE");
+			AspectType positiveType = (AspectType)atservice.find("POSITIVE");
+
 			for (House house : houses) {
 				//Определяем количество планет в доме
 				List<Planet> planets = new ArrayList<Planet>();
@@ -2533,15 +2566,19 @@ public class PDFExporter {
 								&& house.isLilithed())) {
 							Rule rule = EventRules.ruleMoonsHouse(house);
 							if (rule != null) {
-								section.add(Chunk.NEWLINE);
 								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 								section.add(Chunk.NEWLINE);
 							}
 						} else {
-							PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, null);
+							AspectType type = positiveType;
+							if (planet.isDamaged() || planet.getCode().equals("Kethu"))
+								type = negativeType;
+							else if (planet.getCode().equals("Lilith") && !planet.isPerfect())
+								type = negativeType;
+
+							PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, type);
 							if (dict != null) {
 								section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
-								section.add(Chunk.NEWLINE);
 	
 								Rule rule = EventRules.rulePlanetHouse(planet, house, female);
 								if (rule != null) {
@@ -2550,6 +2587,7 @@ public class PDFExporter {
 									section.add(Chunk.NEWLINE);
 								}
 								PDFUtil.printGender(section, dict, female, child, true);
+								section.add(Chunk.NEWLINE);
 							}
 						}
 					}
@@ -2580,7 +2618,6 @@ public class PDFExporter {
 
 					Rule rule = EventRules.ruleHouseSign(house, sign, event);
 					if (rule != null) {
-						section.add(Chunk.NEWLINE);
 						section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 						section.add(Chunk.NEWLINE);
 					}
@@ -4443,8 +4480,8 @@ public class PDFExporter {
 					section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 					if (planet.isDamaged() && planetText.getTextDamaged() != null)
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getTextDamaged(), font)));
-					section.add(Chunk.NEWLINE);
 					PDFUtil.printGender(section, planetText, female, child, true);
+					section.add(Chunk.NEWLINE);
 				}
 			}
 		} catch(Exception e) {
