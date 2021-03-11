@@ -1626,9 +1626,9 @@ public class PDFExporter {
 					}
 				}
 				if (planet.isLord()) {
+					section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-сила", fonth5));
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "strong");
 					if (planetText != null) {
-						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-сила", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 						PDFUtil.printGender(section, planetText, female, child, true);
 						section.add(Chunk.NEWLINE);
@@ -2419,6 +2419,12 @@ public class PDFExporter {
 							if (descr != null) {
 								appendix.add(new Paragraph(descr, font));
 								appendix.add(Chunk.NEWLINE);
+							}
+
+							Rule rule = EventRules.ruleConfiguration(configuration);
+							if (rule != null) {
+			    				section.add(Chunk.NEWLINE);
+								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 							}
 						}
 					}

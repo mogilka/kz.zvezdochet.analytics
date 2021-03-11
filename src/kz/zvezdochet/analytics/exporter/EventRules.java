@@ -1,6 +1,7 @@
 package kz.zvezdochet.analytics.exporter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +12,7 @@ import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.analytics.bean.Degree;
 import kz.zvezdochet.analytics.bean.Rule;
 import kz.zvezdochet.analytics.service.RuleService;
+import kz.zvezdochet.bean.AspectConfiguration;
 import kz.zvezdochet.bean.Event;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
@@ -522,5 +524,24 @@ public class EventRules {
 			}
 		}
 		return rules;
+	}
+
+	/**
+	 * Конфигурация аспектов
+	 * @param conf конфигурация
+	 * @return правило
+	 * @throws DataAccessException
+	 */
+	public static Rule ruleConfiguration(AspectConfiguration conf) throws DataAccessException {
+		Rule rule = null;
+		RuleService service = new RuleService();
+		String code = conf.getCode();
+		if (code.equals("home")) {
+			for (Planet planet : conf.getVertex()) {
+				if (Arrays.asList(new Long[] {19L, 20L, 23L, 24L, 25L, 28L, 29L, 31L}).contains(planet.getId()))
+					return (Rule)service.find(223L);
+			}
+		}
+		return rule;
 	}
 }
