@@ -730,13 +730,14 @@ public class PDFExporter {
 				PlanetSignService service = new PlanetSignService();
 
 				Collection<Planet> planets = event.getPlanets().values();
+				boolean baby = event.isBaby();
 				for (Planet planet : planets) {
 				    if (planet.isMain()) {
 				    	List<PlanetSignText> list = service.find(planet, planet.getSign());
 				    	if (list != null && list.size() > 0)
 				    		for (PlanetSignText object : list) {
 				    			Category category = object.getCategory();
-				    			if (category.getCode().equals("childhood") && !child)
+				    			if (category.getCode().equals("childhood") && !baby)
 				    				continue;
 				    			if (child && Arrays.asList(new String[] {"sex", "male", "female"}).contains(category.getCode()))
 				    				continue;
