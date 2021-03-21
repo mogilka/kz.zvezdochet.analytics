@@ -1435,7 +1435,7 @@ public class PDFExporter {
 			     }
 			}
 
-			if (id > 1 && id < 4)
+			if (id < 4)
 				section.add(Chunk.NEXTPAGE);
 			if (kind.getHigh() != null) {
 				section.add(Chunk.NEWLINE);
@@ -1626,7 +1626,7 @@ public class PDFExporter {
 						section.add(Chunk.NEWLINE);
 					}
 				}
-				if (planet.isLord()) {
+				if (planet.isLord() && !planet.isKethued()) {
 					section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-сила", fonth5));
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "strong");
 					if (planetText != null) {
