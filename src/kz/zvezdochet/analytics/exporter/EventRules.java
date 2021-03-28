@@ -428,6 +428,8 @@ public class EventRules {
 				return (Rule)service.find(215L);
 			else if (house.getCode().equals("XII_2"))
 				return (Rule)service.find(216L);
+			else if (house.getCode().equals("XII"))
+				return (Rule)service.find(224L);
 		}
 		return null;
 	}
