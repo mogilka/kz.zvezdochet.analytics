@@ -218,9 +218,12 @@ public class PDFExporter {
 		        p.setAlignment(Element.ALIGN_CENTER);
 				chapter.add(p);
 			}
+			p = new Paragraph();
 			String text = event.getCallname() + " – ";
 			text += DateUtil.fulldtf.format(event.getBirth());
-			p = new Paragraph(text, font);
+			p.add(new Chunk(text, font));
+			if (!event.isRectified())
+				p.add(new Chunk(" (не ректифицировано)", PDFUtil.getDangerFont()));
 	        p.setAlignment(Element.ALIGN_CENTER);
 			chapter.add(p);
 
@@ -1384,7 +1387,7 @@ public class PDFExporter {
 				    		 section.add(new Paragraph("Что изначально будет вне ваших интересов:", bold));
 			    			 hids = obj.getString("houses2");
 			    			 if (null == hids || hids.isEmpty()) {
-			    				 DialogUtil.alertWarning("Задайте вершины пустых домов в пустых зонах");
+			    				 DialogUtil.alertWarning("Задайте глваные куспиды пустых домов в обеих пустых зонах");
 			    				 return;
 			    			 } else {
 			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1411,7 +1414,7 @@ public class PDFExporter {
 			    		 if (null == pids
 			    				 || pids.isEmpty()
 				    			 || pids.equals("0")) {
-			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций. А если таковых нет, укажите планеты без оппозиций ");
+			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций. А если таковых нет, укажите планеты без оппозиций или благополучные планеты гороскопа");
 			    			 return;
 			    		 } else {
 			    			 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1786,7 +1789,7 @@ public class PDFExporter {
 			}
 			if (map.containsKey("NEGATIVE_HIDDEN") && map.containsKey("NEGATIVE")) {
 				if (map.get("NEGATIVE_HIDDEN") > map.get("NEGATIVE")) {
-					text = "Переживаний у вас больше, чем стресса, значит нужно искать разрядку своим негативным эмоциям, "
+					text = "Стресса у вас больше, чем конфликтов, значит нужно искать разрядку своим негативным эмоциям, "
 						+ "рассказывать о своих проблемах людям, которым вы доверяете. Не держите обиды и напряжение в себе";
 			        li.add(new Chunk(text, font));
 			        list.add(li);
@@ -1803,8 +1806,8 @@ public class PDFExporter {
 			}
 			if (map.containsKey("POSITIVE_HIDDEN") && map.containsKey("NEGATIVE_HIDDEN")) {
 				if (map.get("POSITIVE_HIDDEN") + map.get("NEGATIVE_HIDDEN") < 10) {
-					text = "У вас низкий процент скрытых реакций и переживаний, и это хорошо, потому что эмоции не засядут глубоко в душе. "
-						+ "И горестями и радостями вы будете сразу делиться, что поможет быстрей разрешить конфликт и даст ощущение реализованности";
+					text = "У вас низкий процент скрытых реакций и переживаний, и это хорошо, потому что переживания не засядут глубоко в душе. "
+						+ "И горестями и радостями вы будете сразу делиться, что поможет быстрее разрешить конфликт и даст ощущение реализованности";
 					li = new ListItem();
 			        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, BaseColor.RED)));
 			        list.add(li);
@@ -1814,7 +1817,7 @@ public class PDFExporter {
 				if (map.get("KARMIC") > map.get("NEGATIVE")) {
 					Phrase phrase = new Phrase();
 					Font lifont = new Font(baseFont, 12, Font.NORMAL, BaseColor.BLUE);
-					phrase.add(new Chunk("Воздаяния за ошибки больше, чем стресса, значит непоняток в жизни будет больше, чем реальных конфликтов. "
+					phrase.add(new Chunk("Воздаяния за ошибки больше, чем конфликтов, значит непоняток в жизни будет больше, чем продуктивных споров. "
 						+ "Причины многих неудач таятся в вашем прошлом поведении и мышлении. "
 						+ "Испытания даны вам для того, чтобы очиститься от старых грехов и обременяющих установок, но отыскать и осознать их будет непросто. "
 						+ "Подсказкой здесь послужат синие фигуры в разделе ", lifont));
@@ -1854,7 +1857,7 @@ public class PDFExporter {
 			if (map.containsKey("POSITIVE"))
 				clear += map.get("POSITIVE");
 			if (hidden > clear) {
-				text = "Переживаний и скрытого позитива больше, чем стресса и лёгкости, значит больше активности и событий будет происходить за кулисами жизни";
+				text = "Стресса и скрытого позитива больше, чем конфликтов и лёгкости, значит больше активности будет происходить за кулисами жизни, на внутреннем плане";
 				li = new ListItem();
 		        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, BaseColor.GRAY)));
 		        list.add(li);
@@ -1899,18 +1902,18 @@ public class PDFExporter {
 					if (code.equals("KARMIC")) {
 						color = BaseColor.BLUE;
 						lifont = new Font(baseFont, 12, Font.NORMAL, color);
-						phrase.add(new Chunk("Кармические аспекты зашкаливают, значит многое неизбежное, что происходит в вашей жизни, обусловлено ошибками прошлых воплощений. Это отражено в синих фигурах в разделе ", lifont));
+						phrase.add(new Chunk("Кармические аспекты зашкаливают, значит многое неизбежное, что происходит в вашей жизни, обусловлено прошлыми ошибками и негативной наследственностью. Это отражено в синих фигурах в разделе ", lifont));
 						Anchor anchor = new Anchor("Фигуры гороскопа", fonta);
 						anchor.setReference("#aspectconfiguration");
 						phrase.add(anchor);
-						phrase.add(new Chunk(". Чтобы возврат к прошлому не мешал продвижению вперёд, старайтесь вовремя завершать начатое, не копить проблемы, чтобы повторно не тратить на них своё драгоценное время", lifont));
+						phrase.add(new Chunk(". Чтобы возврат к прошлому не мешал продвижению вперёд, старайтесь вовремя завершать начатое, а не копить проблемы, чтобы повторно не тратить на них своё драгоценное время", lifont));
 					} else if (code.equals("CREATIVE")) {
 						color = new BaseColor(0, 102, 51);
 						lifont = new Font(baseFont, 12, Font.NORMAL, color);
-						text = "Творческие аспекты зашкаливают, так что у вас в распоряжении достаточно свободы и возможности преображать мир! Это очень редкая комбинация, которая говорит о том, что вы не ограничены в своих проявлениях, сможете жить, действовать и принимать решения независимо от других";
+						text = "Творческие аспекты зашкаливают, так что у вас в распоряжении достаточно свободы и возможности преобразить мир! Это очень редкая комбинация, которая говорит о том, что вы не ограничены в своих проявлениях, сможете жить, действовать и принимать решения независимо от других";
 						phrase = new Phrase(text, lifont);
 					} else if (code.equals("NEGATIVE")) {
-						text = "Уровень стресса зашкаливает, значит отток энергии будет довольно сильным. Развивайте силу духа, научитесь управлять конфликтами и рисками и преуменьшать их";
+						text = "Уровень конфликтов зашкаливает, значит отток энергии будет довольно сильным. Развивайте силу духа, научитесь управлять рисками и преуменьшать их";
 						phrase = new Phrase(text, lifont);
 					} else if (code.equals("POSITIVE")) {
 						color = BaseColor.RED;
@@ -1925,7 +1928,7 @@ public class PDFExporter {
 					} else if (code.equals("NEGATIVE_HIDDEN")) {
 						color = BaseColor.GRAY;
 						lifont = new Font(baseFont, 12, Font.NORMAL, color);
-						text = "Уровень переживаний зашкаливает, значит накоплено много скрытого негатива. Старайтесь не растрачивать энергию на неприятные мысли, не зацикливайтесь на внутренних проблемах, а вытаскивайте их на поверхность и решайте";
+						text = "Уровень стресса зашкаливает, значит накоплено много скрытого негатива. Старайтесь не растрачивать энергию на неприятные мысли, не зацикливайтесь на внутренних проблемах, а вытаскивайте их на поверхность и решайте";
 						phrase = new Phrase(text, lifont);
 					}
 					li = new ListItem();
@@ -2265,7 +2268,6 @@ public class PDFExporter {
 							PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
 					}
 					section.add(shapes);
-					section.add(Chunk.NEWLINE);
 
 			    	//индивидуальное описание
 					if (!code.equals("stellium") && !code.equals("necklace"))
@@ -2693,6 +2695,7 @@ public class PDFExporter {
 		    	PDFUtil.printGender(section, element, female, child, true);
 		    }
 
+		    section.add(Chunk.NEWLINE);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
 	        li.add(new Chunk("Категория \"в мыслях\" показывает вашу идеальную модель: "
@@ -2789,6 +2792,7 @@ public class PDFExporter {
 		    	PDFUtil.printGender(section, yinyang, female, child, true);
 		    }
 
+		    section.add(Chunk.NEWLINE);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
 	        li.add(new Chunk("Категория \"в мыслях\" показывает, насколько вы активны в мыслях и принятии решений наедине с самим собой.", font));
@@ -2867,6 +2871,7 @@ public class PDFExporter {
 		    	PDFUtil.printGender(section, sphere, female, child, true);
 		    }
 
+		    section.add(Chunk.NEWLINE);
 			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			ListItem li = new ListItem();
 	        li.add(new Chunk("Открытость выражается в самоутверждении и сотрудничестве", font));
@@ -3711,8 +3716,8 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			Paragraph paragraph = new Paragraph();
-			paragraph.setSpacingBefore(10);
-			paragraph.setSpacingAfter(10);
+			table.setSpacingBefore(1);
+			table.setSpacingAfter(5);
 			paragraph.add(table);
 			return paragraph;
 		} catch (Exception e) {
@@ -3814,8 +3819,8 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			Paragraph paragraph = new Paragraph();
-			paragraph.setSpacingBefore(10);
-			paragraph.setSpacingAfter(10);
+			table.setSpacingBefore(1);
+			table.setSpacingAfter(5);
 			paragraph.add(table);
 			return paragraph;
 		} catch (Exception e) {
@@ -3973,8 +3978,8 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			Paragraph paragraph = new Paragraph();
-			paragraph.setSpacingBefore(10);
-			paragraph.setSpacingAfter(10);
+			table.setSpacingBefore(5);
+			table.setSpacingAfter(5);
 			paragraph.add(table);
 			return paragraph;
 		} catch (Exception e) {
@@ -4105,8 +4110,8 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			Paragraph paragraph = new Paragraph();
-			paragraph.setSpacingBefore(10);
-			paragraph.setSpacingAfter(10);
+			table.setSpacingBefore(1);
+			table.setSpacingAfter(5);
 			paragraph.add(table);
 			return paragraph;
 		} catch (Exception e) {
@@ -4236,8 +4241,8 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			Paragraph paragraph = new Paragraph();
-			paragraph.setSpacingBefore(10);
-			paragraph.setSpacingAfter(10);
+			table.setSpacingBefore(1);
+			table.setSpacingAfter(5);
 			paragraph.add(table);
 			return paragraph;
 		} catch (Exception e) {
@@ -4446,8 +4451,8 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			Paragraph paragraph = new Paragraph();
-			paragraph.setSpacingBefore(10);
-			paragraph.setSpacingAfter(10);
+			table.setSpacingBefore(1);
+			table.setSpacingAfter(5);
 			paragraph.add(table);
 			return paragraph;
 		} catch (Exception e) {
@@ -4604,8 +4609,8 @@ public class PDFExporter {
 			table.addCell(cell);
 
 			Paragraph paragraph = new Paragraph();
-			paragraph.setSpacingBefore(10);
-			paragraph.setSpacingAfter(10);
+			paragraph.setSpacingBefore(1);
+			paragraph.setSpacingAfter(5);
 			paragraph.add(table);
 			return paragraph;
 		} catch (Exception e) {
