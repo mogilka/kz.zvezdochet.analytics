@@ -1647,7 +1647,7 @@ public class HTMLExporter {
 						div.add(planetText.getText());
 
 						PlanetService planetService = new PlanetService();
-						Planet ruler = planetService.getRuler(planet.getSign(), true);
+						Planet ruler = planetService.getRuler(planet.getSign().getId(), true, false);
 						if (ruler != null) {
 							planetText = (PlanetText)service.findByPlanet(ruler.getId(), "positive");
 							if (planetText != null) {

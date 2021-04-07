@@ -973,6 +973,7 @@ public class PDFExporter {
 			Font boldred = new Font(baseFont, 12, Font.BOLD, PDFUtil.FONTCOLORED);
 			Font red = new Font(baseFont, 12, Font.NORMAL, PDFUtil.FONTCOLORED);
 			Font boldgreen = new Font(baseFont, 12, Font.BOLD, PDFUtil.FONTCOLORGREEN);
+			Font green = new Font(baseFont, 12, Font.NORMAL, PDFUtil.FONTCOLORGREEN);
 
 //----------тигр
 
@@ -1132,7 +1133,9 @@ public class PDFExporter {
 				    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
 				    			 if (planet != null) {
 				    				 ListItem li = new ListItem();
-				    				 boolean negative = planet.isNegative();
+				    				 boolean negative = planet.isNegative()
+				    					|| planet.getCode().equals("Lilith")
+				    					|| planet.getCode().equals("Kethu");
 				    				 String sign = negative ? " - " : " + ";
 				    				 String s = term
 				    					? planet.getName() + " в " + planet.getHouse().getDesignation()
@@ -1140,7 +1143,7 @@ public class PDFExporter {
 				    				 anchor = new Anchor(s, fonta);
 				    				 anchor.setReference("#" + planet.getAnchor());
 				    				 li.add(anchor);
-				    				 li.add(new Chunk(negative ? " (ваша негативная стрела)" : " (ваша позитивная стрела)", font));
+				    				 li.add(new Chunk(negative ? " (ваша негативная стрела)" : " (ваша позитивная стрела)", negative ? red : green));
 				    				 list.add(li);
 				    			 }
 				    		 }
@@ -1675,7 +1678,7 @@ public class PDFExporter {
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 
 						PlanetService planetService = new PlanetService();
-						Planet ruler = planetService.getRuler(planet.getSign(), true);
+						Planet ruler = planetService.getRuler(planet.getSign().getId(), true, false);
 						if (ruler != null) {
 							PlanetText text = (PlanetText)service.findByPlanet(ruler.getId(), "positive");
 							if (text != null) {
