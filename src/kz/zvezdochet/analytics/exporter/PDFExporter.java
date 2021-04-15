@@ -1187,7 +1187,7 @@ public class PDFExporter {
 				    	 }
 				    	 String pids = obj.getString("planet3"); //планета или соединение на дне чаши
 				    	 if (null == pids || pids.isEmpty()) {
-			    			 DialogUtil.alertWarning("Задайте планеты на дне чаши");
+			    			 DialogUtil.alertWarning("Задайте планеты на вершине тау-квадрата");
 			    			 return;
 				    	 }
 
@@ -1201,6 +1201,7 @@ public class PDFExporter {
 			    		 for (String pid : arr) {
 			    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
 			    			 if (planet != null) {
+			    				 li.add(Chunk.NEWLINE);
 			    				 String s = term
 			    					? planet.getName() + " в " + planet.getHouse().getDesignation()
 			    					: planet.getShortName() + " + " + planet.getHouse().getName();
@@ -1238,7 +1239,7 @@ public class PDFExporter {
 			    		 section.add(Chunk.NEWLINE);
 
 				    	 // down|top|left|right какое полушарие занимает чаша
-			    		 section.add(new Paragraph("Располжение чаши на космограмме:", boldred));
+			    		 section.add(new Paragraph("Расположение чаши на космограмме:", boldgreen));
 				    	 try {
 				    		 String direction = obj.getString("direction");
 				    		 if (null == direction || direction.isEmpty()) {
@@ -1866,8 +1867,11 @@ public class PDFExporter {
 		        list.add(li);
 			}
 
-			if (map.containsKey("SPIRITUAL") && map.get("SPIRITUAL") > 0) {
-				text = "Чем больше духовности – тем более высокого уровня развития вы достигли";
+			if (map.containsKey("SPIRITUAL")) {
+				double val = map.get("SPIRITUAL");
+				text = (val > 6)
+					? "Благодаря испытаниям прошлой жизни вы достигли высокого уровня духовности, который теперь надо использовать на благо других"
+					: "Чем больше духовности – тем более высокого уровня развития вы достигли";
 				li = new ListItem();
 		        li.add(new Chunk(text, new Font(baseFont, 12, Font.NORMAL, BaseColor.MAGENTA)));
 		        list.add(li);
