@@ -1391,7 +1391,7 @@ public class PDFExporter {
 				    		 section.add(new Paragraph("Что изначально будет вне ваших интересов:", bold));
 			    			 hids = obj.getString("houses2");
 			    			 if (null == hids || hids.isEmpty()) {
-			    				 DialogUtil.alertWarning("Задайте глваные куспиды пустых домов в обеих пустых зонах");
+			    				 DialogUtil.alertWarning("Задайте главные куспиды пустых домов в обеих пустых зонах");
 			    				 return;
 			    			 } else {
 			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1418,7 +1418,7 @@ public class PDFExporter {
 			    		 if (null == pids
 			    				 || pids.isEmpty()
 				    			 || pids.equals("0")) {
-			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций. А если таковых нет, укажите планеты без оппозиций или благополучные планеты гороскопа");
+			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций. А если таковых нет, укажите планеты без оппозиций или благополучные планеты гороскопа (Кету и Лилит не в счёт)");
 			    			 return;
 			    		 } else {
 			    			 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
