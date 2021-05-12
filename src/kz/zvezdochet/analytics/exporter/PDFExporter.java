@@ -256,10 +256,17 @@ public class PDFExporter {
 	        chapter.add(p);
 
 			p = new Paragraph("Файл содержит ваши врождённые предрасположенности. "
-				+ "Ваша личность описана как с позиции силы, так и с позиции слабости. "
-				+ "Не зацикливайтесь на недостатках – развивайте свои сильные стороны, "
+				+ "Ваша личность описана как с позиции ", font);
+			Anchor anchor = new Anchor("силы", fonta);
+            anchor.setReference("#planetstrong");
+	        p.add(anchor);
+			p.add(new Chunk(", так и с позиции ", font));
+			anchor = new Anchor("слабости", fonta);
+            anchor.setReference("#planetweak");
+	        p.add(anchor);
+			p.add(new Chunk(". Не зацикливайтесь на недостатках – развивайте свои сильные стороны, "
 				+ "используя благоприятные факторы гороскопа, – это более эффективно. "
-				+ "Судьба и так сделает всё, чтобы помочь вам закалить характер.", font);
+				+ "Судьба и так сделает всё, чтобы помочь вам закалить характер.", font));
 	        p.setSpacingAfter(10);
 			chapter.add(p);
 			chapter.add(new Paragraph("Если вы росли без отца или матери, но в гороскопе они упомянуты, "
@@ -300,7 +307,10 @@ public class PDFExporter {
 
 			chapter = new ChapterAutoNumber(PDFUtil.printHeader(new Paragraph(), "Ваш архетип", "commontype"));
 			chapter.setNumberDepth(0);
-			chapter.add(new Paragraph("Архетип – это обобщённый образ людей, рождённых вблизи " + DateUtil.sdf.format(event.getBirth()), PDFUtil.getWarningFont()));
+			chapter.add(new Paragraph("Архетип – это обобщённый образ людей, рождённых вблизи " + DateUtil.sdf.format(event.getBirth())
+				+ ". Архетип характеризует вас как представителя своего поколения, а не как уникальную индивидуальность. "
+				+ "Более точное и персонализированное описание вашей натуры приведено в дальнейших разделах"
+			, PDFUtil.getWarningFont()));
 
 			//планеты в знаках
 			printPlanetSign(chapter, event);
@@ -310,7 +320,7 @@ public class PDFExporter {
 			chapter.setNumberDepth(0);
 
 			Font greenfont = PDFUtil.getSuccessFont();
-			Anchor anchor = new Anchor("Ваш архетип", fonta);
+			anchor = new Anchor("Ваш архетип", fonta);
             anchor.setReference("#commontype");
 			p = new Paragraph();
 			p.add(new Chunk("В разделе ", greenfont));
@@ -1391,7 +1401,7 @@ public class PDFExporter {
 				    		 section.add(new Paragraph("Что изначально будет вне ваших интересов:", bold));
 			    			 hids = obj.getString("houses2");
 			    			 if (null == hids || hids.isEmpty()) {
-			    				 DialogUtil.alertWarning("Задайте главные куспиды пустых домов в обеих пустых зонах");
+			    				 DialogUtil.alertWarning("Задайте вершины пустых домов в обеих пустых зонах");
 			    				 return;
 			    			 } else {
 			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1591,7 +1601,7 @@ public class PDFExporter {
 	 */
 	private void printPlanetStrong(Chapter chapter, Event event) {
 		try {
-			Section section = PDFUtil.printSection(chapter, "Сильные стороны", null);
+			Section section = PDFUtil.printSection(chapter, "Сильные стороны", "planetstrong");
 			PlanetTextService service = new PlanetTextService();
 			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
@@ -1667,7 +1677,7 @@ public class PDFExporter {
 			if (weaks.isEmpty())
 				return;
 
-			Section section = PDFUtil.printSection(chapter, "Слабые стороны", null);
+			Section section = PDFUtil.printSection(chapter, "Слабые стороны", "planetweak");
 			PlanetTextService service = new PlanetTextService();
 			for (Planet planet : weaks) {
 				PlanetText planetText = null;
