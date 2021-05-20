@@ -117,10 +117,18 @@ public class EventRules {
 					return (Rule)service.find(10L);
 			}
 		}
-		if (planet.getCode().equals("Venus") && planet2.getCode().equals("Mars")) {
-			if (code.equals("NEUTRAL")) {
-				if (planet.isDamaged() || planet2.isDamaged())
-					return (Rule)service.find(37L);
+		if (planet.getCode().equals("Venus")) {
+			if (planet2.getCode().equals("Mars")) {
+				if (code.equals("NEUTRAL")) {
+					if (planet.isDamaged() || planet2.isDamaged())
+						return (Rule)service.find(37L);
+				}
+			} else if (planet2.getCode().equals("Pluto")) {
+				if (code.equals("NEGATIVE")) {
+					if (planet.getHouse().getCode().equals("IX_2")
+							&& planet2.getHouse().getCode().equals("V_3"))
+						return (Rule)service.find(226L);
+				}
 			}
 		}
 		return null;
