@@ -305,10 +305,10 @@ public class PDFExporter {
 			printSymbols(chapter, event);
 			doc.add(chapter);
 
-			chapter = new ChapterAutoNumber(PDFUtil.printHeader(new Paragraph(), "Ваш архетип", "commontype"));
+			chapter = new ChapterAutoNumber(PDFUtil.printHeader(new Paragraph(), "Ваш психотип", "commontype"));
 			chapter.setNumberDepth(0);
-			chapter.add(new Paragraph("Архетип – это обобщённый образ людей, рождённых вблизи " + DateUtil.sdf.format(event.getBirth())
-				+ ". Архетип характеризует вас как представителя своего поколения, а не как уникальную индивидуальность. "
+			chapter.add(new Paragraph("Психотип – это обобщённый образ людей, рождённых вблизи " + DateUtil.sdf.format(event.getBirth())
+				+ ". Психотип характеризует вас как представителя своего поколения, а не как уникальную индивидуальность. "
 				+ "Более точное и персонализированное описание вашей натуры приведено в дальнейших разделах"
 			, PDFUtil.getWarningFont()));
 
@@ -320,7 +320,7 @@ public class PDFExporter {
 			chapter.setNumberDepth(0);
 
 			Font greenfont = PDFUtil.getSuccessFont();
-			anchor = new Anchor("Ваш архетип", fonta);
+			anchor = new Anchor("Ваш психотип", fonta);
             anchor.setReference("#commontype");
 			p = new Paragraph();
 			p.add(new Chunk("В разделе ", greenfont));
