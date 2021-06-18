@@ -222,8 +222,8 @@ public class PDFExporter {
 			String text = event.getCallname() + " – ";
 			text += DateUtil.fulldtf.format(event.getBirth());
 			p.add(new Chunk(text, font));
-			if (!event.isRectified())
-				p.add(new Chunk(" (не ректифицировано)", PDFUtil.getDangerFont()));
+//			if (!event.isRectified())
+//				p.add(new Chunk(" (не ректифицировано)", PDFUtil.getDangerFont()));
 	        p.setAlignment(Element.ALIGN_CENTER);
 			chapter.add(p);
 
@@ -309,8 +309,7 @@ public class PDFExporter {
 			chapter.setNumberDepth(0);
 			chapter.add(new Paragraph("Психотип – это обобщённый образ людей, рождённых вблизи " + DateUtil.sdf.format(event.getBirth())
 				+ ". Психотип характеризует вас как представителя своего поколения, а не как уникальную индивидуальность. "
-				+ "Более точное и персонализированное описание вашей натуры приведено в дальнейших разделах"
-			, PDFUtil.getWarningFont()));
+				+ "Более точное и персонализированное описание вашей натуры приведено в дальнейших разделах", PDFUtil.getWarningFont()));
 
 			//планеты в знаках
 			printPlanetSign(chapter, event);
@@ -1612,7 +1611,7 @@ public class PDFExporter {
 				if (planet.isSword()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "sword");
 					if (planetText != null) {
-						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-меч", fonth5));
+						section.addSection(new Paragraph((term ? planet.getName() : planet.getGoodName()) + "-меч", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 
 						Rule rule = EventRules.rulePlanetSword(planet, female);
@@ -1626,7 +1625,7 @@ public class PDFExporter {
 				} else if (planet.isShield()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "shield");
 					if (planetText != null) {
-						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-щит", fonth5));
+						section.addSection(new Paragraph((term ? planet.getName() : planet.getGoodName()) + "-щит", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 						PDFUtil.printGender(section, planetText, female, child, true);
 						section.add(Chunk.NEWLINE);
@@ -1637,14 +1636,14 @@ public class PDFExporter {
 						section.add(new Paragraph("Планета " + planet.getName() + " не вызывает напряжения, так что вы сумеете проработать недостатки, описанные в разделе «" + planet.getShortName() + " в шахте»", fonth5));
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "perfect");
 					if (planetText != null) {
-						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-гармония", fonth5));
+						section.addSection(new Paragraph((term ? planet.getName() : planet.getGoodName()) + "-гармония", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 						PDFUtil.printGender(section, planetText, female, child, true);
 						section.add(Chunk.NEWLINE);
 					}
 				}
 				if (planet.isLord() && !planet.isKethued()) {
-					section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + "-сила", fonth5));
+					section.addSection(new Paragraph((term ? planet.getName() : planet.getGoodName()) + "-сила", fonth5));
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "strong");
 					if (planetText != null) {
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
@@ -1685,7 +1684,7 @@ public class PDFExporter {
 				if (planet.inMine()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "mine");
 					if (planetText != null) {
-						section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()) + " в шахте", fonth5));
+						section.addSection(new Paragraph((term ? planet.getName() : planet.getGoodName()) + " в шахте", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 
 						PlanetService planetService = new PlanetService();
@@ -1705,7 +1704,7 @@ public class PDFExporter {
 				} else if (planet.isDamaged()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "damaged");
 					if (planetText != null) {
-						section.addSection(new Paragraph(term ? planet.getName() : planet.getShortName() + "-дисгармония", fonth5));
+						section.addSection(new Paragraph(term ? planet.getName() : planet.getBadName() + "-дисгармония", fonth5));
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 						PDFUtil.printGender(section, planetText, female, child, true);
 						section.add(Chunk.NEWLINE);
@@ -2070,6 +2069,7 @@ public class PDFExporter {
 				}
 			}
 			Font afont = new Font(PDFUtil.getAstroFont(), 14, Font.NORMAL, PDFUtil.FONTCOLORGRAY);
+			String[] pnegative = {"Lilith", "Kethu"};
 
 			for (SkyPointAspect aspect : spas) {
 				List<Model> dicts = aspect.getTexts();
@@ -2089,10 +2089,16 @@ public class PDFExporter {
 						p.add(new Chunk(dict.getPlanet1().getName() + " " + 
 							type.getSymbol() + " " + 
 							dict.getPlanet2().getName(), fonth5));
-    				else
-						p.add(new Chunk(dict.getPlanet1().getShortName() + " " + 
-							type.getSymbol() + " " + 
-							dict.getPlanet2().getShortName(), fonth5));
+    				else {
+						boolean bad = type.getPoints() < 0
+								|| (type.getCode().equals("NEUTRAL")
+									&& (Arrays.asList(pnegative).contains(dict.getPlanet1().getCode())
+										|| Arrays.asList(pnegative).contains(dict.getPlanet2().getCode())));
+		    				String pname = bad ? dict.getPlanet1().getBadName() : dict.getPlanet1().getGoodName();
+		    				String pname2 = bad ? dict.getPlanet2().getBadName() : dict.getPlanet2().getGoodName();
+
+						p.add(new Chunk(pname + " " + type.getSymbol() + " " + pname2, fonth5));
+    				}
 				}
 				section.addSection(p);
 
@@ -2167,6 +2173,7 @@ public class PDFExporter {
 		    List<AspectConfiguration> confs = null;
 		    AspectConfigurationService service = new AspectConfigurationService();
 			AspectConfiguration conf = null;
+			Font bold = new Font(baseFont, 12, Font.BOLD);
 
 //----------стеллиум 0° 0° 0° 0°
 
@@ -2281,20 +2288,48 @@ public class PDFExporter {
 								shapes.add(par);
 							}
 						}
+				    	//индивидуальное описание
+						if (!code.equals("stellium") && !code.equals("necklace")) {
+							String descr = configuration.getDescription();
+							if (descr != null)
+								shapes.add(new Paragraph(descr, font));
+						} else if (code.equals("necklace") && event.isHousable()) {
+							shapes.add(new Paragraph("Этапы жизни, которые будут последовательно активироваться под влиянием людей и факторов, указанных на рисунке:", bold));
+							com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+							list.setNumbered(true);
+
+							int NECKLACE_STEP = 7;
+							long start = (long)configuration.getData();
+							long finish = start + NECKLACE_STEP;
+
+							for (long i = start; i <= finish; i++) {
+								long hid = (i > 177) ? i - 36 : i; 
+								House house = event.getHouses().get((long)hid);
+								if (house != null && house.getStage() != null) {
+									ListItem li = new ListItem();
+									li.add(new Chunk(house.getStage(), font));
+									list.add(li);
+								}
+							}
+							shapes.add(list);
+							shapes.add(Chunk.NEWLINE);
+
+					    	//индивидуальное описание
+							String descr = configuration.getDescription();
+							if (descr != null)
+								shapes.add(new Paragraph(descr, font));
+
+							Rule rule = EventRules.ruleConfiguration(configuration);
+							if (rule != null) {
+			    				section.add(Chunk.NEWLINE);
+								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+							}
+						}
 						if (confs.size() > 1)
 							PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
 					}
 					section.add(shapes);
-
-			    	//индивидуальное описание
-					if (!code.equals("stellium") && !code.equals("necklace"))
-						for (AspectConfiguration configuration : confs) {
-							String descr = configuration.getDescription();
-							if (descr != null) {
-								section.add(new Paragraph(descr, font));
-								section.add(Chunk.NEWLINE);
-							}
-						}
+					section.add(Chunk.NEWLINE);
 
 					//описание из справочника
 			    	String text = conf.getText();
@@ -2308,7 +2343,6 @@ public class PDFExporter {
 
 					//дополнение
 					Paragraph appendix = new Paragraph();
-					Font bold = new Font(baseFont, 12, Font.BOLD);
 					int j = 0;
 					for (AspectConfiguration configuration : confs) {
 						++j;
@@ -2411,40 +2445,6 @@ public class PDFExporter {
 									appendix.add(new Paragraph(s + ":", bold));
 									appendix.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
 								}
-							}
-						} else if (code.equals("necklace") && event.isHousable()) {
-							String iteration = (confs.size() > 1) ? " №" + j : "";
-							appendix.add(new Paragraph("Ниже перечислены этапы вашей жизни, которые будут последовательно активироваться под влиянием людей и факторов, указанных на рисунке" + iteration + ":", bold));
-							com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-							list.setNumbered(true);
-
-							int NECKLACE_STEP = 7;
-							long start = (long)configuration.getData();
-							long finish = start + NECKLACE_STEP;
-
-							for (long i = start; i <= finish; i++) {
-								long hid = (i > 177) ? i - 36 : i; 
-								House house = event.getHouses().get((long)hid);
-								if (house != null && house.getStage() != null) {
-									ListItem li = new ListItem();
-									li.add(new Chunk(house.getStage(), font));
-									list.add(li);
-								}
-							}
-						    appendix.add(list);
-							appendix.add(Chunk.NEWLINE);
-
-					    	//индивидуальное описание
-							String descr = configuration.getDescription();
-							if (descr != null) {
-								appendix.add(new Paragraph(descr, font));
-								appendix.add(Chunk.NEWLINE);
-							}
-
-							Rule rule = EventRules.ruleConfiguration(configuration);
-							if (rule != null) {
-			    				section.add(Chunk.NEWLINE);
-								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 							}
 						}
 					}
@@ -4503,7 +4503,7 @@ public class PDFExporter {
 			Section section = PDFUtil.printSection(chapter, term ? "Ретроградные планеты" : "Нестандартные качества", null);
 			PlanetTextService service = new PlanetTextService();
 			for (Planet planet : retro) {
-				section.addSection(new Paragraph((term ? planet.getName() : planet.getShortName()), fonth5));
+				section.addSection(new Paragraph((term ? planet.getName() : planet.getGoodName()), fonth5));
 				PlanetText planetText = (PlanetText)service.findByPlanet(planet.getId(), "retro");
 				if (planetText != null && planetText.getText() != null) {
 					section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
