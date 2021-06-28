@@ -219,7 +219,7 @@ public class PDFExporter {
 				chapter.add(p);
 			}
 			p = new Paragraph();
-			String text = event.getCallname() + " – ";
+			String text = event.isCelebrity() ? event.getName() : event.getCallname() + " – ";
 			text += DateUtil.fulldtf.format(event.getBirth());
 			p.add(new Chunk(text, font));
 //			if (!event.isRectified())
