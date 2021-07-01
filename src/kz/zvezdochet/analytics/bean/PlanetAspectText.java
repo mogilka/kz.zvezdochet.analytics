@@ -115,17 +115,4 @@ public class PlanetAspectText extends TextGenderModel {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	/**
-	 * Признак позтивного аспекта
-	 */
-	private boolean positive;
-
-	public boolean isPositive() {
-		return positive;
-	}
-
-	public void setPositive(boolean positive) {
-		this.positive = positive;
-	}
 }
