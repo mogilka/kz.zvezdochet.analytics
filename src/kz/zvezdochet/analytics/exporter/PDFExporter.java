@@ -755,7 +755,7 @@ public class PDFExporter {
 
 				    			Section section = PDFUtil.printSection(chapter, category.getName(), null);
 				    			if (term) {
-				    				section.add(new Chunk(planet.getMark("sign"), fonth5));
+				    				section.add(new Chunk(planet.getMark("sign", term), fonth5));
 				    				section.add(new Chunk(planet.getSymbol(), PDFUtil.getHeaderAstroFont()));
 				    				section.add(new Chunk(" " + planet.getName() + " в созвездии " + planet.getSign().getName() + " ", fonth5));
 				    				section.add(new Chunk(planet.getSign().getSymbol(), PDFUtil.getHeaderAstroFont()));
@@ -2106,6 +2106,7 @@ public class PDFExporter {
 			}
 			Font afont = new Font(PDFUtil.getAstroFont(), 14, Font.NORMAL, PDFUtil.FONTCOLORGRAY);
 			String[] pnegative = {"Lilith", "Kethu"};
+			Font aifont = PDFUtil.getAnnotationFont(true);
 
 			for (SkyPointAspect aspect : spas) {
 				List<Model> dicts = aspect.getTexts();
@@ -2139,11 +2140,11 @@ public class PDFExporter {
 				section.addSection(p);
 
 				if (term) {
-					p = new Paragraph(aspect.getAspect().getName() + " планеты " + aspl1.getName() + " ", PDFUtil.getAnnotationFont(true));
+					p = new Paragraph(aspect.getAspect().getName() + " планеты " + aspl1.getName() + " ", aifont);
 					p.add(new Chunk(aspl1.getSymbol(), afont));
 //		    		if (aspect.getAspect().getCode().equals("CONJUNCTION") || aspect.getAspect().getCode().equals("OPPOSITION"))
 //		    			p.add(new Chunk(aspect.getAspect().getSymbol(), afont));
-	    			p.add(new Chunk((aspect.getAspect().getCode().equals("CONJUNCTION") ? " с планетой " : " к планете ") + aspl2.getName() + " ", PDFUtil.getAnnotationFont(true)));
+	    			p.add(new Chunk((aspect.getAspect().getCode().equals("CONJUNCTION") ? " с планетой " : " к планете ") + aspl2.getName() + " ", aifont));
 		    		p.add(new Chunk(aspl2.getSymbol(), afont));
 		    		section.add(p);
 
@@ -2607,7 +2608,7 @@ public class PDFExporter {
 
 						Phrase ph = new Phrase("", fonth5);
 		    			if (term) {
-							String mark = planet.getMark("house");
+							String mark = planet.getMark("house", term);
 							if (mark.length() > 0) {
 			    				ph.add(new Chunk(mark, fonth5));
 			    				ph.add(new Chunk(planet.getSymbol() + " ", PDFUtil.getHeaderAstroFont()));
