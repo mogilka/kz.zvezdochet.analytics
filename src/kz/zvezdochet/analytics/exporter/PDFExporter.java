@@ -2261,6 +2261,7 @@ public class PDFExporter {
 			    section.add(p);
 
 			    RuleService ruleService = new RuleService();
+				PlanetTextService ptservice = new PlanetTextService();
 			    for (Map.Entry<String, List<AspectConfiguration>> entry : map.entrySet()) {
 			    	//заголовок
 			    	confs = entry.getValue();
@@ -2325,11 +2326,108 @@ public class PDFExporter {
 								shapes.add(par);
 							}
 						}
+
 				    	//индивидуальное описание
 						if (!code.equals("stellium") && !code.equals("necklace")) {
 							String descr = configuration.getDescription();
 							if (descr != null)
 								shapes.add(new Paragraph(descr, font));
+
+							//дополнение
+							shapes.add(Chunk.NEWLINE);
+							if (code.equals("taucross")) {
+								shapes.add(new Paragraph("Напряжённые факторы треугольника:", bold));
+
+								Planet vertex = configuration.getVertex()[0];
+								PlanetText ptext = (PlanetText)ptservice.findByPlanet(vertex.getId(), configuration.isVertexPositive() ? "positive" : "negative");
+								if (ptext != null)
+									shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
+								vertex.setSign(event.getPlanets().get(vertex.getId()).getSign());
+								Cross cross = (Cross)new CrossService().find(vertex.getSign().getCrossId());
+								if (cross != null) {
+									String str = term ? cross.getName() : "Ваша реакция на указанные факторы";
+									shapes.add(new Paragraph(str + ":", bold));
+									shapes.add(new Paragraph(PDFUtil.removeTags(cross.getTau(), font)));
+									shapes.add(Chunk.NEWLINE);
+								}
+
+							} else if (code.equals("triangle")) {
+								shapes.add(Chunk.NEWLINE);
+								if (event.isHousable()) {
+									com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+									Planet[] tplanets = {configuration.getVertex()[0], configuration.getLeftFoot()[0], configuration.getRightFoot()[0]};
+									House[] houses = new House[3];
+									Collection<Planet> planets = event.getPlanets().values();
+									for (int i = 0; i < 3; i++) {
+										 Planet tp = tplanets[i];
+										for (Planet planet : planets) {
+											if (tp.getCode().equals(planet.getCode())) {
+												houses[i] = planet.getHouse(); break;
+											}
+										}
+									}
+									shapes.add(new Paragraph("Благоприятные сферы треугольника:", bold));
+									for (House h : houses) {
+										if (h != null) {
+											ListItem li = new ListItem();
+											li.add(new Chunk(h.getDescription(), font));
+											list.add(li);
+										}
+									}
+									shapes.add(list);
+									shapes.add(Chunk.NEWLINE);
+								}							
+								if (configuration.getElement() != null) {
+									if (term)
+										shapes.add(new Paragraph(configuration.getElement().getDescription(), fonth5));
+									shapes.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
+									shapes.add(new Paragraph(configuration.getElement().getTriangle(), font));
+								}
+
+							} else if (code.equals("cross")) {
+								Cross cross = (Cross)new CrossService().find(1L);
+								if (cross != null) {
+									String str = "Ваша реакция на проблемные сферы";
+									if (term)
+										str += " (" + cross.getName() + ")";
+									shapes.add(new Paragraph(str + ":", bold));
+									shapes.add(new Paragraph(PDFUtil.removeTags(cross.getTau(), font)));
+								}
+
+							} else if (code.equals("stretcher")) {
+								if (!female) {
+									RuleService rservice = new RuleService();
+									Rule rule = (Rule)rservice.find(101L);
+									if (rule != null)
+										shapes.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+								}
+
+							} else if (code.equals("arrester")) {
+								for (Planet planet : configuration.getVertex()) {
+									PlanetText ptext = (PlanetText)ptservice.findByPlanet(planet.getId(), configuration.isVertexPositive() ? "positive" : "negative");
+									if (ptext != null) {
+										String s = configuration.isVertexPositive() ? planet.getPositive() : planet.getNegative();
+										if (term)
+											s += " (" + ptext.getPlanet().getName() + ")";
+										shapes.add(new Paragraph(s, bold));
+										shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
+									}
+								}
+
+							} else if (code.equals("buoy")) {
+								for (Planet planet : configuration.getVertex()) {
+									PlanetText ptext = (PlanetText)ptservice.findByPlanet(planet.getId(), configuration.isVertexPositive() ? "positive" : "negative");
+									if (ptext != null) {
+										String s = configuration.isVertexPositive() ? planet.getPositive() : planet.getNegative();
+										if (term)
+											s += " (" + ptext.getPlanet().getName() + ")";
+										shapes.add(new Paragraph(s + ":", bold));
+										shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
+									}
+								}
+							}
+
+						//ожерелье
 						} else if (code.equals("necklace") && event.isHousable()) {
 							shapes.add(new Paragraph("Этапы жизни, которые будут последовательно активироваться под влиянием людей и факторов, указанных на рисунке:", bold));
 							com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -2351,7 +2449,6 @@ public class PDFExporter {
 							shapes.add(list);
 							shapes.add(Chunk.NEWLINE);
 
-					    	//индивидуальное описание
 							String descr = configuration.getDescription();
 							if (descr != null)
 								shapes.add(new Paragraph(descr, font));
@@ -2366,9 +2463,9 @@ public class PDFExporter {
 							PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
 					}
 					section.add(shapes);
-					section.add(Chunk.NEWLINE);
 
 					//описание из справочника
+					section.add(new Paragraph("Общее описание фигуры:", bold));
 			    	String text = conf.getText();
 					if (code.equals("stellium")) {
 						if (sign != null) {
@@ -2378,115 +2475,8 @@ public class PDFExporter {
 					}
 					section.add(new Paragraph(PDFUtil.removeTags(text, font)));
 
-					//дополнение
-					Paragraph appendix = new Paragraph();
-					int j = 0;
-					for (AspectConfiguration configuration : confs) {
-						++j;
-						if (code.equals("taucross")) {
-							String iteration = (confs.size() > 1) ? " №" + j : "";
-							appendix.add(new Paragraph("Напряжённые факторы треугольника" + iteration + ":", fonth5));
-
-							PlanetTextService ptservice = new PlanetTextService();
-							for (Planet planet : configuration.getVertex()) {
-								PlanetText ptext = (PlanetText)ptservice.findByPlanet(planet.getId(), configuration.isVertexPositive() ? "positive" : "negative");
-								if (ptext != null) {
-									String s = term ? ptext.getPlanet().getName() : (configuration.isVertexPositive() ? planet.getPositive() : planet.getNegative());
-									appendix.add(new Paragraph(s + ":", bold));
-									appendix.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
-								}
-							}
-							Planet vertex = configuration.getVertex()[0];
-							vertex.setSign(event.getPlanets().get(vertex.getId()).getSign());
-							Cross cross = (Cross)new CrossService().find(vertex.getSign().getCrossId());
-							if (cross != null) {
-								String str = term ? cross.getName() : "Ваша реакция на указанные факторы";
-								appendix.add(new Paragraph(str + ":", bold));
-								appendix.add(new Paragraph(PDFUtil.removeTags(cross.getTau(), font)));
-								appendix.add(Chunk.NEWLINE);
-							}
-
-						} else if (code.equals("triangle")) {
-							appendix.add(Chunk.NEWLINE);
-							if (event.isHousable()) {
-								com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-								Planet[] tplanets = {configuration.getVertex()[0], configuration.getLeftFoot()[0], configuration.getRightFoot()[0]};
-								House[] houses = new House[3];
-								Collection<Planet> planets = event.getPlanets().values();
-								for (int i = 0; i < 3; i++) {
-									 Planet tp = tplanets[i];
-									for (Planet planet : planets) {
-										if (tp.getCode().equals(planet.getCode())) {
-											houses[i] = planet.getHouse(); break;
-										}
-									}
-								}
-								String iteration = (confs.size() > 1) ? " №" + j : "";
-								appendix.add(new Paragraph("Благоприятные сферы треугольника" + iteration + ":", fonth5));
-								for (House h : houses) {
-									if (h != null) {
-										ListItem li = new ListItem();
-										li.add(new Chunk(h.getDescription(), font));
-										list.add(li);
-									}
-								}
-								appendix.add(list);
-								appendix.add(Chunk.NEWLINE);
-							}							
-							if (configuration.getElement() != null) {
-								if (term)
-									appendix.add(new Paragraph(configuration.getElement().getDescription(), fonth5));
-								appendix.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
-								appendix.add(new Paragraph(configuration.getElement().getTriangle(), font));
-							}
-
-						} else if (code.equals("cross")) {
-							Cross cross = (Cross)new CrossService().find(1L);
-							if (cross != null) {
-								String str = "Ваша реакция на проблемные сферы";
-								if (term)
-									str += " (" + cross.getName() + ")";
-								appendix.add(new Paragraph(str + ":", fonth5));
-								appendix.add(new Paragraph(PDFUtil.removeTags(cross.getTau(), font)));
-							}
-
-						} else if (code.equals("stretcher")) {
-							if (!female) {
-								RuleService rservice = new RuleService();
-								Rule rule = (Rule)rservice.find(101L);
-								if (rule != null)
-									appendix.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
-							}
-
-						} else if (code.equals("arrester")) {
-							PlanetTextService ptservice = new PlanetTextService();
-							for (Planet planet : configuration.getVertex()) {
-								PlanetText ptext = (PlanetText)ptservice.findByPlanet(planet.getId(), configuration.isVertexPositive() ? "positive" : "negative");
-								if (ptext != null) {
-									String s = configuration.isVertexPositive() ? planet.getPositive() : planet.getNegative();
-									if (term)
-										s += " (" + ptext.getPlanet().getName() + ")";
-									appendix.add(new Paragraph(s, bold));
-									appendix.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
-								}
-							}
-
-						} else if (code.equals("buoy")) {
-							PlanetTextService ptservice = new PlanetTextService();
-							for (Planet planet : configuration.getVertex()) {
-								PlanetText ptext = (PlanetText)ptservice.findByPlanet(planet.getId(), configuration.isVertexPositive() ? "positive" : "negative");
-								if (ptext != null) {
-									String s = configuration.isVertexPositive() ? planet.getPositive() : planet.getNegative();
-									if (term)
-										s += " (" + ptext.getPlanet().getName() + ")";
-									appendix.add(new Paragraph(s + ":", bold));
-									appendix.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
-								}
-							}
-						}
-					}
-
 					//несколько однотипных конфигураций
+					Paragraph appendix = new Paragraph();
 					if (confs.size() > 1) {
 						if (code.equals("bisextile")) {
 							Rule rule =	(Rule)ruleService.find(38L);
