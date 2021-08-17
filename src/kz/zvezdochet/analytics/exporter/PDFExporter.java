@@ -1868,7 +1868,7 @@ public class PDFExporter {
 					Font lifont = new Font(baseFont, 12, Font.NORMAL, BaseColor.BLUE);
 					phrase.add(new Chunk("Воздаяния за ошибки больше, чем конфликтов, значит непоняток в жизни будет больше, чем продуктивных споров. "
 						+ "Причины многих неудач таятся в вашем прошлом поведении и мышлении. "
-						+ "Испытания даны вам для того, чтобы очиститься от старых грехов и обременяющих установок, но отыскать и осознать их будет непросто. "
+						+ "Испытания даны вам для того, чтобы очиститься от старых грехов и обременяющих установок (в т.ч. чужих), но отыскать и осознать их будет непросто. "
 						+ "Подсказкой здесь послужат синие фигуры в разделе ", lifont));
 					Anchor anchor = new Anchor("Фигуры гороскопа", fonta);
 					anchor.setReference("#aspectconfiguration");
@@ -1958,7 +1958,7 @@ public class PDFExporter {
 						Anchor anchor = new Anchor("Фигуры гороскопа", fonta);
 						anchor.setReference("#aspectconfiguration");
 						phrase.add(anchor);
-						phrase.add(new Chunk(". Чтобы возврат к прошлому не мешал продвижению вперёд, старайтесь вовремя завершать начатое, а не копить проблемы, чтобы повторно не тратить на них своё драгоценное время", lifont));
+						phrase.add(new Chunk(". Чтобы возврат к прошлому не мешал продвижению вперёд, старайтесь вовремя завершать начатое, а не копить проблемы, для решения которых придётся тратить своё драгоценное время", lifont));
 					} else if (code.equals("CREATIVE")) {
 						color = new BaseColor(0, 102, 51);
 						lifont = new Font(baseFont, 12, Font.NORMAL, color);
@@ -2336,14 +2336,18 @@ public class PDFExporter {
 							//дополнение
 							shapes.add(Chunk.NEWLINE);
 							if (code.equals("taucross")) {
-								shapes.add(new Paragraph("Напряжённые факторы треугольника:", bold));
+								shapes.add(new Paragraph("Напряжённые факторы треугольника:", fonth5));
 
-								Planet vertex = configuration.getVertex()[0];
-								PlanetText ptext = (PlanetText)ptservice.findByPlanet(vertex.getId(), configuration.isVertexPositive() ? "positive" : "negative");
-								if (ptext != null)
-									shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
-								vertex.setSign(event.getPlanets().get(vertex.getId()).getSign());
-								Cross cross = (Cross)new CrossService().find(vertex.getSign().getCrossId());
+								Planet[] planets = configuration.getVertex();
+								for (Planet vertex : planets) {
+									PlanetText ptext = (PlanetText)ptservice.findByPlanet(vertex.getId(), configuration.isVertexPositive() ? "positive" : "negative");
+									if (ptext != null) {
+										shapes.add(new Paragraph(configuration.isVertexPositive() ? vertex.getPositive() : vertex.getNegative(), bold));
+										shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
+									}
+								}
+								sign = event.getPlanets().get(planets[0].getId()).getSign();
+								Cross cross = (Cross)new CrossService().find(sign.getCrossId());
 								if (cross != null) {
 									String str = term ? cross.getName() : "Ваша реакция на указанные факторы";
 									shapes.add(new Paragraph(str + ":", bold));
@@ -2352,36 +2356,12 @@ public class PDFExporter {
 								}
 
 							} else if (code.equals("triangle")) {
-								shapes.add(Chunk.NEWLINE);
-								if (event.isHousable()) {
-									com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-									Planet[] tplanets = {configuration.getVertex()[0], configuration.getLeftFoot()[0], configuration.getRightFoot()[0]};
-									House[] houses = new House[3];
-									Collection<Planet> planets = event.getPlanets().values();
-									for (int i = 0; i < 3; i++) {
-										 Planet tp = tplanets[i];
-										for (Planet planet : planets) {
-											if (tp.getCode().equals(planet.getCode())) {
-												houses[i] = planet.getHouse(); break;
-											}
-										}
-									}
-									shapes.add(new Paragraph("Благоприятные сферы треугольника:", bold));
-									for (House h : houses) {
-										if (h != null) {
-											ListItem li = new ListItem();
-											li.add(new Chunk(h.getDescription(), font));
-											list.add(li);
-										}
-									}
-									shapes.add(list);
-									shapes.add(Chunk.NEWLINE);
-								}							
 								if (configuration.getElement() != null) {
 									if (term)
 										shapes.add(new Paragraph(configuration.getElement().getDescription(), fonth5));
 									shapes.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
 									shapes.add(new Paragraph(configuration.getElement().getTriangle(), font));
+									PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
 								}
 
 							} else if (code.equals("cross")) {
@@ -2400,18 +2380,6 @@ public class PDFExporter {
 									Rule rule = (Rule)rservice.find(101L);
 									if (rule != null)
 										shapes.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
-								}
-
-							} else if (code.equals("arrester")) {
-								for (Planet planet : configuration.getVertex()) {
-									PlanetText ptext = (PlanetText)ptservice.findByPlanet(planet.getId(), configuration.isVertexPositive() ? "positive" : "negative");
-									if (ptext != null) {
-										String s = configuration.isVertexPositive() ? planet.getPositive() : planet.getNegative();
-										if (term)
-											s += " (" + ptext.getPlanet().getName() + ")";
-										shapes.add(new Paragraph(s, bold));
-										shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
-									}
 								}
 
 							} else if (code.equals("buoy")) {
@@ -2451,13 +2419,14 @@ public class PDFExporter {
 
 							String descr = configuration.getDescription();
 							if (descr != null)
-								shapes.add(new Paragraph(descr, font));
+								shapes.add(new Paragraph(descr, PDFUtil.getWarningFont()));
 
 							Rule rule = EventRules.ruleConfiguration(configuration);
 							if (rule != null) {
 			    				section.add(Chunk.NEWLINE);
 								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 							}
+							PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
 						}
 						if (confs.size() > 1)
 							PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
@@ -2571,14 +2540,15 @@ public class PDFExporter {
 				//Определяем количество планет в доме
 				List<Planet> planets = new ArrayList<Planet>();
 				for (Planet planet : cplanets) {
-					if ((planet.getCode().equals("Selena")
+					if (planet.getCode().equals("Selena")
 							&& house.isSelened()
-							&& house.isLilithed()))
+							&& (house.isLilithed()
+								|| house.isKethued()))
 						continue;
 
-					if ((planet.getCode().equals("Rakhu")
+					if (planet.getCode().equals("Rakhu")
 							&& house.isRakhued()
-							&& house.isLilithed()))
+							&& house.isLilithed())
 						continue;
 
 					if (planet.getHouse().getId().equals(house.getId()))
@@ -2617,9 +2587,17 @@ public class PDFExporter {
 		            	p.add(anchorTarget);
 		    			section.addSection(p);
 
-						if ((planet.getCode().equals("Lilith")
+						if (planet.getCode().equals("Lilith")
 								&& (house.isSelened() || house.isRakhued())
-								&& house.isLilithed())) {
+								&& house.isLilithed()) {
+							Rule rule = EventRules.ruleMoonsHouse(house);
+							if (rule != null) {
+								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+								section.add(Chunk.NEWLINE);
+							}
+						} if (planet.getCode().equals("Kethu")
+								&& house.isKethued()
+								&& house.isSelened()) {
 							Rule rule = EventRules.ruleMoonsHouse(house);
 							if (rule != null) {
 								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
