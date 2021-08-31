@@ -112,7 +112,6 @@ import kz.zvezdochet.service.ElementService;
 import kz.zvezdochet.service.EventConfigurationService;
 import kz.zvezdochet.service.EventService;
 import kz.zvezdochet.service.HalfsphereService;
-import kz.zvezdochet.service.HouseService;
 import kz.zvezdochet.service.PlanetService;
 import kz.zvezdochet.service.SignService;
 import kz.zvezdochet.service.SquareService;
@@ -292,7 +291,7 @@ public class PDFExporter {
 			//дома
 			statistics.initPlanetHouses();
 			if (event.isHousable()) {
-				printHouses(writer, chapter, statistics);
+				printHouses(writer, chapter, event, statistics);
 				chapter.add(Chunk.NEXTPAGE);
 			}
 
@@ -1965,7 +1964,7 @@ public class PDFExporter {
 						text = "Творческие аспекты зашкаливают, так что у вас в распоряжении достаточно свободы и возможности преобразить мир! Это очень редкая комбинация, которая говорит о том, что вы не ограничены в своих проявлениях, сможете жить, действовать и принимать решения независимо от других";
 						phrase = new Phrase(text, lifont);
 					} else if (code.equals("NEGATIVE")) {
-						text = "Уровень конфликтов зашкаливает, значит отток энергии будет довольно сильным. Развивайте силу духа, научитесь управлять рисками и преуменьшать их";
+						text = "Уровень конфликтов зашкаливает, значит отток энергии через трудности и выяснение отношений будет довольно сильным. Развивайте силу духа, научитесь управлять рисками и преуменьшать их";
 						phrase = new Phrase(text, lifont);
 					} else if (code.equals("POSITIVE")) {
 						color = BaseColor.RED;
@@ -2262,6 +2261,9 @@ public class PDFExporter {
 
 			    RuleService ruleService = new RuleService();
 				PlanetTextService ptservice = new PlanetTextService();
+				ElementService elementService = new ElementService();
+				CrossService crossService = new CrossService();
+
 			    for (Map.Entry<String, List<AspectConfiguration>> entry : map.entrySet()) {
 			    	//заголовок
 			    	confs = entry.getValue();
@@ -2277,7 +2279,7 @@ public class PDFExporter {
 							if (conf.getDegree() != null)
 								text += "Конфигурация аспектов: " + conf.getDegree() + ". ";
 							if (conf.getElementid() > 0) {
-								kz.zvezdochet.bean.Element element = (kz.zvezdochet.bean.Element)new ElementService().find(conf.getElementid());
+								kz.zvezdochet.bean.Element element = (kz.zvezdochet.bean.Element)elementService.find(conf.getElementid());
 								if (element != null)
 									text += "Стихия: " + element.getName() + ". ";
 							}
@@ -2342,12 +2344,13 @@ public class PDFExporter {
 								for (Planet vertex : planets) {
 									PlanetText ptext = (PlanetText)ptservice.findByPlanet(vertex.getId(), configuration.isVertexPositive() ? "positive" : "negative");
 									if (ptext != null) {
-										shapes.add(new Paragraph(configuration.isVertexPositive() ? vertex.getPositive() : vertex.getNegative(), bold));
+										if (term)
+											shapes.add(new Paragraph(configuration.isVertexPositive() ? vertex.getPositive() : vertex.getNegative(), bold));
 										shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
 									}
 								}
 								sign = event.getPlanets().get(planets[0].getId()).getSign();
-								Cross cross = (Cross)new CrossService().find(sign.getCrossId());
+								Cross cross = (Cross)crossService.find(sign.getCrossId());
 								if (cross != null) {
 									String str = term ? cross.getName() : "Ваша реакция на указанные факторы";
 									shapes.add(new Paragraph(str + ":", bold));
@@ -2365,7 +2368,7 @@ public class PDFExporter {
 								}
 
 							} else if (code.equals("cross")) {
-								Cross cross = (Cross)new CrossService().find(1L);
+								Cross cross = (Cross)crossService.find(1L);
 								if (cross != null) {
 									String str = "Ваша реакция на проблемные сферы";
 									if (term)
@@ -2376,8 +2379,7 @@ public class PDFExporter {
 
 							} else if (code.equals("stretcher")) {
 								if (!female) {
-									RuleService rservice = new RuleService();
-									Rule rule = (Rule)rservice.find(101L);
+									Rule rule = (Rule)ruleService.find(101L);
 									if (rule != null)
 										shapes.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 								}
@@ -2472,9 +2474,10 @@ public class PDFExporter {
 	 * Генерация диаграмм домов
 	 * @param writer обработчик генерации документа
 	 * @param chapter раздел
+	 * @param event событие
 	 * @param statistics объект статистики события
 	 */
-	private void printHouses(PdfWriter writer, Chapter chapter, EventStatistics statistics) {
+	private void printHouses(PdfWriter writer, Chapter chapter, Event event, EventStatistics statistics) {
 		try {
 			Section section = PDFUtil.printSection(chapter, "Сферы жизни", null);
 			section.add(new Paragraph("Сферы жизни отражают ваши врождённые возможности, багаж и опыт, с которым вы пришли в этот мир. "
@@ -2485,27 +2488,38 @@ public class PDFExporter {
 				+ "Даже если в будущем приоритеты поменяются, указанные в диаграмме факторы сохранят свою силу. "
 				+ "Чем длиннее столбик, тем больше мыслей и событий с ним будет связано:", font));
 
-			Map<String, Double> houses = statistics.getPlanetHouses();
+			Map<Long, Double> houses = statistics.getPlanetHouses();
+			House house = null;
 
 			Bar[] bars = new Bar[houses.size()];
-			Iterator<Map.Entry<String, Double>> iterator = houses.entrySet().iterator();
+			Iterator<Map.Entry<Long, Double>> iterator = houses.entrySet().iterator();
 		    int i = -1;
 		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
-		    	House house = statistics.getHouse(entry.getKey());
+		    	Entry<Long, Double> entry = iterator.next();
+		    	House h = statistics.getHouse(entry.getKey());
 		    	Bar bar = new Bar();
-		    	bar.setName(term ? house.getName() : house.getName());
-		    	bar.setValue(entry.getValue());
-				bar.setColor(house.getColor());
+		    	bar.setName(term ? h.getName() : h.getName());
+		    	double val = entry.getValue();
+		    	bar.setValue(val);
+				bar.setColor(h.getColor());
 				bar.setCategory("Сферы жизни");
-				bars[++i] = (bar);
+				bars[++i] = bar;
+				if (val > 2) {
+					House ehouse = event.getHouses().get(entry.getKey());
+					if (!ehouse.isKethued() && !ehouse.isLilithed())
+						house = ehouse;
+				}
 		    }
 			section.add(PDFUtil.printBars(writer, "", null, "Сферы жизни", "Баллы", bars, 500, 500, false, false, false));
 
+			if (house != null) {
+				section.add(new Paragraph(house.getMission(), PDFUtil.getSuccessFont()));
+				section.add(Chunk.NEWLINE);
+			}
 			Anchor anchor = new Anchor("Реализация личности", fonta);
             anchor.setReference("#planethouses");
 			Paragraph p = new Paragraph();
-			p.add(new Chunk("Более подробно эти сферы описаны в разделе ", font));
+			p.add(new Chunk("Более подробно важные сферы описаны в разделе ", font));
 	        p.add(anchor);
 			section.add(p);
 		} catch(Exception e) {
@@ -2563,7 +2577,8 @@ public class PDFExporter {
 						boolean negative = planet.isDamaged()
 								|| ((planet.getCode().equals("Lilith")
 										|| planet.getCode().equals("Kethu"))
-									&& !planet.isLord() && !planet.isPerfect());
+									&& !planet.isLord() && !planet.isPerfect())
+								|| (planet.isLilithed() && house.isLilithed());
 						String sign = negative ? "-" : "+";
 
 						Phrase ph = new Phrase("", fonth5);
@@ -2608,6 +2623,8 @@ public class PDFExporter {
 							if (planet.isDamaged() || planet.getCode().equals("Kethu"))
 								type = negativeType;
 							else if (planet.getCode().equals("Lilith") && !planet.isPerfect())
+								type = negativeType;
+							else if (planet.isLilithed() && house.isLilithed())
 								type = negativeType;
 
 							PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, type);
@@ -3018,19 +3035,18 @@ public class PDFExporter {
 
 			//дома
 			if (event.isHousable()) {
-				houseMap = statistics.getMainPlanetHouses(); //TODO найти более оптимальный вариант, мат.формулу
-				bars = new Bar[houseMap.size()];
-				iterator = houseMap.entrySet().iterator();
+				Map<Long, Double> houseMap2 = statistics.getMainPlanetHouses(); //TODO найти более оптимальный вариант, мат.формулу
+				bars = new Bar[houseMap2.size()];
+				Iterator<Map.Entry<Long, Double>> iterator2 = houseMap2.entrySet().iterator();
 				i = -1;
-				HouseService hservice = new HouseService();
-				   while (iterator.hasNext()) {
-				   	Entry<String, Double> entry = iterator.next();
+				while (iterator2.hasNext()) {
+				   	Entry<Long, Double> entry = iterator2.next();
 			    	double val = entry.getValue();
 			    	if (0 == val)
 			    		continue;
 				   	Bar bar = new Bar();
 					//по индексу трети определяем дом, в котором она находится
-				   	House element = (House)hservice.find(entry.getKey());
+				   	House element = event.getHouses().get(entry.getKey());
 				   	bar.setName(element.getDiaName());
 				   	bar.setValue(val);
 				   	bar.setColor(element.getColor());
@@ -4008,6 +4024,7 @@ public class PDFExporter {
 			p.setAlignment(Element.ALIGN_RIGHT);
 			PdfPCell cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
+			cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 			cell.addElement(p);
 			table.addCell(cell);
 
@@ -4029,6 +4046,7 @@ public class PDFExporter {
 			p = new Paragraph(text, font);
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
+			cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 			cell.addElement(p);
 			table.addCell(cell);
 
