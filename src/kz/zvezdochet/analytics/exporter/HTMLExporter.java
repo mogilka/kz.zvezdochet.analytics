@@ -128,7 +128,7 @@ public class HTMLExporter {
 			printAspect(event, body, "Негативные сочетания", "NEGATIVE");
 
 			//планеты в домах
-			Map<String, Double> houseMap = statistics.getPlanetHouses();
+			Map<Long, Double> houseMap = statistics.getPlanetHouses();
 			printPlanetHouse(event, body, houseMap);
 
 //			//стихии
@@ -168,11 +168,14 @@ public class HTMLExporter {
 	 * @param body тег-контейнер для вложенных тегов
 	 * @param houseMap карта домов
 	 */
-	private void printPlanetHouse(Event event, Tag body, Map<String, Double> houseMap) {
+	private void printPlanetHouse(Event event, Tag body, Map<Long, Double> houseMap) {
 		Collection<House> houses = event.getHouses().values();
 		Collection<Planet> cplanets = event.getPlanets().values();
 		if (null == houses) return;
 		try {
+			PlanetHouseService planetHouseService = new PlanetHouseService();
+			HouseSignService houseSignService = new HouseSignService();
+
 			Tag div = new Tag("div");
 			for (Model hmodel : houses) {
 				House house = (House)hmodel;
@@ -197,9 +200,8 @@ public class HTMLExporter {
 				Tag tag = null;
 				if (planets.size() > 0) {
 					tag = new Tag("h2");
-					PlanetHouseService service = new PlanetHouseService();
 					for (Planet planet : planets) {
-						PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, null);
+						PlanetHouseText dict = (PlanetHouseText)planetHouseService.find(planet, house, null);
 						if (dict != null) {
 							String sign = planet.isDamaged() || planet.isLilithed() ? "-" : "+";
 							tag.add(planet.getShortName() + " " + sign + " " + house.getName());
@@ -216,7 +218,7 @@ public class HTMLExporter {
 					continue;
 
 				Sign sign = SkyPoint.getSign(house.getLongitude(), event.getBirthYear());
-				HouseSignText dict = (HouseSignText)new HouseSignService().find(house, sign);
+				HouseSignText dict = (HouseSignText)houseSignService.find(house, sign);
 				if (dict != null) {
 					if (null == tag)
 						tag = new Tag("h2");
@@ -784,9 +786,9 @@ public class HTMLExporter {
 				cell.add(tr);
 				
 				//дома
-				Map<String, Double> houseMap = statistics.getMainPlanetHouses(); //TODO найти более оптимальный вариант, мат.формулу
+				Map<Long, Double> houseMap = statistics.getMainPlanetHouses(); //TODO найти более оптимальный вариант, мат.формулу
 				bars = new Bar[houseMap.size()];
-				iterator = houseMap.entrySet().iterator();
+				Iterator<Map.Entry<Long, Double>> iterator2 = houseMap.entrySet().iterator();
 				i = -1;
 				HouseService hservice = new HouseService();
 			    while (iterator.hasNext()) {
@@ -1256,12 +1258,12 @@ public class HTMLExporter {
 					+ "В любом случае, это отправная точка корабля событий, на котором вы поплывёте по морю жизни и реализуете свою миссию.");
 			td.add(p);
 			
-			Map<String, Double> houses = statistics.getPlanetHouses();
+			Map<Long, Double> houses = statistics.getPlanetHouses();
 			Bar[] bars = new Bar[houses.size()];
-			Iterator<Map.Entry<String, Double>> iterator = houses.entrySet().iterator();
+			Iterator<Map.Entry<Long, Double>> iterator = houses.entrySet().iterator();
 	    	int i = -1;
 		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
+		    	Entry<Long, Double> entry = iterator.next();
 		    	Bar bar = new Bar();
 		    	House house = statistics.getHouse(entry.getKey());
 		    	bar.setName(house.getName());

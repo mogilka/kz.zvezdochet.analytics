@@ -31,6 +31,7 @@ public class AnalyticsService {
         PreparedStatement ps = null;
         ResultSet rs = null;
 		try {
+			PlanetService service = new PlanetService();
 			String sql = 
 					"select p.planetid from planetsignposition p " +
 					"inner join positiontype t on p.typeid = t.id " +
@@ -43,7 +44,7 @@ public class AnalyticsService {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				Long id = Long.parseLong(rs.getString(1));
-				planet = (Planet)new PlanetService().find(id);
+				planet = (Planet)service.find(id);
 				if (!planet.isFictitious())
 					return planet;
 			}

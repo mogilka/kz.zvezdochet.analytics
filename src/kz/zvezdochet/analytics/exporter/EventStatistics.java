@@ -22,7 +22,6 @@ import kz.zvezdochet.bean.YinYang;
 import kz.zvezdochet.bean.Zone;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
-import kz.zvezdochet.core.service.ModelService;
 import kz.zvezdochet.core.util.CoreUtil;
 import kz.zvezdochet.service.CrossService;
 import kz.zvezdochet.service.ElementService;
@@ -41,7 +40,7 @@ import kz.zvezdochet.service.ZoneService;
 public class EventStatistics {
 	private Event event;
 	private Map<String, Double> planetSigns;
-	private Map<String, Double> planetHouses;
+	private Map<Long, Double> planetHouses;
 	private Map<String, Double> planetElements;
 	private Map<String, Double> planetYinYangs;
 	private Map<String, Double> planetHalfspheres;
@@ -114,7 +113,7 @@ public class EventStatistics {
 	 */
 	public void initPlanetHouses() throws DataAccessException {
 		if (event.getPlanets() != null) {
-			planetHouses = new HashMap<String, Double>();
+			planetHouses = new HashMap<Long, Double>();
 			Map<Long, House> houses = event.getHouses();
 			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
@@ -124,11 +123,11 @@ public class EventStatistics {
 					if (SkyPoint.getHouse(house1.getLongitude(), house2.getLongitude(), planet.getLongitude())) { 
 						planet.setHouse(house1);
 						double value = 0.0;
-						Object object = planetHouses.get(house1.getCode());
+						Object object = planetHouses.get(house1.getId());
 						if (object != null)
 							value = (Double)object;
 						value += planet.getScore();
-						planetHouses.put(house1.getCode(), value);
+						planetHouses.put(house1.getId(), value);
 					}
 				}
 			}
@@ -136,14 +135,14 @@ public class EventStatistics {
 	}
 
 	/**
-	 * Поиск астрологического дома конфигурации по коду
-	 * @param code код дома
+	 * Поиск астрологического дома конфигурации по идентификатору
+	 * @param id идентификатор дома
 	 * @return астрологический дом конфигурации
 	 * @throws DataAccessException 
 	 */
-	public House getHouse(String code) throws DataAccessException {
+	public House getHouse(long id) throws DataAccessException {
 		for (House house : event.getHouses().values())
-			if (house.getCode().equals(code))
+			if (house.getId().equals(id))
 				return house;
 		return null;
 	}
@@ -161,16 +160,23 @@ public class EventStatistics {
 			planetSquares = Square.getMap();
 			planetCrosses = Cross.getMap();
 			planetZones = Zone.getMap();
-			
+
+			SignService signService = new SignService();
+			ElementService elementService = new ElementService();
+			YinYangService yinYangService = new YinYangService();
+			HalfsphereService halfsphereService = new HalfsphereService();
+			SquareService squareService = new SquareService();
+			CrossService crossService = new CrossService();
+			ZoneService zoneService = new ZoneService();
+
 			Iterator<Map.Entry<String, Double>> iterator = planetSigns.entrySet().iterator();
 		    while (iterator.hasNext()) {
 		    	Entry<String, Double> entry = iterator.next();
-		    	Sign sign = (Sign)new SignService().find(entry.getKey());
+		    	Sign sign = (Sign)signService.find(entry.getKey());
 				double value = 0.0;
 				
 				//выделенность стихий
-				ModelService service = new ElementService();
-				Element element = (Element)service.find(sign.getElementId());
+				Element element = (Element)elementService.find(sign.getElementId());
 		    	String division = element.getCode();
 				Object object = planetElements.get(division);
 				if (object != null)
@@ -179,9 +185,8 @@ public class EventStatistics {
 				planetElements.put(division, value);
 
 				//выделенность инь-ян
-				service = new YinYangService();
 				value = 0.0;
-				YinYang yinYang = (YinYang)service.find(sign.getYinyangId());
+				YinYang yinYang = (YinYang)yinYangService.find(sign.getYinyangId());
 				division = yinYang.getCode();
 				object = planetYinYangs.get(division);
 				if (object != null)
@@ -190,9 +195,8 @@ public class EventStatistics {
 				planetYinYangs.put(division, value);
 
 				//выделенность полусфер
-				service = new HalfsphereService();
 				value = 0.0;
-				Halfsphere halfsphere = (Halfsphere)service.find(sign.getVerticalHalfSphereId());
+				Halfsphere halfsphere = (Halfsphere)halfsphereService.find(sign.getVerticalHalfSphereId());
 				division = halfsphere.getCode();
 				object = planetHalfspheres.get(division);
 				if (object != null)
@@ -201,7 +205,7 @@ public class EventStatistics {
 				planetHalfspheres.put(division, value);
 
 				value = 0.0;
-				halfsphere = (Halfsphere)service.find(sign.getHorizontalalHalfSphereId());
+				halfsphere = (Halfsphere)halfsphereService.find(sign.getHorizontalalHalfSphereId());
 				division = halfsphere.getCode();
 				object = planetHalfspheres.get(division);
 				if (object != null)
@@ -210,9 +214,8 @@ public class EventStatistics {
 				planetHalfspheres.put(division, value);
 
 				//выделенность квадратов
-				service = new SquareService();
 				value = 0.0;
-				Square square = (Square)service.find(sign.getSquareId());
+				Square square = (Square)squareService.find(sign.getSquareId());
 				division = square.getCode();
 				object = planetSquares.get(division);
 				if (object != null)
@@ -221,9 +224,8 @@ public class EventStatistics {
 				planetSquares.put(division, value);
 
 				//выделенность крестов
-				service = new CrossService();
 				value = 0.0;
-				Cross cross = (Cross)service.find(sign.getCrossId());
+				Cross cross = (Cross)crossService.find(sign.getCrossId());
 				division = cross.getCode();
 				object = planetCrosses.get(division);
 				if (object != null)
@@ -232,9 +234,8 @@ public class EventStatistics {
 				planetCrosses.put(division, value);
 
 				//выделенность зон
-				service = new ZoneService();
 				value = 0.0;
-				Zone zone = (Zone)service.find(sign.getZoneId());
+				Zone zone = (Zone)zoneService.find(sign.getZoneId());
 				division = zone.getCode();
 				object = planetZones.get(division);
 				if (object != null)
@@ -277,7 +278,7 @@ public class EventStatistics {
 		return planetZones;
 	}
 
-	public Map<String, Double> getPlanetHouses() {
+	public Map<Long, Double> getPlanetHouses() {
 		return planetHouses;
 	}
 
@@ -294,15 +295,22 @@ public class EventStatistics {
 			houseSquares = Square.getMap();
 			houseCrosses = Cross.getMap();
 			houseZones = Zone.getMap();
-			
-			Iterator<Map.Entry<String, Double>> iterator = planetHouses.entrySet().iterator();
+
+			ElementService elementService = new ElementService();
+			YinYangService yinYangService = new YinYangService();
+			HalfsphereService halfsphereService = new HalfsphereService();
+			SquareService squareService = new SquareService();
+			CrossService crossService = new CrossService();
+			ZoneService zoneService = new ZoneService();
+
+			Iterator<Map.Entry<Long, Double>> iterator = planetHouses.entrySet().iterator();
 		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
-		    	House house = (House)new HouseService().find(entry.getKey());
+		    	Entry<Long, Double> entry = iterator.next();
+		    	House house = event.getHouses().get(entry.getKey());
 				double value = 0.0;
 				
 				//выделенность стихий
-				Element element = (Element)new ElementService().find(house.getElementId());
+				Element element = (Element)elementService.find(house.getElementId());
 		    	String division = element.getCode();
 				Object object = houseElements.get(division);
 				if (object != null)
@@ -312,7 +320,7 @@ public class EventStatistics {
 
 				//выделенность инь-ян
 				value = 0.0;
-				YinYang yinYang = (YinYang)new YinYangService().find(house.getYinyangId());
+				YinYang yinYang = (YinYang)yinYangService.find(house.getYinyangId());
 				division = yinYang.getCode();
 				object = houseYinYangs.get(division);
 				if (object != null)
@@ -322,7 +330,7 @@ public class EventStatistics {
 
 				//выделенность полусфер
 				value = 0.0;
-				Halfsphere halfsphere = (Halfsphere)new HalfsphereService().find(house.getVerticalHalfSphereId());
+				Halfsphere halfsphere = (Halfsphere)halfsphereService.find(house.getVerticalHalfSphereId());
 				division = halfsphere.getCode();
 				object = houseHalfspheres.get(division);
 				if (object != null)
@@ -331,7 +339,7 @@ public class EventStatistics {
 				houseHalfspheres.put(division, value);
 
 				value = 0.0;
-				halfsphere = (Halfsphere)new HalfsphereService().find(house.getHorizontalalHalfSphereId());
+				halfsphere = (Halfsphere)halfsphereService.find(house.getHorizontalalHalfSphereId());
 				division = halfsphere.getCode();
 				object = houseHalfspheres.get(division);
 				if (object != null)
@@ -341,7 +349,7 @@ public class EventStatistics {
 
 				//выделенность квадратов
 				value = 0.0;
-				Square square = (Square)new SquareService().find(house.getSquareId());
+				Square square = (Square)squareService.find(house.getSquareId());
 				division = square.getCode();
 				object = houseSquares.get(division);
 				if (object != null)
@@ -351,7 +359,7 @@ public class EventStatistics {
 
 				//выделенность крестов
 				value = 0.0;
-				Cross cross = (Cross)new CrossService().find(house.getCrossId());
+				Cross cross = (Cross)crossService.find(house.getCrossId());
 				division = cross.getCode();
 				object = houseCrosses.get(division);
 				if (object != null)
@@ -361,7 +369,7 @@ public class EventStatistics {
 
 				//выделенность зон
 				value = 0.0;
-				Zone zone = (Zone)new ZoneService().find(house.getZoneId());
+				Zone zone = (Zone)zoneService.find(house.getZoneId());
 				division = zone.getCode();
 				object = houseZones.get(division);
 				if (object != null)
@@ -401,15 +409,15 @@ public class EventStatistics {
 	 * @return карта главных домов
 	 * @throws DataAccessException 
 	 */
-	public Map<String, Double> getMainPlanetHouses() throws DataAccessException {
-		Map<String, Double> houses = new HashMap<String, Double>();
+	public Map<Long, Double> getMainPlanetHouses() throws DataAccessException {
+		Map<Long, Double> houses = new HashMap<Long, Double>();
 		if (planetHouses != null) {
-			Iterator<Map.Entry<String, Double>> iterator = planetHouses.entrySet().iterator();
+			Iterator<Map.Entry<Long, Double>> iterator = planetHouses.entrySet().iterator();
 			HouseService service = new HouseService();
 		    while (iterator.hasNext()) {
-		    	Entry<String, Double> entry = iterator.next();
+		    	Entry<Long, Double> entry = iterator.next();
 				//по индексу трети определяем дом, в котором она находится
-		    	House house = (House)service.find(entry.getKey());
+		    	House house = event.getHouses().get(entry.getKey());
 				double value = entry.getValue();
 				int index;
 				if (CoreUtil.isArrayContainsNumber(new int[] {1,4,7,10,13,16,19,22,25,28,31,34}, house.getNumber()))
@@ -418,10 +426,10 @@ public class EventStatistics {
 					index = (house.getNumber() % 3 == 0) ? house.getNumber() - 2 : house.getNumber() - 1;
 		    	house = service.getHouse(index);
 
-				Object object = houses.get(house.getCode());
+				Object object = houses.get(house.getId());
 				if (object != null)
 					value += (Double)object;
-				houses.put(house.getCode(), value);
+				houses.put(house.getId(), value);
 			}
 		}
 		return houses;
@@ -471,7 +479,7 @@ public class EventStatistics {
 				List<Model> houses = service.findByCross(model.getId());
 				for (Model smodel : houses) {
 					House house = (House)smodel;
-					Double value = planetHouses.get(house.getCode());
+					Double value = planetHouses.get(house.getId());
 					if (value != null)
 						sum += value; 
 				}
