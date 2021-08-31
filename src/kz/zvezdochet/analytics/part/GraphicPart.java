@@ -150,7 +150,7 @@ public class GraphicPart extends View {
 					event = new Event(DateUtil.getDatabaseDateTime(sdate + " 12:00:00"), "Мой гороскоп");
 					event.calc(true);
 					event.setCalculated(true);
-					service.save(event);
+					event.save();
 					System.out.println("Новый добавлен: " + event.toLog() + "\n");
 				} else {
 					event = events.get(0);
