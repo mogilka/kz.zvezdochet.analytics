@@ -2489,7 +2489,6 @@ public class PDFExporter {
 				+ "Чем длиннее столбик, тем больше мыслей и событий с ним будет связано:", font));
 
 			Map<Long, Double> houses = statistics.getPlanetHouses();
-			House house = null;
 
 			Bar[] bars = new Bar[houses.size()];
 			Iterator<Map.Entry<Long, Double>> iterator = houses.entrySet().iterator();
@@ -2504,14 +2503,19 @@ public class PDFExporter {
 				bar.setColor(h.getColor());
 				bar.setCategory("Сферы жизни");
 				bars[++i] = bar;
-				if (val > 2) {
-					House ehouse = event.getHouses().get(entry.getKey());
-					if (!ehouse.isKethued() && !ehouse.isLilithed())
-						house = ehouse;
-				}
 		    }
 			section.add(PDFUtil.printBars(writer, "", null, "Сферы жизни", "Баллы", bars, 500, 500, false, false, false));
 
+			//определяем дом с 3+ планетами
+			Collection<House> ehouses = event.getHouses().values();
+			if (null == ehouses) return;
+			House house = null;
+			for (House h : ehouses) {
+				if (h.isLilithed() || h.isKethued())
+					continue;
+				if (h.getPoints() > 2)
+					house = h;
+			}
 			if (house != null) {
 				section.add(new Paragraph(house.getMission(), PDFUtil.getSuccessFont()));
 				section.add(Chunk.NEWLINE);
@@ -2603,14 +2607,13 @@ public class PDFExporter {
 		    			section.addSection(p);
 
 						if (planet.getCode().equals("Lilith")
-								&& (house.isSelened() || house.isRakhued())
-								&& house.isLilithed()) {
+								&& (house.isSelened() || house.isRakhued())) {
 							Rule rule = EventRules.ruleMoonsHouse(house);
 							if (rule != null) {
 								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 								section.add(Chunk.NEWLINE);
 							}
-						} if (planet.getCode().equals("Kethu")
+						} else if (planet.getCode().equals("Kethu")
 								&& house.isKethued()
 								&& house.isSelened()) {
 							Rule rule = EventRules.ruleMoonsHouse(house);
