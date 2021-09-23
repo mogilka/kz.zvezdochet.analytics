@@ -433,9 +433,13 @@ public class EventRules {
 					return (Rule)service.find(219L);
 				else if (house.getCode().equals("XI"))
 					return (Rule)service.find(225L);
+				else if (house.getCode().equals("XI_2"))
+					return (Rule)service.find(230L);
 			} else if (house.isKethued()) {
-				if (house.getCode().equals("IX"))
-					return (Rule)service.find(228L);				
+				if (house.getCode().equals("VI_2"))
+					return (Rule)service.find(231L);
+				else if (house.getCode().equals("IX"))
+					return (Rule)service.find(228L);
 			}
 		}
 		if (house.isRakhued()) {
