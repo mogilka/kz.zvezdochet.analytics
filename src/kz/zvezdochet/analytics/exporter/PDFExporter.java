@@ -213,7 +213,7 @@ public class PDFExporter {
 			chapter.add(p);
 
 			p = new Paragraph();
-			String text = event.isCelebrity() ? event.getName() : event.getCallname() + " – ";
+			String text = (event.isCelebrity() ? event.getName() : event.getCallname()) + " – ";
 			text += DateUtil.fulldtf.format(event.getBirth());
 			p.add(new Chunk(text, font));
 			if (!event.isRectified())
@@ -1430,7 +1430,7 @@ public class PDFExporter {
 			    		 if (null == pids
 			    				 || pids.isEmpty()
 				    			 || pids.equals("0")) {
-			    			 DialogUtil.alertWarning("Задайте крайние планеты качелей без оппозиций. А если таковых нет, укажите планеты без оппозиций или благополучные планеты гороскопа (Кету и Лилит не в счёт)");
+			    			 DialogUtil.alertWarning("Задайте через запятую крайние планеты качелей без оппозиций. А если таковых нет, укажите планеты без оппозиций или благополучные планеты гороскопа (Кету и Лилит не в счёт)");
 			    			 return;
 			    		 } else {
 			    			 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -2300,6 +2300,7 @@ public class PDFExporter {
 					
 					//изображения
 					Paragraph shapes = new Paragraph();
+					String descr = null;
 					for (AspectConfiguration configuration : confs) {
 						String shape = configuration.getShape();
 						if (shape.equals("triangle")) {
@@ -2340,7 +2341,7 @@ public class PDFExporter {
 
 				    	//индивидуальное описание
 						if (!code.equals("stellium") && !code.equals("necklace")) {
-							String descr = configuration.getDescription();
+							descr = configuration.getDescription();
 							if (descr != null)
 								shapes.add(new Paragraph(descr, font));
 
@@ -2373,7 +2374,6 @@ public class PDFExporter {
 										shapes.add(new Paragraph(configuration.getElement().getDescription(), fonth5));
 									shapes.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
 									shapes.add(new Paragraph(configuration.getElement().getTriangle(), font));
-									PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
 								}
 
 							} else if (code.equals("cross")) {
@@ -2429,7 +2429,7 @@ public class PDFExporter {
 							shapes.add(list);
 							shapes.add(Chunk.NEWLINE);
 
-							String descr = configuration.getDescription();
+							descr = configuration.getDescription();
 							if (descr != null)
 								shapes.add(new Paragraph(descr, term ? font : PDFUtil.getWarningFont()));
 
@@ -2446,15 +2446,18 @@ public class PDFExporter {
 					section.add(shapes);
 
 					//описание из справочника
-					section.add(new Paragraph("Общее описание фигуры:", bold));
 			    	String text = conf.getText();
 					if (code.equals("stellium")) {
 						if (sign != null) {
 							text = text.replace("{sign}", sign.getName());
 							text = text.replace("{merit}", sign.getKeyword());
 						}
+						section.add(new Paragraph(PDFUtil.removeTags(text, font)));
 					}
-					section.add(new Paragraph(PDFUtil.removeTags(text, font)));
+					if (term || null == descr) {
+						section.add(new Paragraph("Общее описание фигуры:", bold));
+						section.add(new Paragraph(PDFUtil.removeTags(text, font)));
+					}
 
 					//несколько однотипных конфигураций
 					Paragraph appendix = new Paragraph();
