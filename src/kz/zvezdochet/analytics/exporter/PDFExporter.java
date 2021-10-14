@@ -411,9 +411,6 @@ public class PDFExporter {
 			printZones(writer, chapter, statistics, event);
 			chapter.add(Chunk.NEXTPAGE);
 
-			//знаменитости
-			printSimilar(chapter, event);
-
 			//координаты планет
 			printCoords(chapter, event);
 			doc.add(chapter);
@@ -547,6 +544,7 @@ public class PDFExporter {
 	 * @param date дата события
 	 * @param cell тег-контейнер для вложенных тегов
 	 */
+	@SuppressWarnings("unused")
 	private void printSimilar(Chapter chapter, Event event) {
 		try {
 			List<Model> events = new EventService().findSimilar(event, 1);
@@ -679,6 +677,11 @@ public class PDFExporter {
 						String filename = url.getPath();
 						com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(filename);
 						section.add(image);
+					}
+					if (degree.isPositive()) {
+						Paragraph p = new Paragraph("Подобную иллюстрацию можно нарисовать и повесить в месте вашего вдохновения", font);
+						p.setSpacingBefore(10);
+						section.add(p);
 					}
 			    }
 			}
@@ -1308,6 +1311,31 @@ public class PDFExporter {
 			    	 }
 			     }
 
+//----------айсберг
+			} else if (3 == id) {
+			     if (jsonObject != null) {
+			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+			    	 if (obj != null) {
+				    	 int pid = obj.getInt("planet"); //планета-ядро
+				    	 if (0 == pid) {
+			    			 DialogUtil.alertWarning("Задайте планету с наибольшим кармическим статусом");
+			    			 return;
+				    	 }
+			    		 section.add(new Paragraph("Планета-ядро гороскопа", bold));
+			    		 section.add(new Paragraph("Центральной считается планета с наибольшим кармическим статусом, на неё и надо опираться:", font));
+				    	 Planet planet = event.getPlanets().get(Long.valueOf(pid));
+		    			 if (planet != null) {
+		    				 String s = term
+		    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
+		    					: planet.getShortName() + " + " + planet.getHouse().getName();
+		    				 anchor = new Anchor(s, fonta);
+		    				 anchor.setReference("#" + planet.getAnchor());
+		    				 section.add(anchor);
+		    			 }
+			    		 section.add(Chunk.NEWLINE);
+			    	 }
+			     }
+
 //---------сгущение
 
 			} else if (15 == id) {
@@ -1500,35 +1528,6 @@ public class PDFExporter {
 		        }
 				section.add(table);
 			}
-
-//			CardKind type = null;
-//			//упорядочиваем массив планет по возрастанию
-//			List<Planet> planets = new ArrayList<Planet>();
-//			for (BaseEntity entity : event.getConfiguration().getPlanets())
-//				planets.add((Planet)entity);
-//			Collections.sort(planets, new SkyPointComparator());
-//			
-//			//расчет интервалов между планетами
-//			double max = 0.0;
-//			double[] cuts = new double[planets.size()]; 
-//			for (int i = 0; i < planets.size(); i++) {
-//				int n = (i == planets.size() - 1) ? 0 : i + 1;
-//				double value = CalcUtil.getDifference(planets.get(i).getCoord(), planets.get(n).getCoord());
-//				cuts[i] = value;
-//				if (value > max) max = value;
-//			}
-//			
-//			if (type != null) {
-//				Tag p = new Tag("h5"); 
-//				p.add(type.getName());
-//				td.add(p);
-//				p = new Tag("p", "class=desc"); 
-//				p.add(type.getDescription());
-//				td.add(p);
-//				p = new Tag("p"); 
-//				p.add(type.getText());
-//				td.add(p);
-//			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -1637,12 +1636,21 @@ public class PDFExporter {
 					if (planetText != null) {
 						section.addSection(new Paragraph((term ? planet.getName() : planet.getGoodName()) + "-щит", fonth5));
 						if (term) {
+							Font afont = PDFUtil.getAnnotationFont(true);
 							section.add(new Paragraph("Планета-щит (Дорифорий) следует сразу за Солнцем. "
 								+ "Она имеет отношение к вашей профессии, указывая направление для самовыражения. "
-								+ "Астрологический дом, в котором находится Щит, определяет сферу жизни, которая будет часто выдвигаться на первый план, требуя от вас решения. "
-								+ "Чем ближе Щит к Солнцу, тем быстрее придётся решать эти вопросы, что добавит вам опыта в реализации солнечного потенциала. "
+								+ "Астрологический дом, в котором находится Щит, определяет сферу жизни, которая будет часто выдвигаться на первый план, требуя от вас решения:", afont));
+
+			    			 if (event.isHousable()) {
+			    				 House house = planet.getHouse();
+			    				 String s = house.getDesignation() + " дом – " + house.getName();
+			    				 Anchor anchor = new Anchor(s, fonta);
+			    				 anchor.setReference("#" + planet.getAnchor());
+			    				 section.add(anchor);
+			    			 }
+			    			 section.add(new Paragraph("Чем ближе Щит к Солнцу, тем быстрее придётся решать эти вопросы, что добавит вам опыта в реализации солнечного потенциала. "
 								+ "Чем дальше Щит от Солнца, тем больше у вас будет времени для согласования вопросов перед тем, как приступить к действию. "
-								+ "В прогностике Щит тоже важен: прежде чем сформировать транзит к вашему Солнцу, планетам придётся пройти сквозь систему защиты", PDFUtil.getAnnotationFont(true)));
+								+ "В прогностике Щит тоже важен: прежде чем сформировать транзит к вашему Солнцу, планетам придётся пройти сквозь систему защиты", afont));
 							section.add(Chunk.NEWLINE);
 						}
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
@@ -1745,6 +1753,7 @@ public class PDFExporter {
 						if (term) {
 							section.add(new Paragraph("У поражённой планеты нет благоприятных аспектов, а значит через неё от вас будет утекать больше всего энергии. "
 								+ "То, что другим даётся на халяву, вам придётся долго отвоёвывать, бережно хранить и иногда жить напрасной надеждой. "
+								+ "Поражённая планета не даёт права на ошибку. "
 								+ "Однако при прохождении позитивных дирекций и транзитов по данной планете вы ощутите её положительную природу и сможете наверстать упущенное. "
 								+ "Когда именно это произойдёт, - покажет краткосрочный и долгосрочный прогноз", PDFUtil.getAnnotationFont(true)));
 							section.add(Chunk.NEWLINE);
@@ -2453,8 +2462,7 @@ public class PDFExporter {
 							text = text.replace("{merit}", sign.getKeyword());
 						}
 						section.add(new Paragraph(PDFUtil.removeTags(text, font)));
-					}
-					if (term || null == descr) {
+					} else if (term || null == descr) {
 						section.add(new Paragraph("Общее описание фигуры:", bold));
 						section.add(new Paragraph(PDFUtil.removeTags(text, font)));
 					}
@@ -2522,7 +2530,7 @@ public class PDFExporter {
 				bar.setCategory("Сферы жизни");
 				bars[++i] = bar;
 		    }
-			section.add(PDFUtil.printBars(writer, "", null, "Сферы жизни", "Баллы", bars, 500, 500, false, false, false));
+			section.add(PDFUtil.printBars(writer, "", null, "Сферы жизни", "Баллы", bars, 500, 400, false, false, false));
 
 			//определяем дом с 3+ планетами
 			Collection<House> ehouses = event.getHouses().values();
