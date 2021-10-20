@@ -2532,18 +2532,20 @@ public class PDFExporter {
 		    }
 			section.add(PDFUtil.printBars(writer, "", null, "Сферы жизни", "Баллы", bars, 500, 400, false, false, false));
 
-			//определяем дом с 3+ планетами
+			//определяем дома с 3+ планетами
 			Collection<House> ehouses = event.getHouses().values();
 			if (null == ehouses) return;
-			House house = null;
+			List<House> houses3 = new ArrayList<>();
 			for (House h : ehouses) {
 				if (h.isLilithed() || h.isKethued())
 					continue;
 				if (h.getPoints() > 2)
-					house = h;
+					houses3.add(h);
 			}
-			if (house != null) {
-				section.add(new Paragraph(house.getMission(), PDFUtil.getSuccessFont()));
+			Font green = PDFUtil.getSuccessFont();
+			for (House h : houses3) {
+				String mission = h.getMission();
+				section.add(new Paragraph(null == mission ? h.getDescription() : mission, green));
 				section.add(Chunk.NEWLINE);
 			}
 			Anchor anchor = new Anchor("Реализация личности", fonta);
