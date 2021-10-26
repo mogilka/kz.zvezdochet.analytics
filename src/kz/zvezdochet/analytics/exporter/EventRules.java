@@ -440,6 +440,8 @@ public class EventRules {
 					return (Rule)service.find(231L);
 				else if (house.getCode().equals("IX"))
 					return (Rule)service.find(228L);
+				else if (house.getCode().equals("X_2"))
+					return (Rule)service.find(232L);
 			}
 		}
 		if (house.isRakhued()) {
