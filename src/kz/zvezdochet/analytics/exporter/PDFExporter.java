@@ -751,7 +751,8 @@ public class PDFExporter {
 				boolean baby = event.isBaby();
 				for (Planet planet : planets) {
 				    if (planet.isMain()) {
-				    	List<PlanetSignText> list = service.find(planet, planet.getSign());
+				    	Sign sign = planet.getSign();
+				    	List<PlanetSignText> list = service.find(planet, sign);
 				    	if (list != null && list.size() > 0)
 				    		for (PlanetSignText object : list) {
 				    			Category category = object.getCategory();
@@ -768,8 +769,8 @@ public class PDFExporter {
 				    			if (term) {
 				    				section.add(new Chunk(planet.getMark("sign", term) + " ", fonth5));
 				    				section.add(new Chunk(planet.getSymbol(), PDFUtil.getHeaderAstroFont()));
-				    				section.add(new Chunk(" " + planet.getName() + " в созвездии " + planet.getSign().getName() + " ", fonth5));
-				    				section.add(new Chunk(planet.getSign().getSymbol(), PDFUtil.getHeaderAstroFont()));
+				    				section.add(new Chunk(" " + planet.getName() + " в созвездии " + sign.getName() + " ", fonth5));
+				    				section.add(new Chunk(sign.getSymbol(), PDFUtil.getHeaderAstroFont()));
 				    			}
 				    			String text = object.getText();
 				    			if (text != null) {
@@ -779,7 +780,7 @@ public class PDFExporter {
 					    			section.add(p);
 					    			PDFUtil.printGender(section, object, female, child, true);
 				    			}
-								Rule rule = EventRules.rulePlanetSign(planet, planet.getSign(), event, category);
+								Rule rule = EventRules.rulePlanetSign(planet, sign, event, category);
 								if (rule != null) {
 									section.add(Chunk.NEWLINE);
 									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
