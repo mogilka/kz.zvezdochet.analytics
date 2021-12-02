@@ -138,62 +138,95 @@ public class EventRules {
 	 * Нахождение планеты в доме
 	 * @param planet планета
 	 * @param house дом
-	 * @return правило
+	 * @return массив правил
 	 * @throws DataAccessException
 	 */
-	public static Rule rulePlanetHouse(Planet planet, House house, boolean female) throws DataAccessException {
+	public static List<Rule> rulePlanetHouse(Planet planet, House house, boolean female) throws DataAccessException {
+		List<Rule> rules = new ArrayList<Rule>();
 		RuleService service = new RuleService();
 		String hcode = house.getCode();
 		String pcode = planet.getCode();
 		if (hcode.equals("I")) {
 			if (pcode.equals("Mercury")) {
 				if (planet.isWeak())
-					return (Rule)service.find(186L);
+					rules.add((Rule)service.find(186L));
 				else if (planet.isDamaged())
-					return (Rule)service.find(187L);
+					rules.add((Rule)service.find(187L));
 			}
 		} else if (hcode.equals("I_3")) {
 			if (pcode.equals("Sun")) {
 				if (planet.getSign().getCode().equals("Aquarius"))
-					return (Rule)service.find(26L);
+					rules.add((Rule)service.find(26L));
+			}
+		} else if (hcode.equals("II")) {
+			if (pcode.equals("Moon")) {
+				Map<String, String> aspectMap = planet.getAspectMap();
+				String pcode2 = "Venus";
+				if (aspectMap.containsKey(pcode2)) {
+					String acode = aspectMap.get(pcode2);
+					if (Arrays.asList(new String[] {"SEXTILE", "TRIN"}).contains(acode))
+						rules.add((Rule)service.find(235L));
+				}
+				pcode2 = "Mercury";
+				if (aspectMap.containsKey(pcode2)) {
+					String acode = aspectMap.get(pcode2);
+					if (Arrays.asList(new String[] {"OPPOSITION", "QUADRATURE"}).contains(acode))
+						rules.add((Rule)service.find(236L));
+				}
+				pcode2 = "Saturn";
+				if (aspectMap.containsKey(pcode2)) {
+					String acode = aspectMap.get(pcode2);
+					if (Arrays.asList(new String[] {"OPPOSITION", "QUADRATURE"}).contains(acode))
+						rules.add((Rule)service.find(237L));
+				}
 			}
 		} else if (hcode.equals("VI_2")) {
 			if (pcode.equals("Mars")) {
 				String scode = planet.getSign().getCode();
 				if (scode.equals("Aries"))
-					return (Rule)service.find(193L);
+					rules.add((Rule)service.find(193L));
 				else if (scode.equals("Taurus"))
-					return (Rule)service.find(194L);
+					rules.add((Rule)service.find(194L));
 				else if (scode.equals("Gemini"))
-					return (Rule)service.find(195L);
+					rules.add((Rule)service.find(195L));
 				else if (scode.equals("Cancer"))
-					return (Rule)service.find(196L);
+					rules.add((Rule)service.find(196L));
 				else if (scode.equals("Leo"))
-					return (Rule)service.find(197L);
+					rules.add((Rule)service.find(197L));
 				else if (scode.equals("Virgo"))
-					return (Rule)service.find(198L);
+					rules.add((Rule)service.find(198L));
 				else if (scode.equals("Libra"))
-					return (Rule)service.find(199L);
+					rules.add((Rule)service.find(199L));
 				else if (scode.equals("Scorpio"))
-					return (Rule)service.find(200L);
+					rules.add((Rule)service.find(200L));
 				else if (scode.equals("Ophiuchus"))
-					return (Rule)service.find(205L);
+					rules.add((Rule)service.find(205L));
 				else if (scode.equals("Sagittarius"))
-					return (Rule)service.find(201L);
+					rules.add((Rule)service.find(201L));
 				else if (scode.equals("Capricornus"))
-					return (Rule)service.find(202L);
+					rules.add((Rule)service.find(202L));
 				else if (scode.equals("Aquarius"))
-					return (Rule)service.find(203L);
+					rules.add((Rule)service.find(203L));
 				else if (scode.equals("Pisces"))
-					return (Rule)service.find(204L);
+					rules.add((Rule)service.find(204L));
 			}
 		} else if (hcode.equals("VII")) {
 			if (pcode.equals("Rakhu")) {
 				if (female && !planet.isNegative())
-					return (Rule)service.find(70L);
+					rules.add((Rule)service.find(70L));
+			}
+		} else if (hcode.equals("VII_3")) {
+			if (pcode.equals("Mercury")) {
+				Map<String, String> aspectMap = planet.getAspectMap();
+				String pcode2 = "Moon";
+				if (aspectMap.containsKey(pcode2)) {
+					String acode = aspectMap.get(pcode2);
+					if (Arrays.asList(new String[] {"OPPOSITION", "QUADRATURE"}).contains(acode))
+						rules.add((Rule)service.find(238L));
+				}
 			}
 		}
-		return null;
+		return rules;
 	}
 
 	/**

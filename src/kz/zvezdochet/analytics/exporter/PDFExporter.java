@@ -1323,15 +1323,19 @@ public class PDFExporter {
 			    			 return;
 				    	 }
 			    		 section.add(new Paragraph("Планета-ядро гороскопа", bold));
-			    		 section.add(new Paragraph("Центральной считается планета с наибольшим кармическим статусом, на неё и надо опираться:", font));
+			    		 section.add(new Paragraph("Центральной считается планета с наибольшим кармическим статусом:", font));
 				    	 Planet planet = event.getPlanets().get(Long.valueOf(pid));
 		    			 if (planet != null) {
+		    				 Paragraph paragraph = new Paragraph();
 		    				 String s = term
 		    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
 		    					: planet.getShortName() + " + " + planet.getHouse().getName();
 		    				 anchor = new Anchor(s, fonta);
 		    				 anchor.setReference("#" + planet.getAnchor());
-		    				 section.add(anchor);
+		    				 paragraph.add(anchor);
+		    				 boolean bad = planet.isBad() || planet.isNegative();
+		    				 paragraph.add(new Chunk(bad ? " (через эту планету вам предстоит работа над собой)" : " (это планета-поддержка, можете опираться на неё)", bad ? red : green));
+		    				 section.add(paragraph);
 		    			 }
 			    		 section.add(Chunk.NEWLINE);
 			    	 }
@@ -2671,11 +2675,13 @@ public class PDFExporter {
 							if (dict != null) {
 								section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
 	
-								Rule rule = EventRules.rulePlanetHouse(planet, house, female);
-								if (rule != null) {
-									section.add(Chunk.NEWLINE);
-									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
-									section.add(Chunk.NEWLINE);
+								List<Rule> rules = EventRules.rulePlanetHouse(planet, house, female);
+								if (rules != null && !rules.isEmpty()) {
+									for (Rule rule : rules) {
+										section.add(Chunk.NEWLINE);
+										section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+										PDFUtil.printGender(section, rule, female, child, true);
+									}
 								}
 								PDFUtil.printGender(section, dict, female, child, true);
 								section.add(Chunk.NEWLINE);

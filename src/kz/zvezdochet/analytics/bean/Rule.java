@@ -4,14 +4,14 @@
 package kz.zvezdochet.analytics.bean;
 
 import kz.zvezdochet.analytics.service.RuleService;
-import kz.zvezdochet.core.bean.Model;
+import kz.zvezdochet.core.bean.TextGenderModel;
 import kz.zvezdochet.core.service.ModelService;
 
 /**
  * Правило дополнительного толкования
  * @author Natalie Didenko
  */
-public class Rule extends Model {
+public class Rule extends TextGenderModel {
 	private static final long serialVersionUID = -7317270890720890440L;
 
 	/**
