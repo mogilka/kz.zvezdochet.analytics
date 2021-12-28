@@ -480,16 +480,18 @@ public class EventRules {
 			}
 		}
 		if (house.isRakhued()) {
-			if (house.getCode().equals("IX_2"))
-				return (Rule)service.find(234L);
+			if (house.getCode().equals("III"))
+				return (Rule)service.find(239L);
 			else if (house.getCode().equals("V"))
 				return (Rule)service.find(215L);
+			else if (house.getCode().equals("IX_2"))
+				return (Rule)service.find(234L);
 			else if (house.getCode().equals("XI_2"))
 				return (Rule)service.find(229L);
-			else if (house.getCode().equals("XII_2"))
-				return (Rule)service.find(216L);
 			else if (house.getCode().equals("XII"))
 				return (Rule)service.find(224L);
+			else if (house.getCode().equals("XII_2"))
+				return (Rule)service.find(216L);
 		}
 		return null;
 	}

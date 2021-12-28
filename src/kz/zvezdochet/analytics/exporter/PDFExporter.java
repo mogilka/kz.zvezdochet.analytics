@@ -1323,9 +1323,9 @@ public class PDFExporter {
 			    			 return;
 				    	 }
 			    		 section.add(new Paragraph("Планета-ядро гороскопа", bold));
-			    		 section.add(new Paragraph("Центральной считается планета с наибольшим кармическим статусом:", font));
 				    	 Planet planet = event.getPlanets().get(Long.valueOf(pid));
 		    			 if (planet != null) {
+				    		 section.add(new Paragraph("Центральной считается планета с наибольшим кармическим статусом. В вашем случае это " + planet.getName(), font));
 		    				 Paragraph paragraph = new Paragraph();
 		    				 String s = term
 		    					? planet.getName() + " в " + planet.getHouse().getDesignation() + " доме"
