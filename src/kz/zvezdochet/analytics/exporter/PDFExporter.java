@@ -1024,7 +1024,7 @@ public class PDFExporter {
 						    		 section.add(new Paragraph(PDFUtil.html2pdf(planetText.getText(), font)));
 						    	 }
 				    		 } else {
-				    			 DialogUtil.alertWarning("Задайте обе планеты тигра, обрамляющие пустую зону");
+				    			 DialogUtil.alertWarning("Задайте обе планеты тигра, обрамляющие пустую зону (левая - planet, правая - planet2, если рассматривать конфигурацию вниз дном)");
 				    			 return;
 				    		 }
 
@@ -1034,7 +1034,7 @@ public class PDFExporter {
 				    		 	+ "которые они олицетворяют:", font));
 				    		 String signs = obj.getString("signs");
 				    		 if (null == signs || signs.isEmpty()) {
-				    			 DialogUtil.alertWarning("Задайте пустые знаки тигра");
+				    			 DialogUtil.alertWarning("Задайте пустые знаки тигра (signs)");
 				    			 return;
 				    		 } else {
 				    			 String[] arr = signs.split(",");
@@ -1125,7 +1125,7 @@ public class PDFExporter {
 				    		 }
 				    		 section.add(list);
 			    		 } else {
-			    			 DialogUtil.alertWarning("Задайте обе планеты колыбели Ньютона");
+			    			 DialogUtil.alertWarning("Задайте боковые планеты колыбели Ньютона (левые - planet, правые - planet2)");
 			    			 return;			    			 
 			    		 }
 			    	 }
@@ -1140,7 +1140,7 @@ public class PDFExporter {
 				    	 if (null == pids
 				    			 || pids.toString().isEmpty()
 				    			 || pids.toString().equals("0")) {
-			    			 DialogUtil.alertWarning("Задайте планеты на острие лука");
+			    			 DialogUtil.alertWarning("Задайте планеты на острие лука (planet)");
 			    			 return;
 				    	 } else {
 				    		 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1170,7 +1170,7 @@ public class PDFExporter {
 				    	 try {
 				    		 String direction = obj.getString("direction");
 				    		 if (null == direction || direction.isEmpty()) {
-				    			 DialogUtil.alertWarning("Задайте направление чаши East|West|North|South");
+				    			 DialogUtil.alertWarning("Задайте направление чаши East|West|North|South (direction)");
 				    			 return;
 				    		 } else {
 				    			 Halfsphere halfsphere = (Halfsphere)new HalfsphereService().find(direction);
@@ -1193,20 +1193,21 @@ public class PDFExporter {
 			    	 if (obj != null) {
 				    	 int pid1 = obj.getInt("planet"); //левая планета чаши
 				    	 if (0 == pid1) {
-			    			 DialogUtil.alertWarning("Задайте левую планету чаши");
+			    			 DialogUtil.alertWarning("Задайте левую планету чаши (planet), если рассматривать чашу вниз дном");
 			    			 return;
 				    	 }
 				    	 int pid2 = obj.getInt("planet2"); //правая планета чаши
 				    	 if (0 == pid2) {
-			    			 DialogUtil.alertWarning("Задайте правую планету чаши");
+			    			 DialogUtil.alertWarning("Задайте правую планету чаши (planet2), если рассматривать чашу вниз дном");
 			    			 return;
 				    	 }
 				    	 String pids = obj.getString("planet3"); //планета или соединение на дне чаши
 				    	 if (null == pids || pids.isEmpty()) {
-			    			 DialogUtil.alertWarning("Задайте планеты на вершине тау-квадрата");
+			    			 DialogUtil.alertWarning("Задайте планеты на вершине тау-квадрата (planet3)");
 			    			 return;
 				    	 }
 
+				    	 section.add(Chunk.NEXTPAGE);
 			    		 section.add(new Paragraph("Чего вам не хватает:", boldred));
 				    	 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 				    	 list.setNumbered(true);
@@ -1249,17 +1250,47 @@ public class PDFExporter {
 	    				 anchor = new Anchor(s, fonta);
 	    				 anchor.setReference("#" + planet.getAnchor());
 	    				 li.add(anchor);
-	    				 li.add(new Chunk(" — данный фактор поможет вам направить основной импульс в нужное русло", font));
+	    				 String factor = planet.isBad()
+							? " — данный фактор указывает на сферу жизни, которая потребует от вас чрезмерной отдачи"
+							: " — данный фактор поможет вам направить основной импульс в нужное русло";
+	    				 li.add(new Chunk(factor, planet.isBad() ? red : font));
 	    				 list.add(li);
+
+	    				 if (event.isHousable()) {
+	    					 String hids = obj.getString("houses");
+	    					 if (null == hids || hids.isEmpty()) {
+	    						 DialogUtil.alertWarning("Задайте вершины пустых домов (houses)");
+	    						 return;
+	    					 } else {
+	    						 li = new ListItem();
+	    						 li.add(new Chunk("Сферы жизни, которые изначально будут для вас неважны:", font));
+	    						 li.add(Chunk.NEWLINE);
+	    						 arr = hids.split(",");
+	    						 i = -1;
+	    						 s = "";
+	    						 for (String hid : arr) {
+	    							 House house = event.getHouses().get(Long.valueOf(hid));
+	    							 if (house != null) {
+	    								 if (++i > 0)
+	    									 s += ", ";
+	    								 
+	    								 s += term ? house.getDesignation() + " дом: " : "";
+	    								 s += house.getGeneral();
+	    							 }
+	    						 }
+		    					 li.add(new Chunk(s, bold));
+		    					 list.add(li);
+	    					 }
+	    				 }
 			    		 section.add(list);
 			    		 section.add(Chunk.NEWLINE);
 
 				    	 // down|top|left|right какое полушарие занимает чаша
-			    		 section.add(new Paragraph("Расположение чаши на космограмме:", boldgreen));
+			    		 section.add(new Paragraph("Расположение чаши внутри космограммы:", boldgreen));
 				    	 try {
 				    		 String direction = obj.getString("direction");
 				    		 if (null == direction || direction.isEmpty()) {
-				    			 DialogUtil.alertWarning("Задайте полушарие чаши East|West|North|South");
+				    			 DialogUtil.alertWarning("Задайте полушарие чаши East|West|North|South (direction)");
 				    			 return;
 				    		 } else {
 				    			 Halfsphere halfsphere = (Halfsphere)new HalfsphereService().find(direction);
@@ -1282,12 +1313,12 @@ public class PDFExporter {
 			    	 if (obj != null) {
 				    	 int pid1 = obj.getInt("planet"); //левая планета
 				    	 if (0 == pid1) {
-			    			 DialogUtil.alertWarning("Задайте левую ножку табуретки");
+			    			 DialogUtil.alertWarning("Задайте левую ножку табуретки (planet), если рассматривать фигуру ножками вниз");
 			    			 return;
 				    	 }
 				    	 int pid2 = obj.getInt("planet2"); //правая планета
 				    	 if (0 == pid2) {
-			    			 DialogUtil.alertWarning("Задайте правую правую ножку табуретки");
+			    			 DialogUtil.alertWarning("Задайте правую правую ножку табуретки (planet2), если рассматривать фигуру ножками вниз");
 			    			 return;
 				    	 }
 
@@ -1319,7 +1350,7 @@ public class PDFExporter {
 			    	 if (obj != null) {
 				    	 int pid = obj.getInt("planet"); //планета-ядро
 				    	 if (0 == pid) {
-			    			 DialogUtil.alertWarning("Задайте планету с наибольшим кармическим статусом");
+			    			 DialogUtil.alertWarning("Задайте планету с наибольшим кармическим статусом (planet)");
 			    			 return;
 				    	 }
 			    		 section.add(new Paragraph("Планета-ядро гороскопа", bold));
@@ -1350,7 +1381,7 @@ public class PDFExporter {
 						if (event.isHousable()) {
 							String hids = obj.getString("houses");
 							if (null == hids || hids.isEmpty()) {
-								DialogUtil.alertWarning("Задайте дома сгущения");
+								DialogUtil.alertWarning("Задайте дома сгущения (houses)");
 								return;
 							} else {
 								com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1372,7 +1403,7 @@ public class PDFExporter {
 				    	 } else {
 				    		 String pids = obj.getString("planet");
 				    		 if (null == pids || pids.isEmpty()) {
-				    			 DialogUtil.alertWarning("Задайте планеты сгущения");
+				    			 DialogUtil.alertWarning("Задайте планеты сгущения (planet)");
 				    			 return;
 				    		 } else {
 				    			 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1402,7 +1433,7 @@ public class PDFExporter {
 				    		 section.add(new Paragraph("Главные противоположности вашей жизни:", boldred));
 			    			 String hids = obj.getString("houses");
 			    			 if (null == hids || hids.isEmpty()) {
-			    				 DialogUtil.alertWarning("Задайте дома одной зоны, из которых исходят оппозиции");
+			    				 DialogUtil.alertWarning("Задайте дома одной зоны, из которых исходят оппозиции (houses)");
 			    				 return;
 			    			 } else {
 			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1436,7 +1467,7 @@ public class PDFExporter {
 				    		 section.add(new Paragraph("Что изначально будет вне ваших интересов:", bold));
 			    			 hids = obj.getString("houses2");
 			    			 if (null == hids || hids.isEmpty()) {
-			    				 DialogUtil.alertWarning("Задайте вершины пустых домов в обеих пустых зонах");
+			    				 DialogUtil.alertWarning("Задайте вершины пустых домов в обеих пустых зонах (houses2)");
 			    				 return;
 			    			 } else {
 			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -1463,7 +1494,7 @@ public class PDFExporter {
 			    		 if (null == pids
 			    				 || pids.isEmpty()
 				    			 || pids.equals("0")) {
-			    			 DialogUtil.alertWarning("Задайте через запятую крайние планеты качелей без оппозиций. А если таковых нет, укажите планеты без оппозиций или благополучные планеты гороскопа (Кету и Лилит не в счёт)");
+			    			 DialogUtil.alertWarning("Задайте через запятую крайние планеты качелей без оппозиций (planet). А если таковых нет, укажите планеты без оппозиций или благополучные планеты гороскопа (Кету и Лилит не в счёт)");
 			    			 return;
 			    		 } else {
 			    			 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
@@ -2445,7 +2476,7 @@ public class PDFExporter {
 
 							descr = configuration.getDescription();
 							if (descr != null)
-								shapes.add(new Paragraph(descr, term ? font : PDFUtil.getWarningFont()));
+								shapes.add(new Paragraph(descr, descr.contains("№") ? PDFUtil.getWarningFont() : font));
 
 							Rule rule = EventRules.ruleConfiguration(configuration);
 							if (rule != null) {
@@ -2718,8 +2749,8 @@ public class PDFExporter {
 
 					Rule rule = EventRules.ruleHouseSign(house, sign, event);
 					if (rule != null) {
-						section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 						section.add(Chunk.NEWLINE);
+						section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 					}
 					PDFUtil.printGender(section, dict, female, child, true);
 				}
