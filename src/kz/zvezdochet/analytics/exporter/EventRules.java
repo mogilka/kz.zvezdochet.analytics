@@ -253,30 +253,46 @@ public class EventRules {
 	/**
 	 * Синастрический аспект
 	 * @param spa аспект
+	 * @param event первый партнёр
+	 * @param partner второй партнёр
 	 * @return правило
 	 * @throws DataAccessException
 	 */
-	public static Rule ruleSynastryAspect(SkyPointAspect spa, Event partner) throws DataAccessException {
+	public static Rule ruleSynastryAspect(SkyPointAspect spa, Event event, Event partner) throws DataAccessException {
 		RuleService service = new RuleService();
 		Planet planet = (Planet)spa.getSkyPoint1();
 		Planet planet2 = (Planet)spa.getSkyPoint2();
 		String code = spa.getAspect().getType().getCode();
 
 		Collection<Planet> planets = partner.getPlanets().values();
-		if (planet.getCode().equals("Venus") && planet2.getCode().equals("Saturn")) {
-			if (code.equals("POSITIVE")) {
-				for (Model model : planets) {
-					Planet p = (Planet)model;
-					if (p.getCode().equals("Saturn") && p.isLord())
-						return (Rule)service.find(68L);
+		if (planet.getCode().equals("Moon")) {
+			if (planet2.getCode().equals("Mercury")) {
+				if (code.equals("POSITIVE")) {
+					for (Model model : planets) {
+						Planet p = (Planet)model;
+						if (p.getCode().equals("Mercury") && p.isLord())
+							return (Rule)service.find(69L);
+					}
 				}
+			} else if (planet2.getCode().equals("Venus")) {
+				if (code.equals("NEGATIVE")
+						&& event.isFemale()
+						&& partner.isFemale())
+					return (Rule)service.find(241L);
 			}
-		} else if (planet.getCode().equals("Moon") && planet2.getCode().equals("Mercury")) {
-			if (code.equals("POSITIVE")) {
-				for (Model model : planets) {
-					Planet p = (Planet)model;
-					if (p.getCode().equals("Mercury") && p.isLord())
-						return (Rule)service.find(69L);
+		} else if (planet.getCode().equals("Venus")) {
+			if (planet2.getCode().equals("Venus")) {
+				if (code.equals("NEUTRAL")
+						&& event.isFemale()
+						&& partner.isFemale())
+					return (Rule)service.find(240L);
+			} else if (planet2.getCode().equals("Saturn")) {
+				if (code.equals("POSITIVE")) {
+					for (Model model : planets) {
+						Planet p = (Planet)model;
+						if (p.getCode().equals("Saturn") && p.isLord())
+							return (Rule)service.find(68L);
+					}
 				}
 			}
 		}
