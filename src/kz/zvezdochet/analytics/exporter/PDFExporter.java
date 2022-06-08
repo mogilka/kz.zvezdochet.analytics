@@ -58,6 +58,7 @@ import kz.zvezdochet.analytics.bean.HouseSignText;
 import kz.zvezdochet.analytics.bean.Moonday;
 import kz.zvezdochet.analytics.bean.Numerology;
 import kz.zvezdochet.analytics.bean.PlanetAspectText;
+import kz.zvezdochet.analytics.bean.PlanetHouseRule;
 import kz.zvezdochet.analytics.bean.PlanetHouseText;
 import kz.zvezdochet.analytics.bean.PlanetSignText;
 import kz.zvezdochet.analytics.bean.PlanetText;
@@ -69,6 +70,7 @@ import kz.zvezdochet.analytics.service.HouseSignService;
 import kz.zvezdochet.analytics.service.MoondayService;
 import kz.zvezdochet.analytics.service.NumerologyService;
 import kz.zvezdochet.analytics.service.PlanetAspectService;
+import kz.zvezdochet.analytics.service.PlanetHouseRuleService;
 import kz.zvezdochet.analytics.service.PlanetHouseService;
 import kz.zvezdochet.analytics.service.PlanetSignService;
 import kz.zvezdochet.analytics.service.PlanetTextService;
@@ -863,8 +865,11 @@ public class PDFExporter {
 				if (planet.isLilithed())
 					descr += "сбз ";
 
-				if (planet.isBroken() || planet.inMine()) //TODO разделить
+				if (planet.isBroken())
 					descr += "слб ";
+
+				if (planet.inMine())
+					descr += "шхт ";
 
 				if (planet.isRetrograde())
 					descr += "R";
@@ -2616,10 +2621,12 @@ public class PDFExporter {
 		try {
 			PlanetHouseService service = new PlanetHouseService();
 			HouseSignService hservice = new HouseSignService();
+			PlanetHouseRuleService ruleService = new PlanetHouseRuleService();
 
 			AspectTypeService atservice = new AspectTypeService();
 			AspectType negativeType = (AspectType)atservice.find("NEGATIVE");
 			AspectType positiveType = (AspectType)atservice.find("POSITIVE");
+			Font fonth6 = PDFUtil.getSubheaderFont();
 
 			for (House house : houses) {
 				//Определяем количество планет в доме
@@ -2715,6 +2722,39 @@ public class PDFExporter {
 									}
 								}
 								PDFUtil.printGender(section, dict, female, child, true);
+
+								List<PlanetHouseRule> houseRules = ruleService.find(planet, house);
+								for (PlanetHouseRule rule : houseRules) {
+									AspectType aspectType = rule.getAspectType();
+									Aspect aspect = rule.getAspect();
+									Planet planet2 = rule.getPlanet2();
+									House house2 = rule.getHouse2();
+									List<SkyPointAspect> aspects = planet.getAspectList();
+									for (SkyPointAspect spa : aspects) {
+										if (aspect != null
+												&& !aspect.getId().equals(spa.getAspect().getId()))
+											continue;
+
+										SkyPoint sp = spa.getSkyPoint2();
+										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
+											if (planet2.getId().equals(sp.getId())) {
+												if (house2 != null
+														&& !house2.getId().equals(sp.getHouse().getId()))
+													continue;
+
+												section.add(Chunk.NEWLINE);
+												boolean negative2 = spa.isNegative();
+												String sign2 = negative2 ? "-" : "+";
+												String header = rule.getHouse().getName() + " " + 
+													sign2 + " " + 
+													(negative2 ? planet2.getNegative() : planet2.getPositive());
+												section.add(new Paragraph(header, fonth6));
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
+												PDFUtil.printGender(section, rule, female, child, true);
+											}
+										}
+									}
+								}
 								section.add(Chunk.NEWLINE);
 							}
 						}
