@@ -11,6 +11,7 @@ import kz.zvezdochet.core.service.ModelService;
  * @author Natalie Didenko
  */
 public class PlanetHouseRule extends PlanetHouseText {
+	private static final long serialVersionUID = 2490951071506168720L;
 
 	/**
 	 * Планета
