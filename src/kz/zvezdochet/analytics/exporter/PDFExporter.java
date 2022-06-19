@@ -2463,7 +2463,7 @@ public class PDFExporter {
 							com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 							list.setNumbered(true);
 
-							int NECKLACE_STEP = 7;
+							int NECKLACE_STEP = 10;
 							long start = (long)configuration.getData();
 							long finish = start + NECKLACE_STEP;
 
