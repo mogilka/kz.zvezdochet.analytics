@@ -15,7 +15,7 @@ public class HouseSignText extends TextGenderModel {
 	private static final long serialVersionUID = -6135921834868635512L;
 
 	/**
-	 * Планета
+	 * Дом
 	 */
     private House house;
         

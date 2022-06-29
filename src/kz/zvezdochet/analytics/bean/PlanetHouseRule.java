@@ -4,6 +4,7 @@ import kz.zvezdochet.analytics.service.PlanetHouseRuleService;
 import kz.zvezdochet.bean.Aspect;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.bean.Sign;
 import kz.zvezdochet.core.service.ModelService;
 
 /**
@@ -55,5 +56,30 @@ public class PlanetHouseRule extends PlanetHouseText {
 	@Override
 	public ModelService getService() {
 		return new PlanetHouseRuleService();
+	}
+
+	/**
+	 * Знак планеты или куспида
+	 */
+	private Sign sign;
+	/**
+	 * Признак, по которому определяется толкование знака: 0|1 планета|дом
+	 */
+	private boolean houseSign;
+
+	public Sign getSign() {
+		return sign;
+	}
+
+	public void setSign(Sign sign) {
+		this.sign = sign;
+	}
+
+	public boolean isHouseSign() {
+		return houseSign;
+	}
+
+	public void setHouseSign(boolean houseSign) {
+		this.houseSign = houseSign;
 	}
 }

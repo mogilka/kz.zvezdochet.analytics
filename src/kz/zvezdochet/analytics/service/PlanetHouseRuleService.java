@@ -11,6 +11,7 @@ import kz.zvezdochet.bean.Aspect;
 import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
+import kz.zvezdochet.bean.Sign;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
@@ -18,6 +19,7 @@ import kz.zvezdochet.service.AspectService;
 import kz.zvezdochet.service.AspectTypeService;
 import kz.zvezdochet.service.HouseService;
 import kz.zvezdochet.service.PlanetService;
+import kz.zvezdochet.service.SignService;
 
 /**
  * Сервис планет в астрологических домах
@@ -73,6 +75,8 @@ public class PlanetHouseRuleService extends PlanetHouseService {
 		dict.setPlanet2((Planet)new PlanetService().find(rs.getLong("Planet2ID")));
 		dict.setHouse2((House)new HouseService().find(rs.getLong("House2ID")));
 		dict.setAspect((Aspect)new AspectService().find(rs.getLong("aspectid")));
+		dict.setSign((Sign)new SignService().find(rs.getLong("SignID")));
+		dict.setHouseSign(rs.getBoolean("housesign"));
 		return dict;
 	}
 
