@@ -2152,6 +2152,13 @@ public class PDFExporter {
 							continue;
 					}
 
+					if (aspect.getAspect().getCode().equals("CONJUNCTION")) {
+						if (planet1.isLilithed() && planet1.isSelened())
+							if (planet2.getCode().equals("Lilith")
+									|| planet2.getCode().equals("Selena"))
+							continue;
+					}
+
 					boolean positive = true;
 					List<Model> dicts = service.finds(aspect);
 					if (dicts != null && !dicts.isEmpty()) {
@@ -2237,7 +2244,7 @@ public class PDFExporter {
 							Rule rule = EventRules.rulePlanetAspect(aspect, female);
 							if (rule != null) {
 			    				section.add(Chunk.NEWLINE);
-								section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font))); 
 							}
 							PDFUtil.printGender(section, dict, female, child, true);
 							section.add(Chunk.NEWLINE);
@@ -2354,7 +2361,9 @@ public class PDFExporter {
 					//изображения
 					Paragraph shapes = new Paragraph();
 					String descr = null;
+					int j = 0;
 					for (AspectConfiguration configuration : confs) {
+						++j;
 						String shape = configuration.getShape();
 						if (shape.equals("triangle")) {
 							if (code.equals("triangle")) {
@@ -2427,15 +2436,17 @@ public class PDFExporter {
 										shapes.add(new Paragraph(configuration.getElement().getDescription(), fonth5));
 									shapes.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
 									shapes.add(new Paragraph(configuration.getElement().getTriangle(), font));
+									shapes.add(Chunk.NEWLINE);
 								}
 
 							} else if (code.equals("cross")) {
 								Cross cross = (Cross)crossService.find(1L);
 								if (cross != null) {
-									String str = "Ваша реакция на проблемные сферы";
-									if (term)
+									if (term) {
+										String str = "Ваша реакция на проблемные сферы";
 										str += " (" + cross.getName() + ")";
-									shapes.add(new Paragraph(str + ":", bold));
+										shapes.add(new Paragraph(str + ":", bold));
+									}
 									shapes.add(new Paragraph(PDFUtil.removeTags(cross.getTau(), font)));
 									shapes.add(Chunk.NEWLINE);
 								}
@@ -2497,9 +2508,10 @@ public class PDFExporter {
 			    				section.add(Chunk.NEWLINE);
 								section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
 							}
-							PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
+							if (confs.size() != j)
+								shapes.add(Chunk.NEXTPAGE);
 						}
-						if (confs.size() > 1)
+						if (!code.equals("necklace") && confs.size() > 1 && confs.size() != j)
 							PDFUtil.printHr(shapes, 1, PDFUtil.FONTCOLORGRAY);
 					}
 					section.add(shapes);
@@ -2578,9 +2590,10 @@ public class PDFExporter {
 				bar.setCategory("Сферы жизни");
 				bars[++i] = bar;
 		    }
-			section.add(PDFUtil.printBars(writer, "", null, "Сферы жизни", "Баллы", bars, 500, 400, false, false, false));
+			section.add(PDFUtil.printBars(writer, "", null, "Сферы жизни", "Баллы", bars, 500, 350, false, false, false));
 
 			//определяем дома с 3+ планетами
+			Font green = PDFUtil.getSuccessFont();
 			Collection<House> ehouses = event.getHouses().values();
 			if (null == ehouses) return;
 			List<House> houses3 = new ArrayList<>();
@@ -2590,13 +2603,21 @@ public class PDFExporter {
 				if (h.getPoints() > 2)
 					houses3.add(h);
 			}
-			Font green = PDFUtil.getSuccessFont();
+			int cnt = houses3.size();
+			if (cnt > 1)
+				section.add(new Paragraph("У вас " + cnt + " главных миссии в жизни:", font));
+
+			com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			for (House h : houses3) {
 				String mission = h.getMission();
-				section.add(new Paragraph(null == mission ? h.getDescription() : mission, green));
-				section.add(Chunk.NEWLINE);
+				ListItem li = new ListItem();
+		        li.add(new Chunk(null == mission ? h.getDescription() : mission, green));
+		        list.add(li);
 			}
-			Anchor anchor = new Anchor("Реализация личности", fonta);
+	        section.add(list);
+			section.add(Chunk.NEWLINE);
+
+	        Anchor anchor = new Anchor("Реализация личности", fonta);
             anchor.setReference("#planethouses");
 			Paragraph p = new Paragraph();
 			p.add(new Chunk("Более подробно важные сферы описаны в разделе ", font));
@@ -2693,127 +2714,116 @@ public class PDFExporter {
 		            	p.add(anchorTarget);
 		    			section.addSection(p);
 
-						if (planet.getCode().equals("Lilith")
-								&& (house.isSelened() || house.isRakhued())) {
-							Rule rule = EventRules.ruleMoonsHouse(house);
-							if (rule != null) {
-								section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
-								section.add(Chunk.NEWLINE);
-							}
-						} else if (planet.getCode().equals("Selena")
-								&& house.isKethued()
-								&& house.isSelened()) {
-							//
-						} else {
-							AspectType type = positiveType;
-							if (planet.isDamaged() || planet.getCode().equals("Kethu"))
-								type = negativeType;
-							else if (planet.getCode().equals("Lilith") && !planet.isPerfect())
-								type = negativeType;
+						AspectType type = positiveType;
+						if (planet.isDamaged() || planet.getCode().equals("Kethu"))
+							type = negativeType;
+						else if (planet.getCode().equals("Lilith") && !planet.isPerfect())
+							type = negativeType;
 
-							PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, type);
-							if (dict != null) {
-								section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
+						PlanetHouseText dict = (PlanetHouseText)service.find(planet, house, type);
+						if (dict != null) {
+							section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
 	
-								List<Rule> rules = EventRules.rulePlanetHouse(planet, house, female);
-								if (rules != null && !rules.isEmpty()) {
-									for (Rule rule : rules) {
+							List<Rule> rules = EventRules.rulePlanetHouse(planet, house, female);
+							if (rules != null && !rules.isEmpty()) {
+								for (Rule rule : rules) {
+									if (null == rule)
+										continue;
+									section.add(Chunk.NEWLINE);
+									section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+									PDFUtil.printGender(section, rule, female, child, true);
+								}
+							}
+							PDFUtil.printGender(section, dict, female, child, true);
+
+							//правила домов
+							List<PlanetHouseRule> houseRules = phruleService.find(planet, house);
+							for (PlanetHouseRule rule : houseRules) {
+								AspectType aspectType = rule.getAspectType();
+								Aspect aspect = rule.getAspect();
+								Planet planet2 = rule.getPlanet2();
+								House house2 = rule.getHouse2();
+								Sign rsign = rule.getSign();
+
+								if (null == aspectType) {
+									//2 фиктивные планеты в доме без аспекта
+									if ((house.isSelened() && planet2.getCode().equals("Selena"))
+											|| (house.isRakhued() && planet2.getCode().equals("Rakhu"))) {
 										section.add(Chunk.NEWLINE);
-										section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
-										PDFUtil.printGender(section, rule, female, child, true);
+										String header = house.getName() + " + " + planet2.getPositive();
+										section.add(new Paragraph(header, fonth6));
+										section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
+									} else if (rsign != null) {
+										if (rule.isHouseSign()) {
+											//толкуем знак куспида
+											if (house.getSign().getId().equals(rsign.getId())) {
+												section.add(Chunk.NEWLINE);
+												String header = house.getName() + " + " + rsign.getShortname();
+												section.add(new Paragraph(header, fonth6));
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
+											}
+										} else {
+											//толкуем знак планеты в доме
+											if (planet.getSign().getId().equals(rsign.getId())) {
+												section.add(Chunk.NEWLINE);
+												String header = planet.getShortName() + " + " + rsign.getShortname();
+												section.add(new Paragraph(header, fonth6));
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
+											}												
+										}
 									}
-								}
-								PDFUtil.printGender(section, dict, female, child, true);
-
-								//правила домов
-								List<PlanetHouseRule> houseRules = phruleService.find(planet, house);
-								for (PlanetHouseRule rule : houseRules) {
-									AspectType aspectType = rule.getAspectType();
-									Aspect aspect = rule.getAspect();
-									Planet planet2 = rule.getPlanet2();
-									House house2 = rule.getHouse2();
-									Sign rsign = rule.getSign();
-
-									if (null == aspectType) {
-										//2 фиктивные планеты в доме без аспекта
-										if ((house.isSelened() && planet2.getCode().equals("Selena"))
-												|| (house.isRakhued() && planet2.getCode().equals("Rakhu"))) {
-											section.add(Chunk.NEWLINE);
-											String header = house.getName() + " + " + planet2.getPositive();
-											section.add(new Paragraph(header, fonth6));
-											section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
-										} else if (rsign != null) {
-											if (rule.isHouseSign()) {
-												//толкуем знак куспида
-												if (house.getSign().getId().equals(rsign.getId())) {
-													section.add(Chunk.NEWLINE);
-													String header = house.getName() + " + " + rsign.getShortname();
-													section.add(new Paragraph(header, fonth6));
-													section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
-												}
-											} else {
-												//толкуем знак планеты в доме
-												if (house.getSign().getId().equals(rsign.getId())) {
-													section.add(Chunk.NEWLINE);
-													String header = planet.getShortName() + " + " + rsign.getShortname();
-													section.add(new Paragraph(header, fonth6));
-													section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
-												}												
+								} else if (house2 != null && null == planet2) {
+									//аспект планеты в доме с другим куспидом
+									List<SkyPointAspect> aspects = planet.getAspectHouseList();
+									for (SkyPointAspect spa : aspects) {
+										if (aspect != null
+												&& !aspect.getId().equals(spa.getAspect().getId()))
+											continue;
+	
+										SkyPoint sp = spa.getSkyPoint2();
+										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
+											if (house2.getId().equals(sp.getId())) {
+												section.add(Chunk.NEWLINE);
+												boolean negative2 = spa.isNegative();
+												String sign2 = negative2 ? "-" : "+";
+												String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
+													" " + sign2 + " " + 
+													house2.getName();
+												section.add(new Paragraph(header, fonth6));
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
 											}
 										}
-									} else if (house2 != null && null == planet2) {
-										//аспект планеты в доме с другим куспидом
-										List<SkyPointAspect> aspects = planet.getAspectHouseList();
-										for (SkyPointAspect spa : aspects) {
-											if (aspect != null
-													&& !aspect.getId().equals(spa.getAspect().getId()))
-												continue;
+									}
+								} else {
+									//толкуем планету в доме с аспектом другой планеты
+									List<SkyPointAspect> aspects = planet.getAspectList();
+									for (SkyPointAspect spa : aspects) {
+										if (aspect != null
+												&& !aspect.getId().equals(spa.getAspect().getId()))
+											continue;
 	
-											SkyPoint sp = spa.getSkyPoint2();
-											if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
-												if (house2.getId().equals(sp.getId())) {
-													section.add(Chunk.NEWLINE);
-													boolean negative2 = spa.isNegative();
-													String sign2 = negative2 ? "-" : "+";
-													String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
-														" " + sign2 + " " + 
-														house2.getName();
-													section.add(new Paragraph(header, fonth6));
-													section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
-												}
-											}
-										}
-									} else {
-										//толкуем планету в доме с аспектом другой планеты
-										List<SkyPointAspect> aspects = planet.getAspectList();
-										for (SkyPointAspect spa : aspects) {
-											if (aspect != null
-													&& !aspect.getId().equals(spa.getAspect().getId()))
-												continue;
+										SkyPoint sp = spa.getSkyPoint2();
+										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
+											if (planet2.getId().equals(sp.getId())) {
+												if (house2 != null
+														&& !house2.getId().equals(sp.getHouse().getId()))
+													continue;
 	
-											SkyPoint sp = spa.getSkyPoint2();
-											if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
-												if (planet2.getId().equals(sp.getId())) {
-													if (house2 != null
-															&& !house2.getId().equals(sp.getHouse().getId()))
-														continue;
-	
-													section.add(Chunk.NEWLINE);
-													boolean negative2 = spa.isNegative();
-													String sign2 = negative2 ? "-" : "+";
-													String header = house.getName() + " " + 
-														sign2 + " " + 
-														(negative2 ? planet2.getNegative() : planet2.getPositive());
-													section.add(new Paragraph(header, fonth6));
-													section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
-													PDFUtil.printGender(section, rule, female, child, true);
-												}
+												section.add(Chunk.NEWLINE);
+												boolean negative2 = spa.isNegative();
+												String sign2 = negative2 ? "-" : "+";
+												String header = house.getName() + " " + 
+													sign2 + " " + 
+													(negative2 ? planet2.getNegative() : planet2.getPositive());
+												section.add(new Paragraph(header, fonth6));
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
+												PDFUtil.printGender(section, rule, female, child, true);
 											}
 										}
 									}
 								}
-								section.add(Chunk.NEWLINE);
 							}
+							section.add(Chunk.NEWLINE);
 						}
 					}
 				}
