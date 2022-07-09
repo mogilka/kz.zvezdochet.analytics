@@ -123,12 +123,6 @@ public class EventRules {
 					if (planet.isDamaged() || planet2.isDamaged())
 						return (Rule)service.find(37L);
 				}
-			} else if (planet2.getCode().equals("Pluto")) {
-				if (code.equals("NEGATIVE")) {
-					if (planet.getHouse().getCode().equals("IX_2")
-							&& planet2.getHouse().getCode().equals("V_3"))
-						return (Rule)service.find(226L);
-				}
 			}
 		}
 		return null;

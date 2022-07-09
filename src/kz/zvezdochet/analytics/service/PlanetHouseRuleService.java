@@ -76,7 +76,7 @@ public class PlanetHouseRuleService extends PlanetHouseService {
 		dict.setHouse2((House)new HouseService().find(rs.getLong("House2ID")));
 		dict.setAspect((Aspect)new AspectService().find(rs.getLong("aspectid")));
 		dict.setSign((Sign)new SignService().find(rs.getLong("SignID")));
-		dict.setHouseSign(rs.getBoolean("housesign"));
+		dict.setSignOwner(rs.getInt("sign"));
 		return dict;
 	}
 

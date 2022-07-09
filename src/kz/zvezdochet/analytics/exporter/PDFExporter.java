@@ -2744,17 +2744,25 @@ public class PDFExporter {
 								Planet planet2 = rule.getPlanet2();
 								House house2 = rule.getHouse2();
 								Sign rsign = rule.getSign();
+								int owner = rule.getSignOwner();
 
 								if (null == aspectType) {
-									//2 фиктивные планеты в доме без аспекта
-									if ((house.isSelened() && planet2.getCode().equals("Selena"))
-											|| (house.isRakhued() && planet2.getCode().equals("Rakhu"))) {
+									//2 планеты в доме без аспекта
+									if (null == rsign) {
 										section.add(Chunk.NEWLINE);
-										String header = house.getName() + " + " + planet2.getPositive();
+										String header = house.getName() + " + " + planet2.getShortName();
 										section.add(new Paragraph(header, fonth6));
 										section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
-									} else if (rsign != null) {
-										if (rule.isHouseSign()) {
+									} else {
+										if (0 == owner) {
+											//толкуем знак первой планеты в доме
+											if (planet.getSign().getId().equals(rsign.getId())) {
+												section.add(Chunk.NEWLINE);
+												String header = planet.getShortName() + " + " + rsign.getShortname();
+												section.add(new Paragraph(header, fonth6));
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
+											}
+										} else if (1 == owner) {
 											//толкуем знак куспида
 											if (house.getSign().getId().equals(rsign.getId())) {
 												section.add(Chunk.NEWLINE);
@@ -2763,13 +2771,13 @@ public class PDFExporter {
 												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
 											}
 										} else {
-											//толкуем знак планеты в доме
-											if (planet.getSign().getId().equals(rsign.getId())) {
+											//толкуем знак второй планеты
+											if (planet2.getSign().getId().equals(rsign.getId())) {
 												section.add(Chunk.NEWLINE);
-												String header = planet.getShortName() + " + " + rsign.getShortname();
+												String header = planet2.getShortName() + " + " + rsign.getShortname();
 												section.add(new Paragraph(header, fonth6));
 												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
-											}												
+											}
 										}
 									}
 								} else if (house2 != null && null == planet2) {
@@ -2789,6 +2797,28 @@ public class PDFExporter {
 												String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
 													" " + sign2 + " " + 
 													house2.getName();
+												section.add(new Paragraph(header, fonth6));
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
+											}
+										}
+									}
+								} else if (rsign != null && null == planet2 && null == house2 && 2 == owner) {
+									//аспект планеты в доме с другим знаком
+									List<SkyPointAspect> aspects = planet.getAspectHouseList();
+									for (SkyPointAspect spa : aspects) {
+										if (aspect != null
+												&& !aspect.getId().equals(spa.getAspect().getId()))
+											continue;
+	
+										SkyPoint sp = spa.getSkyPoint2();
+										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
+											if (rsign.getId().equals(sp.getSign().getId())) {
+												section.add(Chunk.NEWLINE);
+												boolean negative2 = spa.isNegative();
+												String sign2 = negative2 ? "-" : "+";
+												String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
+													" " + sign2 + " " + 
+													rsign.getName();
 												section.add(new Paragraph(header, fonth6));
 												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
 											}

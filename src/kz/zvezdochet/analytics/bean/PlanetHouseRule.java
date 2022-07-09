@@ -62,10 +62,11 @@ public class PlanetHouseRule extends PlanetHouseText {
 	 * Знак планеты или куспида
 	 */
 	private Sign sign;
+
 	/**
-	 * Признак, по которому определяется толкование знака: 0|1 планета|дом
+	 * Признак, по которому определяется толкование знака: 0|1|2 планета|дом|планета2
 	 */
-	private boolean houseSign;
+	private int signOwner;
 
 	public Sign getSign() {
 		return sign;
@@ -75,11 +76,11 @@ public class PlanetHouseRule extends PlanetHouseText {
 		this.sign = sign;
 	}
 
-	public boolean isHouseSign() {
-		return houseSign;
+	public int getSignOwner() {
+		return signOwner;
 	}
 
-	public void setHouseSign(boolean houseSign) {
-		this.houseSign = houseSign;
+	public void setSignOwner(int houseSign) {
+		this.signOwner = houseSign;
 	}
 }
