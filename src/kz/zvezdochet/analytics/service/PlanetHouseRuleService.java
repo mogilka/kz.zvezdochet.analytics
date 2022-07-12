@@ -46,7 +46,8 @@ public class PlanetHouseRuleService extends PlanetHouseService {
 		try {
 			sql = "select * from " + tableName + 
 				" where planetid = " + planet.getId() +
-				" and houseid = " + house.getId();
+				" and houseid = " + house.getId() +
+				" order by typeid desc";
 			ps = Connector.getInstance().getConnection().prepareStatement(sql);
 //			System.out.println(planet + " " + house);
 			rs = ps.executeQuery();
