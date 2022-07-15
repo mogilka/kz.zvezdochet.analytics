@@ -590,11 +590,21 @@ public class PDFExporter {
 		try {
 			//выраженные знаки
 			Section section = PDFUtil.printSection(chapter, "Знаки Зодиака", null);
-			if (term) {
+			Font afont = PDFUtil.getAnnotationFont(false);
+			if (term)
 				section.add(new Paragraph("Диаграмма построена на основе непустых натальных созвездий, "
-					+ "в которых находятся ваши минорные (личные) планеты – Солнце, Луна, Меркурий, Венера и Марс:", PDFUtil.getAnnotationFont(false)));
-				section.add(Chunk.NEWLINE);
+					+ "в которых находятся ваши минорные (личные) планеты – Солнце, Луна, Меркурий, Венера и Марс:", afont));
+			else {
+				Paragraph p = new Paragraph();
+				p.add(new Chunk("Диаграмма построена на основе ", afont));
+				Chunk chunk = new Chunk("сидерического зодиака", new Font(baseFont, 12, Font.UNDERLINE, PDFUtil.FONTCOLOR));
+				chunk.setAnchor("https://zvezdochet.guru/ru/post/63/sravnitelnaya-infografika-astrologicheskih-sistem");
+				p.add(chunk);
+				p.add(new Chunk(", в котором знаки идентичны созвездиям", afont));
+				section.add(p);
 			}
+			section.add(Chunk.NEWLINE);
+
 			int size = signMap.size();
 			Bar[] bars = new Bar[size];
 			Bar[] bars2 = new Bar[size];
@@ -2747,12 +2757,15 @@ public class PDFExporter {
 								int owner = rule.getSignOwner();
 
 								if (null == aspectType) {
-									//2 планеты в доме без аспекта
+									//2 планеты в доме с аспектом или без
 									if (null == rsign) {
-										section.add(Chunk.NEWLINE);
-										String header = house.getName() + " + " + planet2.getShortName();
-										section.add(new Paragraph(header, fonth6));
-										section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
+										Planet p2 = eplanets.get(planet2.getId());
+										if (house2.getId().equals(p2.getHouse().getId())) {
+											section.add(Chunk.NEWLINE);
+											String header = house.getName() + " + " + planet2.getShortName();
+											section.add(new Paragraph(header, fonth6));
+											section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+										}											
 									} else {
 										if (0 == owner) {
 											//толкуем знак первой планеты в доме

@@ -8,7 +8,6 @@ import java.util.List;
 
 import kz.zvezdochet.analytics.bean.PlanetHouseRule;
 import kz.zvezdochet.bean.Aspect;
-import kz.zvezdochet.bean.AspectType;
 import kz.zvezdochet.bean.House;
 import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.bean.Sign;
@@ -16,7 +15,6 @@ import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.service.AspectService;
-import kz.zvezdochet.service.AspectTypeService;
 import kz.zvezdochet.service.HouseService;
 import kz.zvezdochet.service.PlanetService;
 import kz.zvezdochet.service.SignService;
@@ -70,9 +68,6 @@ public class PlanetHouseRuleService extends PlanetHouseService {
 	public PlanetHouseRule init(ResultSet rs, Model model) throws DataAccessException, SQLException {
 		PlanetHouseRule dict = (model != null) ? (PlanetHouseRule)model : (PlanetHouseRule)create();
 		dict = (PlanetHouseRule)super.init(rs, model);
-		dict.setPlanet((Planet)new PlanetService().find(rs.getLong("PlanetID")));
-		dict.setHouse((House)new HouseService().find(rs.getLong("HouseID")));
-		dict.setAspectType((AspectType)new AspectTypeService().find(rs.getLong("TypeID")));
 		dict.setPlanet2((Planet)new PlanetService().find(rs.getLong("Planet2ID")));
 		dict.setHouse2((House)new HouseService().find(rs.getLong("House2ID")));
 		dict.setAspect((Aspect)new AspectService().find(rs.getLong("aspectid")));
