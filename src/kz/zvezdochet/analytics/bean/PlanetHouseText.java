@@ -18,17 +18,17 @@ public class PlanetHouseText extends TextGenderModel {
 	/**
 	 * Планета
 	 */
-    private Planet planet;
+    protected Planet planet;
         
 	/**
 	 * Астрологический дом
 	 */
-    private House house;
+    protected House house;
 
 	/**
 	 * Тип аспекта
 	 */
-    private AspectType aspectType;
+    protected AspectType aspectType;
 
 	public House getHouse() {
 		return house;

@@ -83,4 +83,18 @@ public class PlanetHouseRule extends PlanetHouseText {
 	public void setSignOwner(int houseSign) {
 		this.signOwner = houseSign;
 	}
+
+	@Override
+	public String toString() {
+		String res = planet.getCode() + " in " + house.getCode();
+		if (aspectType != null)
+			res += " " + aspectType.getCode();
+		if (planet2 != null)
+			res += " " + planet2.getCode();
+		if (house2 != null)
+			res += " " + house2.getCode();
+		if (sign != null)
+			res += " " + sign.getCode();
+		return res;
+	}
 }

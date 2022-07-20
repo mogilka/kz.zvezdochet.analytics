@@ -2765,6 +2765,7 @@ public class PDFExporter {
 											String header = house.getName() + " + " + planet2.getShortName();
 											section.add(new Paragraph(header, fonth6));
 											section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+											PDFUtil.printGender(section, rule, female, child, true);
 										}											
 									} else {
 										if (0 == owner) {
@@ -2773,7 +2774,8 @@ public class PDFExporter {
 												section.add(Chunk.NEWLINE);
 												String header = planet.getShortName() + " + " + rsign.getShortname();
 												section.add(new Paragraph(header, fonth6));
-												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+												PDFUtil.printGender(section, rule, female, child, true);
 											}
 										} else if (1 == owner) {
 											//толкуем знак куспида
@@ -2781,7 +2783,8 @@ public class PDFExporter {
 												section.add(Chunk.NEWLINE);
 												String header = house.getName() + " + " + rsign.getShortname();
 												section.add(new Paragraph(header, fonth6));
-												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+												PDFUtil.printGender(section, rule, female, child, true);
 											}
 										} else {
 											//толкуем знак второй планеты
@@ -2789,7 +2792,8 @@ public class PDFExporter {
 												section.add(Chunk.NEWLINE);
 												String header = planet2.getShortName() + " + " + rsign.getShortname();
 												section.add(new Paragraph(header, fonth6));
-												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));													
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+												PDFUtil.printGender(section, rule, female, child, true);
 											}
 										}
 									}
@@ -2811,7 +2815,8 @@ public class PDFExporter {
 													" " + sign2 + " " + 
 													house2.getName();
 												section.add(new Paragraph(header, fonth6));
-												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+												PDFUtil.printGender(section, rule, female, child, true);												
 											}
 										}
 									}
@@ -2833,8 +2838,20 @@ public class PDFExporter {
 													" " + sign2 + " " + 
 													rsign.getName();
 												section.add(new Paragraph(header, fonth6));
-												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));												
+												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+												PDFUtil.printGender(section, rule, female, child, true);												
 											}
+										}
+									}
+								} else if (rsign != null && null == planet2 && null == house2) {
+									//планета в доме в знаке
+									if (rsign.getId().equals(planet.getSign().getId())) {
+										if (2 == aspectType.getId() && planet.isDamaged()) {
+											section.add(Chunk.NEWLINE);
+											String header = planet.getNegative() + " - " + rsign.getName();
+											section.add(new Paragraph(header, fonth6));
+											section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+											PDFUtil.printGender(section, rule, female, child, true);
 										}
 									}
 								} else {
@@ -2844,7 +2861,10 @@ public class PDFExporter {
 										if (aspect != null
 												&& !aspect.getId().equals(spa.getAspect().getId()))
 											continue;
-	
+
+//										if (null == planet2)
+//											System.out.println(rule);
+
 										SkyPoint sp = spa.getSkyPoint2();
 										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
 											if (planet2.getId().equals(sp.getId())) {
