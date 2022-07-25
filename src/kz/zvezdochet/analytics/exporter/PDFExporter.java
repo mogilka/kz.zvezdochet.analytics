@@ -2788,7 +2788,8 @@ public class PDFExporter {
 											}
 										} else {
 											//толкуем знак второй планеты
-											if (planet2.getSign().getId().equals(rsign.getId())) {
+											Planet p2 = eplanets.get(planet2.getId());
+											if (p2.getSign().getId().equals(rsign.getId())) {
 												section.add(Chunk.NEWLINE);
 												String header = planet2.getShortName() + " + " + rsign.getShortname();
 												section.add(new Paragraph(header, fonth6));
@@ -2853,6 +2854,20 @@ public class PDFExporter {
 											section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 											PDFUtil.printGender(section, rule, female, child, true);
 										}
+									}
+								} else if (null == rsign && null == planet2 && null == house2) {
+									//планета в доме поражённая или не поражённая
+									boolean damaged = planet.isDamaged();
+									boolean match = (2 == aspectType.getId() && damaged)
+										|| (3 == aspectType.getId() && !damaged);
+									if (match) {
+										section.add(Chunk.NEWLINE);
+										String header = damaged
+											? planet.getBadName() + "-дисгармония"
+											: planet.getGoodName() + "-гармония";
+										section.add(new Paragraph(header, fonth6));
+										section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+										PDFUtil.printGender(section, rule, female, child, true);
 									}
 								} else {
 									//толкуем планету в доме с аспектом другой планеты
