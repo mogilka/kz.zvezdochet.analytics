@@ -2805,7 +2805,10 @@ public class PDFExporter {
 										if (aspect != null
 												&& !aspect.getId().equals(spa.getAspect().getId()))
 											continue;
-	
+
+										if (!aspectType.getId().equals(spa.getAspect().getTypeid()))
+											continue;
+
 										SkyPoint sp = spa.getSkyPoint2();
 										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
 											if (house2.getId().equals(sp.getId())) {
@@ -2823,25 +2826,26 @@ public class PDFExporter {
 									}
 								} else if (rsign != null && null == planet2 && null == house2 && 2 == owner) {
 									//аспект планеты в доме с другим знаком
-									List<SkyPointAspect> aspects = planet.getAspectHouseList();
+									List<SkyPointAspect> aspects = planet.getAspectList();
 									for (SkyPointAspect spa : aspects) {
 										if (aspect != null
 												&& !aspect.getId().equals(spa.getAspect().getId()))
 											continue;
-	
+
+										if (!aspectType.getId().equals(spa.getAspect().getTypeid()))
+											continue;
+
 										SkyPoint sp = spa.getSkyPoint2();
-										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
-											if (rsign.getId().equals(sp.getSign().getId())) {
-												section.add(Chunk.NEWLINE);
-												boolean negative2 = spa.isNegative();
-												String sign2 = negative2 ? "-" : "+";
-												String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
-													" " + sign2 + " " + 
-													rsign.getName();
-												section.add(new Paragraph(header, fonth6));
-												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
-												PDFUtil.printGender(section, rule, female, child, true);												
-											}
+										if (rsign.getId().equals(sp.getSign().getId())) {
+											section.add(Chunk.NEWLINE);
+											boolean negative2 = spa.isNegative();
+											String sign2 = negative2 ? "-" : "+";
+											String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
+												" " + sign2 + " " + 
+												rsign.getName();
+											section.add(new Paragraph(header, fonth6));
+											section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+											PDFUtil.printGender(section, rule, female, child, true);												
 										}
 									}
 								} else if (rsign != null && null == planet2 && null == house2) {
