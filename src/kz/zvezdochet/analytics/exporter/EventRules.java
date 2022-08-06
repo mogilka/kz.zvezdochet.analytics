@@ -42,7 +42,7 @@ public class EventRules {
 			if (planet.isPositive() && planet.isInNeutralSign())
 				return (Rule)service.find(3L);
 		} else if (pcode.equals("Mars")) {
-			if (planet.isNeutral()) {
+			if (planet.isInNeutralSign()) {
 				long id = female ? 67L : 66L;
 				return (Rule)service.find(id);
 			}
