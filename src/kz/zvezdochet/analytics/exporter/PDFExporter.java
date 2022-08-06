@@ -1170,6 +1170,31 @@ public class PDFExporter {
 				    				 section.add(list);
 						    	 }
 				    		 }
+
+				    		 if (event.isHousable()) {
+				    			 section.add(Chunk.NEWLINE);
+					    		 section.add(new Paragraph("Пустые сферы жизни", boldred));
+					    		 section.add(new Paragraph("Указанные ниже сферы жизни изначально не будут важны для вас:", font));
+					    		 String houses = obj.getString("houses");
+					    		 if (null == houses || houses.isEmpty()) {
+					    			 DialogUtil.alertWarning("Задайте пустые вершины домов тигра (houses)");
+					    			 return;
+					    		 } else {
+					    			 String[] arr = houses.split(",");
+					    			 if (arr.length > 0) {
+					    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+					    				 for (String sid : arr) {
+					    					 House house = event.getHouses().get(Long.valueOf(sid));
+					    					 if (house != null) {
+					    						ListItem li = new ListItem();
+					    						li.add(new Chunk(house.getName(), font));
+					    						list.add(li);
+					    					}
+					    				 }
+					    				 section.add(list);
+							    	 }
+					    		 }
+				    		 }
 				    	 }
 				     }
 				} catch (JSONException ex) {
