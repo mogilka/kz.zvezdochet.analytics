@@ -99,6 +99,8 @@ public class EventStatistics {
 				value += planet.getScore();
 				planetSigns.put(planet.getSign().getCode(), value);
 
+				if (planet.isBad())
+					continue;
 				object = signPlanets.get(planet.getSign().getCode());
 				value = object != null ? (Integer)object : 0;
 				signPlanets.put(planet.getSign().getCode(), (int)++value);
