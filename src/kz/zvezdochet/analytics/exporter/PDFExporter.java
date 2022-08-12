@@ -1614,7 +1614,6 @@ public class PDFExporter {
 			    				 return;
 			    			 } else {
 			    				 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-			    				 list.setNumbered(true);
 			    				 String[] arr = hids.split(",");
 			    				 for (String hid : arr) {
 			    					 House house = event.getHouses().get(Long.valueOf(hid));
@@ -1807,10 +1806,15 @@ public class PDFExporter {
 						Rule rule = EventRules.rulePlanetSword(planet, female);
 						if (rule != null) {
 							section.add(Chunk.NEWLINE);
-							section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+							section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 						}
 						PDFUtil.printGender(section, planetText, female, child, true);
 						section.add(Chunk.NEWLINE);
+
+						if (planet.isDamaged() && planetText.getTextDamaged() != null) {
+							section.add(Chunk.NEWLINE);
+							section.add(new Paragraph(PDFUtil.removeTags(planetText.getTextDamaged(), font)));							
+						}
 					}
 				} else if (planet.isShield()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "shield");
@@ -1837,6 +1841,11 @@ public class PDFExporter {
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 						PDFUtil.printGender(section, planetText, female, child, true);
 						section.add(Chunk.NEWLINE);
+
+						if (planet.isDamaged() && planetText.getTextDamaged() != null) {
+							section.add(Chunk.NEWLINE);
+							section.add(new Paragraph(PDFUtil.removeTags(planetText.getTextDamaged(), font)));							
+						}
 					}
 				}
 				if (planet.isPerfect() && !planet.isBroken()) {
@@ -2751,8 +2760,9 @@ public class PDFExporter {
 			if (null == ehouses) return;
 			List<House> houses3 = new ArrayList<>();
 			for (House h : ehouses) {
-				if (h.isLilithed() || h.isKethued())
+				if (h.isLilithed() || h.isKethued() || h.isDamaged())
 					continue;
+
 				if (h.getPoints() > 2)
 					houses3.add(h);
 			}
@@ -4136,13 +4146,16 @@ public class PDFExporter {
 		    	bar.setCategory("категоричны");
 		    	bars2.add(bar);
 		    }
-	    	section.add(Chunk.NEWLINE);
-	    	if (OsUtil.getOS().equals(OsUtil.OS.LINUX))
-	    		section.add(PDFUtil.printStackChart(writer, "К кому вы лояльны, а к кому категоричны:", "Аспекты", "Баллы", bars2.toArray(new Bar[map.size() * 2]), 500, 0, true));
-	    	else {
-		    	section.add(new Paragraph("К кому вы лояльны:", font));
-	    		section.add(PDFUtil.printTableChart(writer, bars2.toArray(new Bar[map.size() * 2]), "К кому вы лояльны, а к кому категоричны:", false));
-	    	}
+
+		    if (loyalty > 0 && flatness > 0) {
+		    	section.add(Chunk.NEWLINE);
+		    	if (OsUtil.getOS().equals(OsUtil.OS.LINUX))
+		    		section.add(PDFUtil.printStackChart(writer, "К кому вы лояльны, а к кому категоричны:", "Аспекты", "Баллы", bars2.toArray(new Bar[map.size() * 2]), 500, 0, true));
+		    	else {
+			    	section.add(new Paragraph("К кому вы лояльны:", font));
+		    		section.add(PDFUtil.printTableChart(writer, bars2.toArray(new Bar[map.size() * 2]), "К кому вы лояльны, а к кому категоричны:", false));
+		    	}
+		    }
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

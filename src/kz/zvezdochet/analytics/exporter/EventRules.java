@@ -46,9 +46,6 @@ public class EventRules {
 				long id = female ? 67L : 66L;
 				return (Rule)service.find(id);
 			}
-		} else if (pcode.equals("Saturn")) {
-			if (planet.isDamaged())
-				return (Rule)service.find(108L);
 		}
 		return null;
 	}
