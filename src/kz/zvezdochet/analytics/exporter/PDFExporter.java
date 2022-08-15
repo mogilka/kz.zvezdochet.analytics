@@ -3131,12 +3131,6 @@ public class PDFExporter {
 						: new Paragraph(PDFUtil.removeTags(dict.getText(), font));
 					section.add(p);
 
-					Rule rule = EventRules.ruleHouseSign(house, sign, event);
-					if (rule != null) {
-						section.add(Chunk.NEWLINE);
-						section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
-					}
-
 					List<HouseSignRule> houseRules = hsruleService.find(house, sign);
 					for (HouseSignRule rule2 : houseRules) {
 						Planet planet = rule2.getPlanet();
