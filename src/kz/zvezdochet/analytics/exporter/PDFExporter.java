@@ -824,6 +824,8 @@ public class PDFExporter {
 					    						s += ". Поскольку планета " + planet.getName() + " поражена, то это местами затруднит её проявление";
 					    					else if (planet.inMine())
 					    						s += ". Поскольку планета " + planet.getName() + " находится в шахте, то это ослабит её проявление";
+					    					else if (planet.isLilithed())
+					    						s += ". Поскольку планета " + planet.getName() + " находится в соединении с Чёрной Луной, то это добавит безответственности к её проявлению";
 					    					section.add(new Paragraph(s, grayfont));
 					    					section.add(Chunk.NEWLINE);
 					    				}
@@ -2949,6 +2951,12 @@ public class PDFExporter {
 												section.add(Chunk.NEWLINE);
 												String header = planet.getShortName() + " + " + rsign.getShortname();
 												section.add(new Paragraph(header, fonth6));
+								    			if (term) {
+								    				section.add(new Paragraph(planet.getName() +
+								    					(house.isAngled() ? " на " + house.getDesignation() :
+								    						" в секторе «" + house.getName() + "» " + house.getDesignation() + " дома" +
+								    							" в созвездии " + rsign.getName()), grayfont));
+								    			}
 												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 												PDFUtil.printGender(section, rule, female, child, true);
 											}
