@@ -2496,6 +2496,7 @@ public class PDFExporter {
 				PlanetTextService ptservice = new PlanetTextService();
 				ElementService elementService = new ElementService();
 				CrossService crossService = new CrossService();
+				Map<Long, Planet> eplanets = event.getPlanets();
 
 			    for (Map.Entry<String, List<AspectConfiguration>> entry : map.entrySet()) {
 			    	//заголовок
@@ -2601,6 +2602,26 @@ public class PDFExporter {
 									shapes.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
 									shapes.add(new Paragraph(configuration.getElement().getTriangle(), font));
 									shapes.add(Chunk.NEWLINE);
+
+									if (event.isHousable()) {
+										com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+										Planet[] tplanets = {configuration.getVertex()[0], configuration.getLeftFoot()[0], configuration.getRightFoot()[0]};
+										House[] houses = new House[3];
+										for (int i = 0; i < 3; i++) {
+											Planet tp = eplanets.get(tplanets[i].getId());
+											houses[i] = tp.getHouse();
+										}
+										shapes.add(new Paragraph("Благоприятные сферы треугольника:", bold));
+										for (House h : houses) {
+											if (h != null) {
+												ListItem li = new ListItem();
+												li.add(new Chunk(h.getDesignation() + " дом – " + h.getDescription(), font));
+												list.add(li);
+											}
+										}
+										shapes.add(list);
+										shapes.add(Chunk.NEWLINE);
+									}
 								}
 
 							} else if (code.equals("cross")) {
