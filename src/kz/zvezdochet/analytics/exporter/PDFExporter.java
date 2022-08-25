@@ -3057,7 +3057,7 @@ public class PDFExporter {
 									if (rsign.getId().equals(planet.getSign().getId())) {
 										if (2 == aspectType.getId() && planet.isDamaged()) {
 											section.add(Chunk.NEWLINE);
-											String header = planet.getNegative() + " - " + rsign.getName();
+											String header = planet.getNegative() + " - " + rsign.getShortname();
 											section.add(new Paragraph(header, fonth6));
 											section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 											PDFUtil.printGender(section, rule, female, child, true);
@@ -3099,8 +3099,10 @@ public class PDFExporter {
 												boolean negative2 = spa.isNegative();
 												String sign2 = negative2 ? "-" : "+";
 												String header = house.getName() + " " + 
-													sign2 + " " + 
-													(negative2 ? planet2.getNegative() : planet2.getPositive());
+													sign2 + " "; 
+												header += (null == house2)
+													? (negative2 ? planet2.getNegative() : planet2.getPositive())
+													: house2.getName();
 												section.add(new Paragraph(header, fonth6));
 								    			if (term) {
 								    				String sector = hmain ? "(" + house.getDesignation() + ")" : house.getDesignation() + " дома";
