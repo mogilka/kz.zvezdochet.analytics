@@ -2983,7 +2983,8 @@ public class PDFExporter {
 											}
 										} else if (1 == owner) {
 											//толкуем знак куспида
-											if (house.getSign().getId().equals(rsign.getId())) {
+											if (!planet.isDamaged()
+													&& house.getSign().getId().equals(rsign.getId())) {
 												section.add(Chunk.NEWLINE);
 												String header = house.getName() + " + " + rsign.getShortname();
 												section.add(new Paragraph(header, fonth6));
