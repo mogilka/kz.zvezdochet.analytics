@@ -315,7 +315,22 @@ public class EventRules {
 	 */
 	public static Rule ruleDegree(Degree degree, Event event, Map<String, Double> signMap) throws DataAccessException {
 		RuleService service = new RuleService();
-		if (147 == degree.getId()) {
+		long id = degree.getId();
+		if (16 == id) {
+			//ASC = Венера — способности в искусстве и естественных науках.
+			//ASC + Венера — способности в искусстве и естественных науках.
+			Map<Long, Planet> planets = event.getPlanets();
+			Planet planet = planets.get(24l);
+			List<SkyPointAspect> aspects = planet.getAspectHouseList();
+			for (SkyPointAspect spa : aspects) {
+				if (spa.getSkyPoint2().getId() > 142)
+					continue;
+
+				long aid = spa.getAspect().getTypeid();
+				if (1 == aid || 3 == aid)
+					return (Rule)service.find(11L);
+			}
+		} else if (147 == id) {
 			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				String pcode = planet.getCode();
