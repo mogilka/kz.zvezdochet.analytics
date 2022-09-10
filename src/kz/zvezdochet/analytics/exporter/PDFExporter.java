@@ -1455,23 +1455,25 @@ public class PDFExporter {
 			     if (jsonObject != null) {
 			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
 			    	 if (obj != null) {
-				    	 int pid1 = obj.getInt("planet"); //левая планета
-				    	 if (0 == pid1) {
+			    		 Object pids = obj.get("planet"); //левая планета
+			    		 if (null == pids) {
 			    			 DialogUtil.alertWarning("Задайте левую ножку табуретки (planet), если рассматривать фигуру ножками вниз");
 			    			 return;
 				    	 }
-				    	 int pid2 = obj.getInt("planet2"); //правая планета
-				    	 if (0 == pid2) {
+			    		 Object pids2 = obj.get("planet2"); //правая планета
+			    		 if (null == pids2) {
 			    			 DialogUtil.alertWarning("Задайте правую правую ножку табуретки (planet2), если рассматривать фигуру ножками вниз");
 			    			 return;
 				    	 }
+			    		 Object[] arr1 = pids.toString().split(",");
+			    		 Object[] arr2 = pids2.toString().split(",");
+			    		 Object[] arr = CoreUtil.concatTwoArrays(arr1, arr2);
 
 			    		 section.add(new Paragraph("Ваша опора в жизни:", bold));
 				    	 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-				    	 int[] arr = new int[] {pid1, pid2};
-			    		 for (int pid : arr) {
+			    		 for (Object pid : arr) {
 					    	 ListItem li = new ListItem();
-			    			 Planet planet = event.getPlanets().get(Long.valueOf(pid));
+			    			 Planet planet = event.getPlanets().get(Long.valueOf(pid.toString()));
 			    			 if (planet != null) {
 			    				 String s = term
 			    					? planet.getName() + " в " + planet.getHouse().getDesignation()
@@ -1479,6 +1481,8 @@ public class PDFExporter {
 			    				 anchor = new Anchor(s, fonta);
 			    				 anchor.setReference("#" + planet.getAnchor());
 			    				 li.add(anchor);
+			    				 if (planet.isBad())
+			    					 li.add(new Chunk(" (прежде чем опереться на эту сферу, её придётся проработать и укрепить)", red));
 			    			 }
 		    				 list.add(li);
 			    		 }
@@ -2615,7 +2619,7 @@ public class PDFExporter {
 										for (House h : houses) {
 											if (h != null) {
 												ListItem li = new ListItem();
-												li.add(new Chunk(h.getDesignation() + " дом – " + h.getDescription(), font));
+												li.add(new Chunk((term ? h.getDesignation() + " дом – " : "") + h.getDescription(), font));
 												list.add(li);
 											}
 										}
