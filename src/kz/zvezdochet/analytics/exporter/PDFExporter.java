@@ -3011,27 +3011,25 @@ public class PDFExporter {
 									//аспект планеты в доме с другим куспидом
 									List<SkyPointAspect> aspects = planet.getAspectHouseList();
 									for (SkyPointAspect spa : aspects) {
-										if (aspect != null
-												&& !aspect.getId().equals(spa.getAspect().getId()))
+										if (!house2.getId().equals(spa.getSkyPoint2().getId()))
 											continue;
 
 										if (!aspectType.getId().equals(spa.getAspect().getTypeid()))
 											continue;
 
-										SkyPoint sp = spa.getSkyPoint2();
-										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
-											if (house2.getId().equals(sp.getId())) {
-												section.add(Chunk.NEWLINE);
-												boolean negative2 = spa.isNegative();
-												String sign2 = negative2 ? "-" : "+";
-												String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
-													" " + sign2 + " " + 
-													house2.getName();
-												section.add(new Paragraph(header, fonth6));
-												section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
-												PDFUtil.printGender(section, rule, female, child, true);												
-											}
-										}
+										if (aspect != null
+												&& !aspect.getId().equals(spa.getAspect().getId()))
+											continue;
+
+										section.add(Chunk.NEWLINE);
+										boolean negative2 = spa.isNegative();
+										String sign2 = negative2 ? "-" : "+";
+										String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
+											" " + sign2 + " " + 
+											house2.getName();
+										section.add(new Paragraph(header, fonth6));
+										section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+										PDFUtil.printGender(section, rule, female, child, true);												
 									}
 								} else if (rsign != null && null == planet2 && null == house2 && 2 == owner) {
 									//аспект планеты в доме с другим знаком
