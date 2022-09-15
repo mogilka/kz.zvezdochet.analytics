@@ -139,9 +139,7 @@ public class EventRules {
 		String pcode = planet.getCode();
 		if (hcode.equals("I")) {
 			if (pcode.equals("Mercury")) {
-				if (planet.isWeak())
-					rules.add((Rule)service.find(186L));
-				else if (planet.isDamaged())
+				if (planet.isDamaged())
 					rules.add((Rule)service.find(187L));
 			}
 		} else if (hcode.equals("I_3")) {
