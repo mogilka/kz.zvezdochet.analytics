@@ -459,6 +459,7 @@ public class PDFExporter {
 				e1.printStackTrace();
 			}
 		    image.dispose();
+		    gc.dispose();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -3049,7 +3050,7 @@ public class PDFExporter {
 											String sign2 = negative2 ? "-" : "+";
 											String header = (negative2 ? planet.getNegative() : planet.getPositive()) +
 												" " + sign2 + " " + 
-												rsign.getName();
+												rsign.getShortname();
 											section.add(new Paragraph(header, fonth6));
 											section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 											PDFUtil.printGender(section, rule, female, child, true);												
