@@ -2575,7 +2575,7 @@ public class PDFExporter {
 						if (!code.equals("stellium") && !code.equals("necklace")) {
 							descr = configuration.getDescription();
 							if (descr != null)
-								shapes.add(new Paragraph(descr, font));
+								shapes.add(new Paragraph(PDFUtil.removeTags(descr, font)));
 
 							//дополнение
 							shapes.add(Chunk.NEWLINE);
@@ -2691,7 +2691,7 @@ public class PDFExporter {
 							
 							descr = configuration.getDescription();
 							if (descr != null)
-								shapes.add(new Paragraph(descr, font));
+								shapes.add(new Paragraph(PDFUtil.removeTags(descr, font)));
 
 							Rule rule = EventRules.ruleConfiguration(configuration);
 							if (rule != null) {
