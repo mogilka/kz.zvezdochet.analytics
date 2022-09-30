@@ -3625,12 +3625,14 @@ public class PDFExporter {
 		    	section.add(new Paragraph(PDFUtil.removeTags(cross.getText(), font)));
 		    	PDFUtil.printGender(section, cross, female, child, true);
 		    }
+		    section.add(Chunk.NEXTPAGE);
 		    Paragraph p = new Paragraph("Диаграмма показывает, какой тип стратегии присущ вашим мыслям в состоянии покоя, " +
 				"и как эта стратегия меняется, когда приходит время действовать и принимать решения:", font);
-		    p.setSpacingBefore(10);
+		    p.setSpacingAfter(10);
 	    	section.add(p);
-		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Стратегия", "Аспекты", "Баллы", bars, 500, 0, true);
+		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, "Стратегия", "Аспекты", "Баллы", bars, 500, 200, true);
 			section.add(image);
+			section.add(Chunk.NEWLINE);
 
 			//знаки
 			crossMap = statistics.getCrossSigns();
