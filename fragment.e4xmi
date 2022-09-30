@@ -4,11 +4,13 @@
     <elements xsi:type="commands:Command" xmi:id="_bRtc0OlkEeaCS4O9hiLsMg" elementId="kz.zvezdochet.analytics.command.export" commandName="exportCommand"/>
     <elements xsi:type="commands:Command" xmi:id="_nHi7cKTqEeeLb_6iVhiuwA" elementId="kz.zvezdochet.analytics.command.html" commandName="htmlCommand"/>
     <elements xsi:type="commands:Command" xmi:id="_pGaw4ADJEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.command.main" commandName="mainCommand"/>
+    <elements xsi:type="commands:Command" xmi:id="_pHiVYDzVEe2Lf84hWW21_A" elementId="kz.zvezdochet.analytics.command.graphics" commandName="graphicsCommand"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_f0-MoOlkEeaCS4O9hiLsMg" featurename="handlers" parentElementId="org.eclipse.e4.ide.application">
     <elements xsi:type="commands:Handler" xmi:id="_nClC0OlkEeaCS4O9hiLsMg" elementId="kz.zvezdochet.analytics.handler.export" contributionURI="bundleclass://kz.zvezdochet.analytics/kz.zvezdochet.analytics.handler.ExportHandler" command="_bRtc0OlkEeaCS4O9hiLsMg"/>
     <elements xsi:type="commands:Handler" xmi:id="_riqb4KTqEeeLb_6iVhiuwA" elementId="kz.zvezdochet.analytics.handler.html" contributionURI="bundleclass://kz.zvezdochet.analytics/kz.zvezdochet.analytics.handler.HtmlHandler" command="_nHi7cKTqEeeLb_6iVhiuwA"/>
     <elements xsi:type="commands:Handler" xmi:id="_sjO2AADJEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.handler.main" contributionURI="bundleclass://kz.zvezdochet.analytics/kz.zvezdochet.analytics.handler.MainHandler" command="_pGaw4ADJEeiGBMQIaNSirA"/>
+    <elements xsi:type="commands:Handler" xmi:id="_uy58wDzVEe2Lf84hWW21_A" elementId="kz.zvezdochet.analytics.handler.graphics" contributionURI="bundleclass://kz.zvezdochet.analytics/kz.zvezdochet.analytics.handler.TransitChartHandler" command="_pHiVYDzVEe2Lf84hWW21_A"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_wU4UoOlkEeaCS4O9hiLsMg" featurename="children" parentElementId="kz.zvezdochet.toolbar.event">
     <elements xsi:type="menu:HandledToolItem" xmi:id="_0zGMYOlkEeaCS4O9hiLsMg" elementId="kz.zvezdochet.analytics.handledtoolitem.export" label="&#x42d;&#x43a;&#x441;&#x43f;&#x43e;&#x440;&#x442; &#x433;&#x43e;&#x440;&#x43e;&#x441;&#x43a;&#x43e;&#x43f;&#x430;" iconURI="platform:/plugin/kz.zvezdochet.export/icons/export.gif" tooltip="&#x42d;&#x43a;&#x441;&#x43f;&#x43e;&#x440;&#x442; &#x433;&#x43e;&#x440;&#x43e;&#x441;&#x43a;&#x43e;&#x43f;&#x430;" command="_bRtc0OlkEeaCS4O9hiLsMg"/>
@@ -24,7 +26,9 @@
       <children xsi:type="basic:PartSashContainer" xmi:id="__B3GwADEEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.partsashcontainer.graphics" horizontal="true">
         <children xsi:type="basic:PartStack" xmi:id="_ENT38ADFEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.partstack.graphics">
           <children xsi:type="basic:Part" xmi:id="_K_R7AADFEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.part.graphics" contributionURI="bundleclass://kz.zvezdochet.analytics/kz.zvezdochet.analytics.part.GraphicPart" label="&#x418;&#x43d;&#x444;&#x43e;&#x433;&#x440;&#x430;&#x444;&#x438;&#x43a;&#x430;" iconURI="platform:/plugin/kz.zvezdochet.analytics/icons/chart_bar.png" tooltip="&#x418;&#x43d;&#x444;&#x43e;&#x433;&#x440;&#x430;&#x444;&#x438;&#x43a;&#x430;">
-            <toolbar xmi:id="_9B0FIADFEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.toolbar.0"/>
+            <toolbar xmi:id="_9B0FIADFEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.toolbar.0">
+              <children xsi:type="menu:HandledToolItem" xmi:id="_jaMYEDzVEe2Lf84hWW21_A" elementId="kz.zvezdochet.analytics.handledtoolitem.graphics" label="&#x414;&#x438;&#x430;&#x433;&#x440;&#x430;&#x43c;&#x43c;&#x430; &#x413;&#x430;&#x43d;&#x442;&#x442;&#x430;" iconURI="platform:/plugin/kz.zvezdochet.analytics/icons/chart_bar.png" tooltip="&#x414;&#x438;&#x430;&#x433;&#x440;&#x430;&#x43c;&#x43c;&#x430; &#x413;&#x430;&#x43d;&#x442;&#x442;&#x430;" command="_pHiVYDzVEe2Lf84hWW21_A"/>
+            </toolbar>
           </children>
         </children>
         <children xsi:type="basic:PartStack" xmi:id="_Ga2tkADFEeiGBMQIaNSirA" elementId="kz.zvezdochet.analytics.partstack.event">
