@@ -1080,7 +1080,7 @@ public class PDFExporter {
 						if (obj != null) {
 							String direction = obj.getString("direction");
 							if (null == direction || direction.isEmpty()) {
-								DialogUtil.alertWarning("Задайте направление чаши East|West|North|South");
+								DialogUtil.alertWarning("Задайте направление чаши direction: East|West|North|South");
 								return;
 							} else {
 								if (direction.equals("North"))
@@ -2312,12 +2312,8 @@ public class PDFExporter {
 						continue;
 
 					if (aspect.getAspect().getCode().equals("OPPOSITION")) {
-						if (planet1.isKethued()
-								&& planet2.getCode().equals("Rakhu"))
-							continue;
-
-						if (planet1.isRakhued()
-								&& planet2.getCode().equals("Kethu"))
+						if (planet2.getCode().equals("Rakhu")
+								|| planet2.getCode().equals("Kethu"))
 							continue;
 					}
 
@@ -2527,7 +2523,7 @@ public class PDFExporter {
 							text += conf.getDescription();
 	    				section.add(new Paragraph(text, PDFUtil.getAnnotationFont(true)));
 					}
-					
+
 					//изображения
 					Paragraph shapes = new Paragraph();
 					String descr = null;
