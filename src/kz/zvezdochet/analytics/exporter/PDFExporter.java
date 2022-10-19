@@ -2598,12 +2598,6 @@ public class PDFExporter {
 
 							} else if (code.equals("triangle")) {
 								if (configuration.getElement() != null) {
-									if (term)
-										shapes.add(new Paragraph(configuration.getElement().getDescription(), fonth5));
-									shapes.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
-									shapes.add(new Paragraph(configuration.getElement().getTriangle(), font));
-									shapes.add(Chunk.NEWLINE);
-
 									if (event.isHousable()) {
 										com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 										Planet[] tplanets = {configuration.getVertex()[0], configuration.getLeftFoot()[0], configuration.getRightFoot()[0]};
@@ -2623,6 +2617,12 @@ public class PDFExporter {
 										shapes.add(list);
 										shapes.add(Chunk.NEWLINE);
 									}
+
+									if (term)
+										shapes.add(new Paragraph(configuration.getElement().getDescription(), fonth5));
+									shapes.add(new Paragraph("Качества, благодаря которым вам обеспечена лёгкость и успех:", bold));
+									shapes.add(new Paragraph(configuration.getElement().getTriangle(), font));
+									shapes.add(Chunk.NEWLINE);
 								}
 
 							} else if (code.equals("cross")) {
