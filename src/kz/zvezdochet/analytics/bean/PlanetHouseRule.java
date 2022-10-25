@@ -17,12 +17,12 @@ public class PlanetHouseRule extends PlanetHouseText {
 	/**
 	 * Планета
 	 */
-    private Planet planet2;
+    protected Planet planet2;
         
 	/**
 	 * Астрологический дом
 	 */
-    private House house2;
+    protected House house2;
 
 	/**
 	 * Аспект
