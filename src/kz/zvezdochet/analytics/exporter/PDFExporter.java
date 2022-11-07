@@ -1667,7 +1667,7 @@ public class PDFExporter {
 			     }
 			}
 
-			if (id < 4)
+			if (id < 4 || (9 == id && term))
 				section.add(Chunk.NEXTPAGE);
 			if (kind.getHigh() != null) {
 				section.add(Chunk.NEWLINE);
@@ -1949,7 +1949,27 @@ public class PDFExporter {
 						if (ruler != null) {
 							PlanetText text = (PlanetText)service.findByPlanet(ruler.getId(), "positive");
 							if (text != null) {
-								String s = term ? "В этом вам помогут качества созвездия " + sign.getName() + ", в котором находится " + planet.getName() : "В этом вам помогут следующие качества и сферы жизни";
+								if (event.isHousable()) {
+									House h = planet.getHouse();
+									String s = term
+										? "В этом вам поможет " + h.getDesignation() + " дом, в котором находится " + planet.getName()
+										: "В этом вам помогут следующие сферы жизни";
+									Paragraph p = new Paragraph(s + ":", new Font(baseFont, 12, Font.BOLD));
+									p.setSpacingBefore(10);
+									section.add(p);
+
+									p = new Paragraph();
+									p.add(new Chunk("- ", font));
+				    				String hname = h.getName();
+				    				Anchor anchor = new Anchor(hname, fonta);
+				    				anchor.setReference("#" + planet.getAnchor());
+				    				p.add(anchor);
+				    				p.add(new Chunk(": " + h.getDescription(), font));
+				    				section.add(p);
+								}
+								String s = term
+									? "В этом вам помогут качества созвездия " + sign.getName() + ", в котором находится " + planet.getName()
+									: "В этом вам помогут следующие качества";
 								Paragraph p = new Paragraph(s + ":", new Font(baseFont, 12, Font.BOLD));
 								p.setSpacingBefore(10);
 								section.add(p);
@@ -3271,19 +3291,19 @@ public class PDFExporter {
 
 			list = new com.itextpdf.text.List(false, false, 10);
 			li = new ListItem();
-	        li.add(new Chunk("Холерик – быстрый, порывистый, страстный, способный преодолевать значительные трудности, но неуравновешенный, склонный к бурным эмоциям и резким сменам настроения. Чувства возникают быстро и ярко отражаются в речи, жестах и мимике", PDFUtil.getDangerFont()));
+	        li.add(new Chunk("Холерик (стихия Огня) – быстрый, порывистый, страстный, способный преодолевать значительные трудности, но неуравновешенный, склонный к бурным эмоциям и резким сменам настроения. Чувства возникают быстро и ярко отражаются в речи, жестах и мимике", PDFUtil.getDangerFont()));
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Флегматик – медлительный, спокойный, с устойчивыми стремлениями и более или менее постоянным настроением (внешне слабо выражает своё душевное состояние). Тип нервной системы: сильный, уравновешенный, инертный. Хорошая память, высокий интеллект, склонность к продуманным, взвешенным решениям, без риска", PDFUtil.getSuccessFont()));
+	        li.add(new Chunk("Флегматик (стихия Земли) – медлительный, спокойный, с устойчивыми стремлениями и более или менее постоянным настроением (внешне слабо выражает своё душевное состояние). Тип нервной системы: сильный, уравновешенный, инертный. Хорошая память, высокий интеллект, склонность к продуманным, взвешенным решениям, без риска", PDFUtil.getSuccessFont()));
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Сангвиник – живой, подвижный, сравнительно легко переживающий неудачи и неприятности. Мимика разнообразна и богата, темп речи быстрый. Эмоции преимущественно положительные, – быстро возникают и меняются", PDFUtil.getWarningFont()));
+	        li.add(new Chunk("Сангвиник (стихия Воздуха) – живой, подвижный, сравнительно легко переживающий неудачи и неприятности. Мимика разнообразна и богата, темп речи быстрый. Эмоции преимущественно положительные, – быстро возникают и меняются", PDFUtil.getWarningFont()));
 	        list.add(li);
 
 			li = new ListItem();
-	        li.add(new Chunk("Меланхолик – легкоранимый, глубоко переживает даже незначительные неудачи, внешне вяло реагирует на происходящее. Тип нервной системы: высокочувствительный. Тонкая реакция на малейшие оттенки чувств. Переживания глубоки, эмоциональны и очень устойчивы", PDFUtil.getNeutralFont()));
+	        li.add(new Chunk("Меланхолик (стихия Воды) – легкоранимый, глубоко переживает даже незначительные неудачи, внешне вяло реагирует на происходящее. Тип нервной системы: высокочувствительный. Тонкая реакция на малейшие оттенки чувств. Переживания глубоки, эмоциональны и очень устойчивы", PDFUtil.getNeutralFont()));
 	        list.add(li);
 	        section.add(list);
 		} catch(Exception e) {
