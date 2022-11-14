@@ -2311,8 +2311,7 @@ public class PDFExporter {
 					continue;
 
 				for (SkyPointAspect aspect : aspects) {
-					if (!planet1.isMain()
-							&& !aspect.getAspect().getCode().equals("CONJUNCTION"))
+					if (!planet1.isMain())
 						continue;
 
 					long asplanetid = aspect.getAspect().getPlanetid();
@@ -2818,7 +2817,7 @@ public class PDFExporter {
 			for (House h : houses3) {
 				String mission = h.getMission();
 				ListItem li = new ListItem();
-		        li.add(new Chunk(null == mission ? h.getDescription() : mission, green));
+		        li.add(null == mission ? new Chunk(h.getDescription(), green) : PDFUtil.removeTags(h.getMission(), green));
 		        list.add(li);
 			}
 	        section.add(list);
