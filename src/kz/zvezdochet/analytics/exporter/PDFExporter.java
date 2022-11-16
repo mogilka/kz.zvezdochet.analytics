@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -24,6 +25,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.service.prefs.Preferences;
 
 import com.itextpdf.text.Anchor;
 import com.itextpdf.text.BaseColor;
@@ -51,6 +53,7 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import kz.zvezdochet.analytics.Activator;
+import kz.zvezdochet.analytics.Messages;
 import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.analytics.bean.CrossSign;
 import kz.zvezdochet.analytics.bean.Degree;
@@ -125,6 +128,7 @@ import kz.zvezdochet.service.SignService;
 import kz.zvezdochet.service.SquareService;
 import kz.zvezdochet.service.YinYangService;
 import kz.zvezdochet.service.ZoneService;
+import kz.zvezdochet.util.Constants;
 import kz.zvezdochet.util.Cosmogram;
 
 /**
@@ -175,6 +179,10 @@ public class PDFExporter {
 	 * Вариации шрифтов
 	 */
 	private Font font, fonta, fonth5;
+	/**
+	 * Язык файла
+	 */
+	private String lang = "ru";
 
 	public PDFExporter(Display display) {
 		this.display = display;
@@ -183,6 +191,11 @@ public class PDFExporter {
 			font = PDFUtil.getRegularFont();
 			fonta = PDFUtil.getLinkFont();
 			fonth5 = PDFUtil.getHeaderFont();
+
+			Preferences preferences = InstanceScope.INSTANCE.getNode("kz.zvezdochet");
+			Preferences recent = preferences.node(Constants.PREF_LANG);
+			lang = recent.get(Constants.PREF_LANG, "ru");
+			Messages.init();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -209,7 +222,7 @@ public class PDFExporter {
 	        doc.open();
 
 	        //metadata
-	        PDFUtil.getMetaData(doc, "Натальная карта");
+	        PDFUtil.getMetaData(doc, Messages.getString("NatalChart"));
 
 	        //раздел
 			Chapter chapter = new ChapterAutoNumber("Общая информация");
@@ -217,7 +230,7 @@ public class PDFExporter {
 
 			//шапка
 			Paragraph p = new Paragraph();
-			PDFUtil.printHeader(p, "Натальная карта", null);
+			PDFUtil.printHeader(p, Messages.getString("NatalChart"), null);
 			chapter.add(p);
 
 			p = new Paragraph();

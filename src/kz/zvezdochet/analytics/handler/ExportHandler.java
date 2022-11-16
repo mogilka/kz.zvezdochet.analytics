@@ -13,7 +13,7 @@ import kz.zvezdochet.core.ui.util.DialogUtil;
 import kz.zvezdochet.part.EventPart;
 
 /**
- * Обработка события для PDF-экспорта индивидуального гороскопа
+ * PDF-экспорт натальной карты
  * @author Natalie Didenko
  *
  */
