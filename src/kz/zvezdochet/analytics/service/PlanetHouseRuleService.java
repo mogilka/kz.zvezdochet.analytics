@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.PlanetHouseRule;
 import kz.zvezdochet.bean.Aspect;
@@ -26,7 +27,8 @@ import kz.zvezdochet.service.SignService;
 public class PlanetHouseRuleService extends PlanetHouseService {
 
 	public PlanetHouseRuleService() {
-		tableName = "planethouserule";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "planethouserule" : "us_planethouserule";
 	}
 
 	/**

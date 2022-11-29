@@ -3,6 +3,7 @@ package kz.zvezdochet.analytics.service;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.Numerology;
 import kz.zvezdochet.core.bean.Model;
@@ -17,7 +18,8 @@ import kz.zvezdochet.core.tool.Connector;
 public class NumerologyService extends ModelService {
 
 	public NumerologyService() {
-		tableName = "numerology";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "numerology" : "us_numerology";
 	}
 
 	@Override

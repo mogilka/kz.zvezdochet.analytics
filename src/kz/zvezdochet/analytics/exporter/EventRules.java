@@ -259,7 +259,7 @@ public class EventRules {
 				if (code.equals("POSITIVE")) {
 					for (Model model : planets) {
 						Planet p = (Planet)model;
-						if (p.getCode().equals("Mercury") && p.isLord())
+						if (p.getCode().equals("Mercury") && p.isDominant())
 							return (Rule)service.find(69L);
 					}
 				}
@@ -279,7 +279,7 @@ public class EventRules {
 				if (code.equals("POSITIVE")) {
 					for (Model model : planets) {
 						Planet p = (Planet)model;
-						if (p.getCode().equals("Saturn") && p.isLord())
+						if (p.getCode().equals("Saturn") && p.isDominant())
 							return (Rule)service.find(68L);
 					}
 				}
@@ -333,7 +333,7 @@ public class EventRules {
 			for (Planet planet : planets) {
 				String pcode = planet.getCode();
 				if (pcode.equals("Mars") || pcode.equals("Uranus")) {
-					if (planet.isLord() || planet.isRakhued())
+					if (planet.isDominant() || planet.isRakhued())
 						return (Rule)service.find(95L);
 					else {
 						Iterator<Map.Entry<String, Double>> iterator = signMap.entrySet().iterator();

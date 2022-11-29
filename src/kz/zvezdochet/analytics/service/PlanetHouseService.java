@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.PlanetHouseText;
 import kz.zvezdochet.bean.AspectType;
@@ -24,7 +25,8 @@ import kz.zvezdochet.service.PlanetService;
 public class PlanetHouseService extends GenderTextModelService {
 
 	public PlanetHouseService() {
-		tableName = "planethouses";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "planethouses" : "us_planethouses";
 	}
 
 	/**

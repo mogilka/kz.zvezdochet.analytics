@@ -5,6 +5,7 @@ package kz.zvezdochet.analytics.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.Rule;
 import kz.zvezdochet.core.bean.Model;
@@ -18,7 +19,8 @@ import kz.zvezdochet.core.service.ModelService;
 public class RuleService extends ModelService {
 
 	public RuleService() {
-		tableName = "rules";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "rules" : "us_rules";
 	}
 
 	@Override

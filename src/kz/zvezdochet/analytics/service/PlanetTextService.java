@@ -3,6 +3,7 @@ package kz.zvezdochet.analytics.service;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.PlanetText;
 import kz.zvezdochet.bean.Planet;
@@ -18,7 +19,8 @@ import kz.zvezdochet.service.PlanetService;
 public class PlanetTextService extends GenderTextModelService {
 
 	public PlanetTextService() {
-		tableName = "planettext";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "planettext" : "us_planettext";
 	}
 
 	@Override

@@ -276,7 +276,7 @@ public class HTMLExporter {
 					}
 				}
 				if (planet.isPerfect() && !planet.isBroken()) {
-					if (planet.inMine()) {
+					if (planet.isUnaspected()) {
 						Tag p = new Tag("p");
 						p.add("Планета " + planet.getName() + " не вызывает напряжения, так что вы сумеете проработать недостатки, описанные в разделе «" + planet.getShortName() + " в шахте»");
 						div.add(p);
@@ -1161,7 +1161,7 @@ public class HTMLExporter {
 					Event event = (Event)model;
 					p.add(util.getSmallTaggedString(DateUtil.formatDate(event.getBirth())));
 					Tag a = new Tag("a", "target=_blank href=" + event.getUrl());
-					a.add(event.getName());
+					a.add(event.getName("ru"));
 					p.add(a);
 					p.add(util.getSmallTaggedString("&nbsp;&nbsp;&nbsp;" + event.getComment()));
 					p.add(new Tag("/br"));
@@ -1641,7 +1641,7 @@ public class HTMLExporter {
 			Collection<Planet> planets = event.getPlanets().values();
 			for (Planet planet : planets) {
 				PlanetText planetText = null;
-				if (planet.inMine()) {
+				if (planet.isUnaspected()) {
 					planetText = (PlanetText)service.findByPlanet(planet.getId(), "mine");
 					if (planetText != null) {
 						tag.add(planet.getShortName() + " в шахте");
@@ -1701,7 +1701,7 @@ public class HTMLExporter {
 				if (!health && gender.getType().equals("health"))
 					continue;
 				Tag tag = new Tag("h5");
-				tag.add(PDFUtil.getGenderHeader(gender.getType()));
+				tag.add(PDFUtil.getGenderHeader(gender.getType(), "ru"));
 				body.add(tag);
 				body.add(gender.getText());
 			};

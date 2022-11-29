@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.Preferences;
 
-import kz.zvezdochet.util.Constants;
+import kz.zvezdochet.core.util.Constants;
 
 /**
  * Обработчик переводов
@@ -38,9 +38,11 @@ public class Messages /*extends org.eclipse.osgi.util.NLS*/ {
 	}
 
 	public static void init() {
+//		Locale defaultLocale = Locale.getDefault();
 		Preferences preferences = InstanceScope.INSTANCE.getNode("kz.zvezdochet");
 		Preferences recent = preferences.node(Constants.PREF_LANG);
 		String lang = recent.get(Constants.PREF_LANG, "ru");
 		RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, new Locale(lang));
+//		Locale.setDefault(defaultLocale);
 	}
 }

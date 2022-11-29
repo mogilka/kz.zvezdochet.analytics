@@ -2,6 +2,7 @@ package kz.zvezdochet.analytics.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.Moonday;
 import kz.zvezdochet.core.bean.Model;
@@ -15,7 +16,8 @@ import kz.zvezdochet.core.service.ModelService;
 public class MoondayService extends ModelService {
 
 	public MoondayService() {
-		tableName = "moonday";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "moonday" : "us_moonday";
 	}
 
 	@Override

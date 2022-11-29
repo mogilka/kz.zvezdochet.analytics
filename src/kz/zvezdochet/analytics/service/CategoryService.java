@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.Category;
 import kz.zvezdochet.bean.Planet;
@@ -21,7 +22,8 @@ import kz.zvezdochet.service.PlanetService;
 public class CategoryService extends DictionaryService {
 
 	public CategoryService() {
-		tableName = "categories";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "categories" : "us_categories";
 	}
 
 	@Override

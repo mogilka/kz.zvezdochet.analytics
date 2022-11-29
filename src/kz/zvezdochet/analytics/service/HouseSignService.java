@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.HouseSignText;
 import kz.zvezdochet.bean.House;
@@ -22,7 +23,8 @@ import kz.zvezdochet.service.SignService;
 public class HouseSignService extends GenderTextModelService {
 
 	public HouseSignService() {
-		tableName = "housesigns";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "housesigns" : "us_housesigns";
 	}
 
 	@Override

@@ -4,13 +4,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Locale;
 
 import kz.zvezdochet.analytics.bean.Degree;
+import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.DataAccessException;
 import kz.zvezdochet.core.service.TextGenderDictionaryService;
 import kz.zvezdochet.core.tool.Connector;
 import kz.zvezdochet.core.util.DateUtil;
+import kz.zvezdochet.service.PlanetService;
 
 /**
  * Сервис Зодиакальных градусов
@@ -19,7 +22,8 @@ import kz.zvezdochet.core.util.DateUtil;
 public class DegreeService extends TextGenderDictionaryService {
 
 	public DegreeService() {
-		tableName = "degrees";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "degrees" : "us_degrees";
 	}
 
 	@Override
@@ -35,6 +39,14 @@ public class DegreeService extends TextGenderDictionaryService {
 		dict.setRoyal(rs.getBoolean("royal"));
 		dict.setDestructive(rs.getBoolean("destructive"));
 		dict.setOccult(rs.getBoolean("occult"));
+		PlanetService service = new PlanetService();
+		dict.setPlanet((Planet)service.find(rs.getLong("planetid")));
+		long val = rs.getLong("planet2id");
+		if (val > 0)
+			dict.setPlanet2((Planet)service.find(val));
+		val = rs.getLong("planet3id");
+		if (val > 0)
+			dict.setPlanet3((Planet)service.find(val));
 		return dict;
 	}
 

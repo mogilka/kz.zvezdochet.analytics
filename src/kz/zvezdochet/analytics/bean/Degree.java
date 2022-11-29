@@ -1,6 +1,7 @@
 package kz.zvezdochet.analytics.bean;
 
 import kz.zvezdochet.analytics.service.DegreeService;
+import kz.zvezdochet.bean.Planet;
 import kz.zvezdochet.core.bean.TextGenderDictionary;
 import kz.zvezdochet.core.service.ModelService;
 
@@ -58,5 +59,27 @@ public class Degree extends TextGenderDictionary {
 	}
 	public void setOccult(boolean occult) {
 		this.occult = occult;
+	}
+	private Planet planet;
+	private Planet planet2;
+	private Planet planet3;
+
+	public Planet getPlanet() {
+		return planet;
+	}
+	public void setPlanet(Planet planet) {
+		this.planet = planet;
+	}
+	public Planet getPlanet2() {
+		return planet2;
+	}
+	public void setPlanet2(Planet planet2) {
+		this.planet2 = planet2;
+	}
+	public Planet getPlanet3() {
+		return planet3;
+	}
+	public void setPlanet3(Planet planet3) {
+		this.planet3 = planet3;
 	}
 }

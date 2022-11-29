@@ -1,5 +1,7 @@
 package kz.zvezdochet.analytics.service;
 
+import java.util.Locale;
+
 import kz.zvezdochet.analytics.bean.CardType;
 import kz.zvezdochet.core.bean.Model;
 import kz.zvezdochet.core.service.TextGenderDictionaryService;
@@ -11,7 +13,8 @@ import kz.zvezdochet.core.service.TextGenderDictionaryService;
 public class CardTypeService extends TextGenderDictionaryService {
 
 	public CardTypeService() {
-		tableName = "cardtypes";
+		String lang = Locale.getDefault().getLanguage();
+		tableName = lang.equals("ru") ? "cardtypes" : "us_cardtypes";
 	}
 
 	@Override
