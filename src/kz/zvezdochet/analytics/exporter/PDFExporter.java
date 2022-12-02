@@ -1271,42 +1271,52 @@ public class PDFExporter {
 //----------праща
 
 			} else if (8 == id) {
-				//планеты напротив чаши
-				Long pids[] = {22L, 30L};
-				PlanetService service = new PlanetService();
-				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
-				for (Long pid : pids) {
-					Planet planet = (Planet)service.find(pid);
-					if (planet != null) {
-						ListItem li = new ListItem();
-				        li.add(new Chunk(planet.getDescription(), font));
-				        list.add(li);
-					}
-				}
-				section.add(list);
+			     if (jsonObject != null) {
+			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
+			    	 //планеты напротив чаши
+			    	 Object pids = obj.get("planet"); //планеты на острие стрелы
+			    	 if (null == pids
+			    			 || pids.toString().isEmpty()
+			    			 || pids.toString().equals("0")) {
+			    		 DialogUtil.alertWarning("Задайте планеты на острие лука (planet)");
+			    		 return;
+			    	 }
+			    	 String[] sids = pids.toString().split(",");
+			    	 PlanetService service = new PlanetService();
+			    	 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+			    	 for (String pid : sids) {
+			    		 Planet planet = (Planet)service.find(Long.getLong(pid));
+			    		 if (planet != null) {
+			    			 ListItem li = new ListItem();
+			    			 li.add(new Chunk(planet.getDescription(), font));
+			    			 list.add(li);
+			    		 }
+			    	 }
+			    	 section.add(list);
 
-				//Если планета-снаряд смещена влево
-				boolean left = false;
-				if (left) {
-					section.add(Chunk.NEWLINE);
-					Planet planet = (Planet)service.find(0L);
-					Rule rule = EventRules.ruleCardKind(planet);
-					if (rule != null) {
-						section.add(new Paragraph("Прицел пращи сдвинут влево:", bold));
-						section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
-					}
-				}
-				//Если планета-снаряд смещена вправо
-				boolean right = true;
-				if (right) {
-					section.add(Chunk.NEWLINE);
-					RuleService rservice = new RuleService();
-					Rule rule = (Rule)rservice.find(86L);
-					if (rule != null) {
-						section.add(new Paragraph("Прицел пращи сдвинут вправо:", bold));
-						section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
-					}
-				}
+			    	 //Если планета-снаряд смещена влево TODO
+			    	 boolean left = false;
+			    	 if (left) {
+			    		 section.add(Chunk.NEWLINE);
+			    		 Planet planet = (Planet)service.find(0L);
+			    		 Rule rule = EventRules.ruleCardKind(planet);
+			    		 if (rule != null) {
+			    			 section.add(new Paragraph("Прицел пращи сдвинут влево:", bold));
+			    			 section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+			    		 }
+			    	 }
+			    	 //Если планета-снаряд смещена вправо
+			    	 boolean right = true;
+			    	 if (right) {
+			    		 section.add(Chunk.NEWLINE);
+			    		 RuleService rservice = new RuleService();
+			    		 Rule rule = (Rule)rservice.find(86L);
+			    		 if (rule != null) {
+			    			 section.add(new Paragraph("Прицел пращи сдвинут вправо:", bold));
+			    			 section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+			    		 }
+			    	 }
+			     }
 
 //----------Колыбель Ньютона
 
@@ -1524,12 +1534,16 @@ public class PDFExporter {
 			    	 JSONObject obj = jsonObject.getJSONObject("cardkind");
 			    	 if (obj != null) {
 			    		 Object pids = obj.get("planet"); //левая планета
-			    		 if (null == pids) {
+			    		 if (null == pids
+				    			 || pids.toString().isEmpty()
+				    			 || pids.toString().equals("0")) {
 			    			 DialogUtil.alertWarning("Задайте левую ножку табуретки (planet), если рассматривать фигуру ножками вниз");
 			    			 return;
 				    	 }
 			    		 Object pids2 = obj.get("planet2"); //правая планета
-			    		 if (null == pids2) {
+			    		 if (null == pids2
+				    			 || pids2.toString().isEmpty()
+				    			 || pids2.toString().equals("0")) {
 			    			 DialogUtil.alertWarning("Задайте правую правую ножку табуретки (planet2), если рассматривать фигуру ножками вниз");
 			    			 return;
 				    	 }
@@ -1549,7 +1563,7 @@ public class PDFExporter {
 			    				 anchor = new Anchor(s, fonta);
 			    				 anchor.setReference("#" + planet.getAnchor());
 			    				 li.add(anchor);
-			    				 if (planet.isBad())
+			    				 if (planet.isBad() || planet.isNegative())
 			    					 li.add(new Chunk(" (прежде чем опереться на эту сферу, её придётся проработать и укрепить)", red));
 			    			 }
 		    				 list.add(li);
@@ -2401,7 +2415,8 @@ public class PDFExporter {
 			boolean rus = lang.equals("ru");
 			Section section = PDFUtil.printSection(chapter, title, null);
 			Paragraph p = null;
-			if (aspectType.equals("NEGATIVE"))
+			boolean negative = aspectType.equals("NEGATIVE");
+			if (negative)
 				p = new Paragraph(rus ? "В данном разделе описаны факторы, через которые вы будете расходовать энергию, "
 						+ "а также качества вашей личности, проявляющиеся в критические моменты жизни:" :
 					"This section describes the factors through which you will expend energy, "
@@ -2420,7 +2435,7 @@ public class PDFExporter {
 
 			//отсутствие аспекта между светилами
 			if (housable)
-				if (aspectType.equals("NEGATIVE")) {
+				if (negative) {
 					Planet sun = planets.get(19L);
 					String amoon = sun.getAspectMap().get("Moon");
 					if (null == amoon) {
@@ -2478,9 +2493,9 @@ public class PDFExporter {
 						positive = dict.isPositive();
 						aspect.setTexts(dicts);
 					}
-					if (positive && aspectType.equals("POSITIVE"))
+					if (positive && !negative)
 						spas.add(aspect);
-					else if (!positive && aspectType.equals("NEGATIVE"))
+					else if (!positive && negative)
 						spas.add(aspect);
 				}
 			}
@@ -2533,16 +2548,16 @@ public class PDFExporter {
 					if (aspect.getAspect().getId() != null) {
 						Font markFont = PDFUtil.getWarningFont();
 						int markPoints = aspect.getMarkPoints();
-						if (aspectType.equals("POSITIVE")) {
-							if (markPoints < 0)
-								markFont = PDFUtil.getSuccessFont();
-							else if (markPoints > 0)
-								markFont = PDFUtil.getDangerFont();
-						} else if (aspectType.equals("NEGATIVE")) {
+						if (negative) {
 							if (markPoints <= 0)
 								markFont = PDFUtil.getDangerFont();
 							else if (markPoints > 0)
 								markFont = PDFUtil.getSuccessFont();
+						} else {
+							if (markPoints < 0)
+								markFont = PDFUtil.getSuccessFont();
+							else if (markPoints > 0)
+								markFont = PDFUtil.getDangerFont();
 						}					
 						section.add(new Paragraph(aspect.getMark() + " " + aspect.getMarkDescr(lang), markFont));
 					}
@@ -2566,13 +2581,23 @@ public class PDFExporter {
 					}
 				}
 			}
-			if (!exists && aspectType.equals("NEGATIVE")) {
-				p = new Paragraph("В вашем гороскопе нет резко негативных аспектов, влияющих на вашу личность. "
-					+ "Это означает отсутствие внутренних конфликтов и наличие хорошего окружения (как у Христа за пазухой). "
-					+ "Точки роста и напряжения будут формироваться не внутри вас, а посредством внешних обстоятельств, "
-						+ "в процессе активных действий и развития всего вашего поколения. "
-						+ "Они описаны в разделе «Фигуры гороскопа»", PDFUtil.getSuccessFont());
-				p.setSpacingAfter(10);
+
+			if (negative) {
+				if (!exists) {
+					p = new Paragraph("В вашем гороскопе нет резко негативных аспектов, влияющих на вашу личность. "
+						+ "Это означает отсутствие внутренних конфликтов и наличие хорошего окружения (как у Христа за пазухой). "
+						+ "Точки роста и напряжения будут формироваться не внутри вас, а посредством внешних обстоятельств, "
+							+ "в процессе активных действий и развития всего вашего поколения. "
+							+ "Они описаны в разделе «Фигуры гороскопа»", PDFUtil.getSuccessFont());
+					p.setSpacingAfter(10);
+					section.add(p);
+				}
+			} else if (spas.size() < 3) {
+		        Anchor anchor = new Anchor(Messages.getString("Personality realization"), fonta);
+	            anchor.setReference("#planethouses");
+				p = new Paragraph();
+				p.add(new Chunk(rus ? "Остальные позитивные факторы описаны в разделе " : "The other positive factors are described in the section ", font));
+		        p.add(anchor);
 				section.add(p);
 			}
 		} catch(Exception e) {
@@ -3266,7 +3291,10 @@ public class PDFExporter {
 //											System.out.println(rule);
 
 										SkyPoint sp = spa.getSkyPoint2();
-										if (aspectType.getId().equals(spa.getAspect().getTypeid())) {
+										long tid = spa.getAspect().getTypeid();
+										if (15 == tid || 17 == tid)
+											tid = 1;
+										if (aspectType.getId().equals(tid)) {
 											if (planet2.getId().equals(sp.getId())) {
 												if (house2 != null
 														&& !house2.getId().equals(sp.getHouse().getId()))
@@ -3708,6 +3736,7 @@ public class PDFExporter {
 	    	section.add(p);
 		    com.itextpdf.text.Image image = PDFUtil.printStackChart(writer, Messages.getString("Maturity"), "", "", bars, 500, 0, true);
 			section.add(image);
+			section.add(Chunk.NEXTPAGE);
 
 			//знаки
 			bars = new Bar[signMap.size()];

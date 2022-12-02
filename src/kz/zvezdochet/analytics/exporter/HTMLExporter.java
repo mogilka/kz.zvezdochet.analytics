@@ -423,11 +423,11 @@ public class HTMLExporter {
 						match = true;
 					//в позитивные добавляем ядро Солнца
 					else if	(aspectType.equals("POSITIVE") &&
-							type.getCode().equals("NEUTRAL_KERNEL"))
+							aspect.getAspect().getCode().equals("_KERNEL"))
 						match = true;
 					//в негативные добавляем пояс Солнца
 					else if (aspectType.equals("NEGATIVE") &&
-							type.getCode().equals("NEGATIVE_BELT"))
+							aspect.getAspect().getCode().equals("BELT"))
 						match = true;
 
 					if (match) {
