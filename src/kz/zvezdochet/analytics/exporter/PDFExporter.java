@@ -233,7 +233,7 @@ public class PDFExporter {
 			text += DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT, Locale.getDefault()).format(event.getBirth());
 			p.add(new Chunk(text, font));
 			if (!event.isRectified())
-				p.add(new Chunk(" (" + Messages.getString("not rectified") + ")", PDFUtil.getDangerFont()));
+				p.add(new Chunk(" (" + kz.zvezdochet.core.Messages.getString("not rectified") + ")", PDFUtil.getDangerFont()));
 	        p.setAlignment(Element.ALIGN_CENTER);
 			chapter.add(p);
 
@@ -3304,10 +3304,11 @@ public class PDFExporter {
 												boolean negative2 = spa.isNegative();
 												String sign2 = negative2 ? "-" : "+";
 												String header = house.getName() + " " + 
-													sign2 + " "; 
+													sign2 + " ";
+												String pstr = negative2 ? planet2.getNegative() : planet2.getPositive();
 												header += (null == house2)
-													? (negative2 ? planet2.getNegative() : planet2.getPositive())
-													: house2.getName();
+													? pstr
+													: house2.getName() + " " + sign2 + " " + pstr;
 												section.add(new Paragraph(header, fonth6));
 								    			if (term) {
 								    				String sector = hmain ? "(" + house.getDesignation() + ")" : house.getDesignation() + (rus ? " дома" : " house");
