@@ -1254,7 +1254,7 @@ public class PDFExporter {
 					    					 House house = event.getHouses().get(Long.valueOf(sid));
 					    					 if (house != null) {
 					    						ListItem li = new ListItem();
-					    						li.add(new Chunk(house.getName(), font));
+					    						li.add(new Chunk(house.getGeneral(), font));
 					    						list.add(li);
 					    					}
 					    				 }
@@ -1565,6 +1565,8 @@ public class PDFExporter {
 			    				 li.add(anchor);
 			    				 if (planet.isBad() || planet.isNegative())
 			    					 li.add(new Chunk(" (прежде чем опереться на эту сферу, её придётся проработать и укрепить)", red));
+								else
+									li.add(new Chunk(" (на эту сферу можете смело опираться)", green));
 			    			 }
 		    				 list.add(li);
 			    		 }
