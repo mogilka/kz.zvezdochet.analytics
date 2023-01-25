@@ -1900,7 +1900,7 @@ public class PDFExporter {
 									+ "Это символ уверенности и самоутверждения, через который выразится ваша энергия, воля и сущность." :
 								"Planet sword is located ahead of the Sun. The Sword represents your abilities with which you will fight your way. "
 									+ "This is a symbol of confidence and self-affirmation, through which your energy, will and essence will be expressed.";
-							if (!planet.isFictitious())
+							if (!planet.isFictious())
 								s += rus ? " Планета-меч не фиктивная, значит, она имеет прямое отношение к профессии, указывая, к чему у вас есть склонность" :
 									" Planet sword is not hypothetical, therefore it's directly related to your profession and indicating what you have a penchant for";
 							section.add(new Paragraph(s, PDFUtil.getAnnotationFont(true)));
@@ -5563,7 +5563,7 @@ public class PDFExporter {
 				if (!event.isHousable() && planet.getCode().equals("Moon"))
 					continue;
 
-				if (planet.isFictitious())
+				if (planet.isFictious())
 					continue;
 
 				if (planet.isRetrograde())

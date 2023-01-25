@@ -45,7 +45,7 @@ public class AnalyticsService {
 			while (rs.next()) {
 				Long id = Long.parseLong(rs.getString(1));
 				planet = (Planet)service.find(id);
-				if (!planet.isFictitious())
+				if (!planet.isFictious())
 					return planet;
 			}
 		} catch (Exception e) {
