@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -2619,6 +2620,7 @@ public class PDFExporter {
 		    AspectConfigurationService service = new AspectConfigurationService();
 			AspectConfiguration conf = null;
 			Font bold = new Font(baseFont, 12, Font.BOLD);
+			boolean housable = event.isHousable();
 
 //----------стеллиум 0° 0° 0° 0°
 
@@ -2766,8 +2768,14 @@ public class PDFExporter {
 										shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
 									}
 								}
-								sign = event.getPlanets().get(planets[0].getId()).getSign();
-								Cross cross = (Cross)crossService.find(sign.getCrossId());
+								Cross cross = null;
+								if (housable) {
+									House house = event.getPlanets().get(planets[0].getId()).getHouse();
+									cross = (Cross)crossService.find(house.getCrossId());
+								} else {
+									sign = event.getPlanets().get(planets[0].getId()).getSign();
+									cross = (Cross)crossService.find(sign.getCrossId());
+								}
 								if (cross != null) {
 									String str = term ? cross.getName() : "Ваша реакция на указанные факторы";
 									shapes.add(new Paragraph(str + ":", bold));
@@ -2777,7 +2785,7 @@ public class PDFExporter {
 
 							} else if (code.equals("triangle")) {
 								if (configuration.getElement() != null) {
-									if (event.isHousable()) {
+									if (housable) {
 										com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 										Planet[] tplanets = {configuration.getVertex()[0], configuration.getLeftFoot()[0], configuration.getRightFoot()[0]};
 										House[] houses = new House[3];
@@ -2837,7 +2845,7 @@ public class PDFExporter {
 							}
 
 						//ожерелье
-						} else if (code.equals("necklace") && event.isHousable()) {
+						} else if (code.equals("necklace") && housable) {
 							shapes.add(new Paragraph(rus
 								? "Этапы жизни, которые будут последовательно активироваться под влиянием людей и факторов, указанных на рисунке:" :
 									"These stages of life will be activated sequentially under the influence of people and factors indicated in the figure:", bold));
@@ -4115,31 +4123,36 @@ public class PDFExporter {
 	private void printSymbols(Chapter chapter, Event event) {
 		try {
 			if (event.getPlanets() != null) {
+				Map<Long, Planet> planets = event.getPlanets();
+
 				Font bold = PDFUtil.getSubheaderFont();
 				boolean rus = lang.equals("ru");
 
 				Section section = PDFUtil.printSection(chapter, Messages.getString("Your mission"), null);
 				if (term) {
-					Paragraph p = new Paragraph(rus ? "Минорные натальные планеты характеризуют 5 граней вашей личности:" :
-						"Minor natal planets characterize 5 facets of your personality:", font);
-					p.setSpacingAfter(10);
-					section.add(p);
+					String text = rus ? "Минорные натальные планеты характеризуют 5 граней вашей личности. " :
+						"Minor natal planets characterize 5 facets of your personality. ";
 
-					com.itextpdf.text.List ilist = new com.itextpdf.text.List(false, false, 10);
-					ListItem li = new ListItem();
-			        li.add(new Chunk(rus ? "если все они собраны в одном созвездии, значит вы являетесь типичным представителем своего знака и одинаково проя́вите себя во всех пяти ипостасях;" :
-			        	"if they are all collected in one constellation, then you are a typical representative of your zodiac sign and will manifest yourself in all 5 hypostases equally;", font));
-			        ilist.add(li);
+					Long pids[] = {
+						planets.get(19L).getSign().getId(),
+						planets.get(20L).getSign().getId(),
+						planets.get(23L).getSign().getId(),
+						planets.get(24L).getSign().getId(),
+						planets.get(25L).getSign().getId()
+					};
+					Long[] unique = new HashSet<Long>(Arrays.asList(pids)).toArray(new Long[0]);
 
-					li = new ListItem();
-			        li.add(new Chunk(rus ? "если личные планеты разбросаны по Зодиаку, то они размоют вашу принадлежность к какому-то одному знаку, потому что в разных сферах жизни вы поведёте себя совершенно по-разному" :
-			        	"if personal planets are scattered throughout the zodiac circle, then they will blur your belonging to any one sign, because you will behave in different areas of life completely differently", font));
-			        ilist.add(li);
-			        section.add(ilist);
+					if (1 == unique.length)
+						text += rus ? "Личные планеты собраны в одном созвездии, значит вы являетесь типичным представителем своего знака зодиака и одинаково проя́вите себя во всех пяти ипостасях:" :
+				        	"Personal planets are collected in one constellation, then you are a typical representative of your zodiac sign and will manifest yourself in all 5 hypostases equally:";
+					else
+						text += rus ? "Личные планеты разбросаны по зодиаку, значит ваша принадлежность к какому-то одному знаку размыта, и в разных сферах жизни вы поведёте себя по-разному:" :
+							"Personal planets are scattered throughout the zodiac circle, so they will blur your belonging to any one sign, because you will behave differently in different areas of life:";
+
+					section.add(new Paragraph(text, font));
 			        section.add(Chunk.NEWLINE);
 				}
 
-				Map<Long, Planet> planets = event.getPlanets();
 				Font gray = new Font(PDFUtil.getAstroFont(), 14, Font.NORMAL, PDFUtil.FONTCOLORGRAY);
 				com.itextpdf.text.List ilist = new com.itextpdf.text.List(false, false, 10);
 				ListItem li = new ListItem();
@@ -4163,7 +4176,7 @@ public class PDFExporter {
 		        li.add(new Chunk(sign.getSlogan(), font));
 		        if (term) {
 		        	li.add(new Chunk(" – " + planet.getSymbol(), gray));
-		        	li.add(new Chunk(" " + Messages.getString("in") + " ", font));
+		        	li.add(new Chunk(" " + kz.zvezdochet.core.Messages.getString("in") + " ", font));
 		        	li.add(new Chunk(ophiuchus ? "∞" : sign.getSymbol(), ophiuchus ? font : gray));
 		        }
 		        ilist.add(li);
@@ -4176,7 +4189,7 @@ public class PDFExporter {
 		        li.add(new Chunk(sign.getSlogan(), font));
 		        if (term) {
 		        	li.add(new Chunk(" – " + planet.getSymbol(), gray));
-		        	li.add(new Chunk(" " + Messages.getString("in") + " ", font));
+		        	li.add(new Chunk(" " + kz.zvezdochet.core.Messages.getString("in") + " ", font));
 		        	li.add(new Chunk(ophiuchus ? "∞" : sign.getSymbol(), ophiuchus ? font : gray));
 		        }
 		        ilist.add(li);
@@ -4189,7 +4202,7 @@ public class PDFExporter {
 		        li.add(new Chunk(sign.getSlogan(), font));
 		        if (term) {
 		        	li.add(new Chunk(" – " + planet.getSymbol(), gray));
-		        	li.add(new Chunk(" " + Messages.getString("in") + " ", font));
+		        	li.add(new Chunk(" " + kz.zvezdochet.core.Messages.getString("in") + " ", font));
 		        	li.add(new Chunk(ophiuchus ? "∞" : sign.getSymbol(), ophiuchus ? font : gray));
 		        }
 		        ilist.add(li);
@@ -4202,7 +4215,7 @@ public class PDFExporter {
 		        li.add(new Chunk(sign.getSlogan(), font));
 		        if (term) {
 		        	li.add(new Chunk(" – " + planet.getSymbol(), gray));
-		        	li.add(new Chunk(" " + Messages.getString("in") + " ", font));
+		        	li.add(new Chunk(" " + kz.zvezdochet.core.Messages.getString("in") + " ", font));
 		        	li.add(new Chunk(ophiuchus ? "∞" : sign.getSymbol(), ophiuchus ? font : gray));
 		        }
 		        ilist.add(li);
@@ -4464,6 +4477,24 @@ public class PDFExporter {
 	 */
 	private Paragraph printTriangle(Event event, AspectConfiguration conf) {
 		try {
+			boolean housable = event.isHousable();
+			Paragraph paragraph = new Paragraph();
+			if (term) {
+				paragraph.add(Chunk.NEWLINE);
+				Font aifont = PDFUtil.getAnnotationFont(false);
+				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				ListItem li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getVertex(), housable, "Вершина"), aifont));
+				list.add(li);
+				li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getLeftFoot(), housable, "Слева"), aifont));
+				list.add(li);
+				li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getRightFoot(), housable, "Справа"), aifont));
+				list.add(li);
+				paragraph.add(list);
+			}
+
 	        PdfPTable table = new PdfPTable(3);
 	        table.setWidthPercentage(100);
 	        Font font = PDFUtil.getSmallFont();
@@ -4486,7 +4517,7 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			if (headOverHeels) {
 				for (Planet planet : conf.getLeftFoot()) {
-					if (event.isHousable()) {
+					if (housable) {
 						House house = planet.getHouse();
 						String hname = house.getName();
 						htext = text.contains(hname) ? "" : "\n(" + hname + ")";
@@ -4506,7 +4537,7 @@ public class PDFExporter {
 				text = "";
 				htext = "";
 				for (Planet planet : conf.getVertex()) {
-					if (event.isHousable()) {
+					if (housable) {
 						House house = planet.getHouse();
 						String hname = house.getName();
 						htext = text.contains(hname) ? "" : "\n(" + hname + ")";
@@ -4526,7 +4557,7 @@ public class PDFExporter {
 				text = "";
 				htext = "";
 				for (Planet planet : conf.getRightFoot()) {
-					if (event.isHousable()) {
+					if (housable) {
 						House house = planet.getHouse();
 						String hname = house.getName();
 						htext = text.contains(hname) ? "" : "\n(" + hname + ")";
@@ -4570,7 +4601,7 @@ public class PDFExporter {
 				text = "";
 				htext = "";
 				for (Planet planet : conf.getLeftFoot()) {
-					if (event.isHousable()) {
+					if (housable) {
 						House house = planet.getHouse();
 						String hname = house.getName();
 						htext = text.contains(hname) ? "" : "\n(" + hname + ")";
@@ -4592,7 +4623,7 @@ public class PDFExporter {
 				text = "";
 				htext = "";
 				for (Planet planet : conf.getVertex()) {
-					if (event.isHousable()) {
+					if (housable) {
 						House house = planet.getHouse();
 						String hname = house.getName();
 						htext = text.contains(hname) ? "" : "\n(" + hname + ")";
@@ -4612,7 +4643,7 @@ public class PDFExporter {
 			htext = "";
 			if (!headOverHeels) {
 				for (Planet planet : conf.getRightFoot()) {
-					if (event.isHousable()) {
+					if (housable) {
 						House house = planet.getHouse();
 						String hname = house.getName();
 						htext = text.contains(hname) ? "" : "\n(" + hname + ")";
@@ -4624,8 +4655,6 @@ public class PDFExporter {
 				cell.addElement(p);
 			}
 			table.addCell(cell);
-
-			Paragraph paragraph = new Paragraph();
 			table.setSpacingBefore(1);
 			table.setSpacingAfter(5);
 			paragraph.add(table);
@@ -4835,7 +4864,29 @@ public class PDFExporter {
 	 */
 	private Paragraph printTetragon(Event event, AspectConfiguration conf) {
 		try {
-	        PdfPTable table = new PdfPTable(3);
+			boolean housable = event.isHousable();
+			Paragraph paragraph = new Paragraph();
+			if (term) {
+				paragraph.add(Chunk.NEWLINE);
+				Font aifont = PDFUtil.getAnnotationFont(false);
+				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				ListItem li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getLeftHand(), housable, "Слева сверху"), aifont));
+				list.add(li);
+				li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getRightHand(), housable, "Справа сверху"), aifont));
+				list.add(li);
+				li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getLeftFoot(), housable, "Слева снизу"), aifont));
+				list.add(li);
+				li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getRightFoot(), housable, "Справа снизу"), aifont));
+				list.add(li);
+				paragraph.add(list);
+				paragraph.add(Chunk.NEWLINE);
+			}
+
+			PdfPTable table = new PdfPTable(3);
 	        table.setWidthPercentage(100);
 	        Font font = PDFUtil.getSmallFont();
 	        Color color = conf.getColor();
@@ -4845,12 +4896,12 @@ public class PDFExporter {
 			String text = "";
 			String htext = "";
 			for (Planet planet : conf.getLeftHand()) {
-				if (event.isHousable()) {
+				if (housable) {
 					House house = planet.getHouse();
-					String hname = term ? house.getDesignation() + " дом" : house.getName();
-					htext = text.contains(hname) ? "" : (term ? " " : "\n") + "(" + hname + ")";
+					String hname = house.getName();
+					htext = text.contains(hname) ? "" : "\n(" + hname + ")";
 				}
-				text += (term ? planet.getName() : conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative()) + htext;
+				text += (conf.isLeftHandPositive() ? planet.getPositive() : planet.getNegative()) + htext;
 				text += "\n";
 			}
 			Paragraph p = new Paragraph(text, font);
@@ -4868,12 +4919,12 @@ public class PDFExporter {
 			text = "";
 			htext = "";
 			for (Planet planet : conf.getRightHand()) {
-				if (event.isHousable()) {
+				if (housable) {
 					House house = planet.getHouse();
-					String hname = term ? house.getDesignation() + " дом" : house.getName();
-					htext = text.contains(hname) ? "" : (term ? " " : "\n") + "(" + hname + ")";
+					String hname = house.getName();
+					htext = text.contains(hname) ? "" : "\n(" + hname + ")";
 				}
-				text += (term ? planet.getName() : conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative()) + htext;
+				text += (conf.isRightHandPositive() ? planet.getPositive() : planet.getNegative()) + htext;
 				text += "\n";
 			}
 			p = new Paragraph(text, font);
@@ -4907,12 +4958,12 @@ public class PDFExporter {
 			text = "";
 			htext = "";
 			for (Planet planet : conf.getLeftFoot()) {
-				if (event.isHousable()) {
+				if (housable) {
 					House house = planet.getHouse();
-					String hname = term ? house.getDesignation() + " дом" : house.getName();
-					htext = text.contains(hname) ? "" : (term ? " " : "\n") + "(" + hname + ")";
+					String hname = house.getName();
+					htext = text.contains(hname) ? "" : "\n(" + hname + ")";
 				}
-				text += (term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative()) + htext;
+				text += (conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative()) + htext;
 				text += "\n";
 			}
 			p = new Paragraph(text, font);
@@ -4929,12 +4980,12 @@ public class PDFExporter {
 			text = "";
 			htext = "";
 			for (Planet planet : conf.getRightFoot()) {
-				if (event.isHousable()) {
+				if (housable) {
 					House house = planet.getHouse();
-					String hname = term ? house.getDesignation() + " дом" : house.getName();
-					htext = text.contains(hname) ? "" : (term ? " " : "\n") + "(" + hname + ")";
+					String hname = house.getName();
+					htext = text.contains(hname) ? "" : "\n(" + hname + ")";
 				}
-				text += (term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative()) + htext;
+				text += (conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative()) + htext;
 				text += "\n";
 			}
 			p = new Paragraph(text, font);
@@ -4942,8 +4993,6 @@ public class PDFExporter {
 			cell.setBorder(Rectangle.NO_BORDER);
 			cell.addElement(p);
 			table.addCell(cell);
-
-			Paragraph paragraph = new Paragraph();
 			table.setSpacingBefore(5);
 			table.setSpacingAfter(5);
 			paragraph.add(table);
@@ -5756,5 +5805,34 @@ public class PDFExporter {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * Формирует описание вершины фигуры конфигурации
+	 * @param planets список планет
+	 * @param housable признак известного времени рождения
+	 * @param header заголовок вершины
+	 * @return текст
+	 */
+	private String vertexToStr(Planet[] planets, boolean housable, String header) {
+		String text = "";
+		try {
+			text = header + ": ";
+			String htext = "";
+			int i = -1;
+			for (Planet planet : planets) {
+				if (++i > 0)
+					text += ", ";
+				if (housable) {
+					House house = planet.getHouse();
+					String hname = house.getDesignation() + " дом";
+					htext = text.contains(hname) ? "" : " " + "(" + hname + ")";
+				}
+				text += planet.getName() + htext;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return text;
 	}
 }
