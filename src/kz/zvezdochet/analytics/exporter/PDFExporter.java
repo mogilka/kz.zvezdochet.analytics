@@ -2548,7 +2548,7 @@ public class PDFExporter {
 		    		p.add(new Chunk(aspl2.getSymbol(), afont));
 		    		section.add(p);
 
-					if (aspect.getAspect().getId() != null) {
+					if (aspect.getAspect().getId() != 46) {
 						Font markFont = PDFUtil.getWarningFont();
 						int markPoints = aspect.getMarkPoints();
 						if (negative) {
@@ -2901,7 +2901,7 @@ public class PDFExporter {
 							text = text.replace("{merit}", sign.getKeyword());
 						}
 						section.add(new Paragraph(PDFUtil.removeTags(text, font)));
-					} else if (term || null == descr) {
+					} else {
 						section.add(new Paragraph(kz.zvezdochet.core.Messages.getString("General description of the pattern") + ":", bold));
 						section.add(new Paragraph(PDFUtil.removeTags(text, font)));
 					}
@@ -3297,19 +3297,19 @@ public class PDFExporter {
 												&& !aspect.getId().equals(spa.getAspect().getId()))
 											continue;
 
-//										if (null == planet2)
-//											System.out.println(rule);
-
 										SkyPoint sp = spa.getSkyPoint2();
 										long tid = spa.getAspect().getTypeid();
 										if (15 == tid || 17 == tid)
 											tid = 1;
 										if (aspectType.getId().equals(tid)) {
+//											if (1 == tid)
+//												System.out.println(rule);
+
 											if (planet2.getId().equals(sp.getId())) {
 												if (house2 != null
 														&& !house2.getId().equals(sp.getHouse().getId()))
 													continue;
-	
+
 												section.add(Chunk.NEWLINE);
 												boolean negative2 = spa.isNegative();
 												String sign2 = negative2 ? "-" : "+";
