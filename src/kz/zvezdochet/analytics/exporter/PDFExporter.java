@@ -231,7 +231,7 @@ public class PDFExporter {
 			Paragraph p = new Paragraph();
 			String text = (event.isCelebrity() ? event.getName(lang) : event.getCallname(lang)) + " – ";
 			//System.out.println(Locale.getDefault());
-			text += DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT, Locale.getDefault()).format(event.getBirth());
+			text += DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.MEDIUM, Locale.getDefault()).format(event.getBirth());
 			p.add(new Chunk(text, font));
 			if (!event.isRectified())
 				p.add(new Chunk(" (" + kz.zvezdochet.core.Messages.getString("not rectified") + ")", PDFUtil.getDangerFont()));
@@ -745,12 +745,14 @@ public class PDFExporter {
 						Paragraph p = new Paragraph("*Вы родились под королевским градусом, и хотя он не гарантирует безоблачной жизни, но вам удастся пересилить трудности, которые кажутся непреодолимыми."
 							+ " Королевский градус даёт испытание через получение позитивных возможностей (обретение жизненного опыта через успех)."
 							+ " Девиз такого градуса: «Надежда умирает последней», а значит вы получите помощь в сложный период жизни, благодаря чему вновь обретёте удачу", font);
+						p.setSpacingBefore(10);
 						p.setSpacingAfter(10);
 						section.add(p);
 					}
 					if (degree.isOccult()) {
 						Paragraph p = new Paragraph("*Вы родились под оккультным градусом, который определяет вас как посвящённого человека, "
 							+ "которому доступен опыт взаимодействия со скрытыми и неизвестными науке энергиями и явлениями", font);
+						p.setSpacingBefore(10);
 						p.setSpacingAfter(10);
 						section.add(p);
 					}
