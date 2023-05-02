@@ -41,11 +41,30 @@ public class EventRules {
 		if (pcode.equals("Venus")) {
 			if (planet.isPositive() && planet.isInNeutralSign())
 				return (Rule)service.find(3L);
+
 		} else if (pcode.equals("Mars")) {
 			if (planet.isInNeutralSign()) {
-				long id = female ? 67L : 66L;
+				long id = female ? 24L : 23L;
 				return (Rule)service.find(id);
 			}
+
+		} else if (pcode.equals("Mercury")) {
+			if (planet.getSign().getCode().equals("Gemini"))
+				return (Rule)service.find(6L);
+			if (planet.isUnaspected())
+				return (Rule)service.find(7L);
+
+		} else if (pcode.equals("Saturn")) {
+			if (planet.isDamaged())
+				return (Rule)service.find(37L);
+
+		} else if (pcode.equals("Chiron")) {
+			if (planet.isDamaged())
+				return (Rule)service.find(32L);
+
+		} else if (pcode.equals("Uranus")) {
+			if (planet.isDamaged())
+				return (Rule)service.find(33L);
 		}
 		return null;
 	}
@@ -70,7 +89,7 @@ public class EventRules {
 			if (house.getCode().equals("II")) {
 				if (spa.getAspect().getType().getCode().equals("POSITIVE")) {
 					if (planet.getSign().getCode().equals("Taurus"))
-						return (Rule)service.find(105L);
+						return (Rule)service.find(35L);
 				}
 			}
 //		} else if (spa.getAspect().getType().getCode().equals("NEUTRAL") //нереалистично
@@ -98,20 +117,70 @@ public class EventRules {
 		Planet planet2 = (Planet)spa.getSkyPoint2();
 		String code = spa.getAspect().getType().getCode();
 
-		if (planet.getCode().equals("Sun") && planet2.getCode().equals("Moon")) {
-			String acode = spa.getAspect().getCode();
-			if (acode != null)
-				if (female && spa.getAspect().getCode().equals("BELT")) {
-					Map<String, Integer> map = planet2.getAspectCountMap();
-					if (map.size() < 2) 
-						return (Rule)service.find(144L);
+		if (planet.getCode().equals("Sun")) {
+			if (planet2.getCode().equals("Moon")) {
+				String acode = spa.getAspect().getCode();
+				if (acode != null) {
+					if (female && acode.equals("BELT")) {
+						Map<String, Integer> map = planet2.getAspectCountMap();
+						if (map.size() < 2) 
+							return (Rule)service.find(144L);
+					}
 				}
+				if (code.equals("NEUTRAL")) {
+					if (planet.isRakhued())
+						return (Rule)service.find(13L);
+					if (planet.getSign().getCode().equals("Pisces"))
+						return (Rule)service.find(1L);
+				}
+			} else if (planet2.getCode().equals("Mars")) {
+				if (code.equals("NEGATIVE")) {
+					String scode = planet.getSign().getCode();
+					if (Arrays.asList(new String[] {"Aries", "Cancer", "Libra", "Capricornus"}).contains(scode))
+						return (Rule)service.find(14L);
+					if (Arrays.asList(new String[] {"Gemini", "Virgo", "Sagittarius", "Pisces"}).contains(scode))
+						return (Rule)service.find(15L);
+					if (Arrays.asList(new String[] {"Taurus", "Leo", "Scorpio", "Ophiuchus", "Aquarius"}).contains(scode))
+						return (Rule)service.find(16L);
+				}
+			}
 		}
 
-		if (planet.getCode().equals("Moon") && planet2.getCode().equals("Pluto")) {
-			if (code.equals("NEGATIVE")) {
-				if (planet.isDamaged() || planet2.isDamaged())
-					return (Rule)service.find(10L);
+		if (planet.getCode().equals("Moon")) {
+			if (planet2.getCode().equals("Pluto")) {
+				if (code.equals("NEGATIVE")) {
+					if (planet.isDamaged() || planet2.isDamaged())
+						return (Rule)service.find(10L);
+				} else if (code.equals("NEUTRAL")) {
+					Map<String, String> aspectMap = planet.getAspectMap();
+					String pcode3 = "Neptune";
+					if (aspectMap.containsKey(pcode3)) {
+						String acode = aspectMap.get(pcode3);
+						if (acode.equals("CONJUNCTION"))
+							return (Rule)service.find(19L);
+					}
+				}
+			} else if (planet2.getCode().equals("Mars")) {
+				if (code.equals("NEUTRAL")) {
+					if (planet.getLongitude() > planet2.getLongitude()
+							&& planet.getSign().getId().equals(planet2.getSign().getId()))
+						return (Rule)service.find(17L);
+				}
+			} else if (planet2.getCode().equals("Saturn")) {
+				if (code.equals("NEUTRAL")) {
+					if (planet.isDamaged())
+						return (Rule)service.find(18L);
+				}
+			} else if (planet2.getCode().equals("Venus")) {
+				if (code.equals("POSITIVE")) {
+					Map<String, String> aspectMap = planet.getAspectMap();
+					String pcode3 = "Neptune";
+					if (aspectMap.containsKey(pcode3)) {
+						String acode = aspectMap.get(pcode3);
+						if (Arrays.asList(new String[] {"SEXTILE", "TRIN"}).contains(acode))
+							return (Rule)service.find(20L);
+					}
+				}
 			}
 		}
 		if (planet.getCode().equals("Venus")) {
@@ -137,11 +206,19 @@ public class EventRules {
 		RuleService service = new RuleService();
 		String hcode = house.getCode();
 		String pcode = planet.getCode();
-		if (hcode.equals("I_3")) {
+
+		if (hcode.equals("I")) {
+			if (pcode.equals("Uranus")) {
+				if (planet.isRetrograde())
+					rules.add((Rule)service.find(44L));
+			}
+
+		} else if (hcode.equals("I_3")) {
 			if (pcode.equals("Sun")) {
 				if (planet.getSign().getCode().equals("Aquarius"))
 					rules.add((Rule)service.find(26L));
 			}
+
 		} else if (hcode.equals("II")) {
 			if (pcode.equals("Moon")) {
 				Map<String, String> aspectMap = planet.getAspectMap();
@@ -164,11 +241,25 @@ public class EventRules {
 						rules.add((Rule)service.find(237L));
 				}
 			}
+
+		} else if (hcode.equals("IV")) {
+			if (pcode.equals("Moon")) {
+				if (planet.getSign().getCode().equals("Capricornus"))
+					rules.add((Rule)service.find(46L));
+			}
+
+		} else if (hcode.equals("IV_2")) {
+			if (pcode.equals("Mars")) {
+				if (planet.isPerfect())
+					rules.add((Rule)service.find(22L));
+			}
+
 		} else if (hcode.equals("VII")) {
 			if (pcode.equals("Rakhu")) {
 				if (female && !planet.isNegative())
 					rules.add((Rule)service.find(70L));
 			}
+
 		} else if (hcode.equals("VII_3")) {
 			if (pcode.equals("Mercury")) {
 				Map<String, String> aspectMap = planet.getAspectMap();
@@ -178,6 +269,12 @@ public class EventRules {
 					if (Arrays.asList(new String[] {"OPPOSITION", "QUADRATURE"}).contains(acode))
 						rules.add((Rule)service.find(238L));
 				}
+			}
+
+		} else if (hcode.equals("X")) {
+			if (pcode.equals("Uranus")) {
+				if (planet.isRetrograde())
+					rules.add((Rule)service.find(44L));
 			}
 		}
 		return rules;
@@ -194,12 +291,23 @@ public class EventRules {
 		RuleService service = new RuleService();
 		if (planet.getCode().equals("Neptune")) {
 			if (planet.isBroken() || planet.isKethued())
-				return (Rule)service.find(96L);
+				return (Rule)service.find(29L);
 			else if (planet.isDamaged())
-				return (Rule)service.find(97L);
+				return (Rule)service.find(30L);
+
 		} else if (planet.getCode().equals("Mars")) {
 			if (planet.getSign().getCode().equals("Taurus"))
-				return (Rule)service.find(96L);
+				return (Rule)service.find(31L);
+			if (female &&
+					(planet.getSign().getCode().equals("Taurus")
+						|| planet.getSign().getCode().equals("Libra")))
+				return (Rule)service.find(12L);
+
+		} else if (planet.getCode().equals("Venus")) {
+			if (!female &&
+					(planet.getSign().getCode().equals("Taurus")
+						|| planet.getSign().getCode().equals("Libra")))
+				return (Rule)service.find(2L);
 		}
 		return null;
 	}
@@ -227,7 +335,10 @@ public class EventRules {
 						if (p.getCode().equals("Mercury") && p.isDominant())
 							return (Rule)service.find(69L);
 					}
-				}
+				} else if (code.equals("NEGATIVE")
+						&& event.isFemale()
+						&& partner.isFemale())
+					return (Rule)service.find(28L);
 			} else if (planet2.getCode().equals("Venus")) {
 				if (code.equals("NEGATIVE")
 						&& event.isFemale()
@@ -255,17 +366,22 @@ public class EventRules {
 
 	/**
 	 * Вид космограммы
+	 * @param code код конфигурации
 	 * @param planet планета
+	 * @param direction направление East|West|North|South
 	 * @return правило
 	 * @throws DataAccessException 
 	 */
-	public static Rule ruleCardKind(Planet planet) throws DataAccessException {
+	public static Rule ruleCardKind(String code, Planet planet, String direction) throws DataAccessException {
 		RuleService service = new RuleService();
-		if (planet.getCode().equals("Chiron")) {
-			if (planet.isNegative())
-				return (Rule)service.find(84L);
-			else
-				return (Rule)service.find(85L);
+		if (code.equals("sling")) {
+			if (planet.getCode().equals("Chiron")) {
+				if (planet.isNegative() && direction.equals("West"))
+					return (Rule)service.find(25L);
+				else
+					return (Rule)service.find(26L);
+			} else if (planet.isPositive() && direction.equals("East"))
+				return (Rule)service.find(27L);
 		}
 		return null;
 	}
@@ -299,14 +415,14 @@ public class EventRules {
 				String pcode = planet.getCode();
 				if (pcode.equals("Mars") || pcode.equals("Uranus")) {
 					if (planet.isDominant() || planet.isRakhued())
-						return (Rule)service.find(95L);
+						return (Rule)service.find(28L);
 					else {
 						Iterator<Map.Entry<String, Double>> iterator = signMap.entrySet().iterator();
 					    while (iterator.hasNext()) {
 					    	Entry<String, Double> entry = iterator.next();
 					    	String scode = entry.getKey();
 					    	if (scode.equals("Scorpio") || scode.equals("Ophiuchus"))
-					    		return (Rule)service.find(95L);
+					    		return (Rule)service.find(28L);
 					    }
 					}
 				}				
@@ -381,13 +497,32 @@ public class EventRules {
 			if (scode.equals("Taurus")) {
 				if (planet.isDamaged() && event.isFemale())
 					if (category.getCode().equals("love"))
-						return (Rule)service.find(107L);
+						return (Rule)service.find(36L);
 			}
 		} else if (pcode.equals("Mars")) {
 			if (scode.equals("Pisces")) {
-				if (planet.isDamaged() && event.isFemale())
-					if (category.getCode().equals("male"))
+				if (planet.isDamaged()) {
+					if (event.isFemale() && category.getCode().equals("male"))
 						return (Rule)service.find(185L);
+					else
+						return (Rule)service.find(43L);
+				}
+			}
+
+		} else if (pcode.equals("Moon")) {
+			if (scode.equals("Cancer")) {
+				Planet planet2 = event.getPlanets().get(23L);
+				if (planet2.getSign().getCode().equals("Cancer"))
+					return (Rule)service.find(21L);
+			}
+
+		} else if (pcode.equals("Mercury")) {
+			if (scode.equals("Gemini")) {
+				if (planet.isDamaged())
+					return (Rule)service.find(42L);
+			} else if (scode.equals("Pisces")) {
+				if (planet.isDamaged())
+					return (Rule)service.find(41L);
 			}
 		}
 		return null;
@@ -418,17 +553,43 @@ public class EventRules {
 	/**
 	 * Планета в шахте
 	 * @param planet планета
-	 * @param female true|false женский|мужской
+	 * @param event персона
 	 * @return правило
 	 * @throws DataAccessException 
 	 */
-	public static Rule rulePlanetMine(Planet planet, boolean female) throws DataAccessException {
+	public static Rule rulePlanetUnaspected(Planet planet, Event event) throws DataAccessException {
 		RuleService service = new RuleService();
 		String pcode = planet.getCode();
 		if (pcode.equals("Moon")) {
 			Map<String, Integer> map = planet.getAspectCountMap();
 			if (map.size() < 2) 
 				return (Rule)service.find(144L);
+
+		} else if (pcode.equals("Rakhu")) {
+			House house = planet.getHouse();
+			if (house.getCode().equals("X_2")) 
+				return (Rule)service.find(4L);
+
+		} else if (pcode.equals("Sun")) {
+			boolean strong = false;
+			if (planet.getSign().getCode().equals("Leo"))
+				strong = true;
+			else {
+				House house = planet.getHouse();
+				if (house.getCode().equals("V") || house.getCode().equals("V_2") || house.getCode().equals("V_3"))
+					strong = true;
+			}
+			if (strong)
+				return (Rule)service.find(9L);
+
+		} else if (pcode.equals("Pluto")) {
+			Planet sun = event.getPlanets().get(19L);
+			Planet moon = event.getPlanets().get(20L);
+			Planet mercury = event.getPlanets().get(23L);
+			Planet venus = event.getPlanets().get(24L);
+			Planet mars = event.getPlanets().get(25L);
+			if (sun.isWeak() || moon.isWeak() || mercury.isWeak() || venus.isWeak() || mars.isWeak()) 
+				return (Rule)service.find(39L);
 		}
 		return null;
 	}
@@ -469,8 +630,8 @@ public class EventRules {
 		String code = conf.getCode();
 		if (code.equals("home")) {
 			for (Planet planet : conf.getVertex()) {
-				if (Arrays.asList(new Long[] {19L, 20L, 23L, 24L, 25L, 28L, 29L, 31L}).contains(planet.getId()))
-					return (Rule)service.find(223L);
+				if (Arrays.asList(new Long[] {19L, 20L, 24L, 25L, 29L}).contains(planet.getId()))
+					return (Rule)service.find(45L);
 			}
 		}
 		return rule;

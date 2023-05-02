@@ -1281,14 +1281,13 @@ public class PDFExporter {
 			    	 if (null == pids
 			    			 || pids.toString().isEmpty()
 			    			 || pids.toString().equals("0")) {
-			    		 DialogUtil.alertWarning("Задайте планеты на острие лука (planet)");
+			    		 DialogUtil.alertWarning("Задайте планеты на острие пращи (planet)");
 			    		 return;
 			    	 }
 			    	 String[] sids = pids.toString().split(",");
-			    	 PlanetService service = new PlanetService();
 			    	 com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
 			    	 for (String pid : sids) {
-			    		 Planet planet = (Planet)service.find(Long.getLong(pid));
+			    		 Planet planet = event.getPlanets().get(Long.getLong(pid));
 			    		 if (planet != null) {
 			    			 ListItem li = new ListItem();
 			    			 li.add(new Chunk(planet.getDescription(), font));
@@ -1297,27 +1296,26 @@ public class PDFExporter {
 			    	 }
 			    	 section.add(list);
 
-			    	 //Если планета-снаряд смещена влево TODO
+			    	 //куда смещена планета-снаряд
 			    	 boolean left = false;
-			    	 if (left) {
+			    	 String direction = obj.getString("direction");
+			    	 if (null == direction || direction.isEmpty()) {
+			    		 DialogUtil.alertWarning("Задайте направление прицела direction: East|West");
+			    		 return;
+			    	 } else {
+			    		 left = direction.equals("West");
 			    		 section.add(Chunk.NEWLINE);
-			    		 Planet planet = (Planet)service.find(0L);
-			    		 Rule rule = EventRules.ruleCardKind(planet);
-			    		 if (rule != null) {
+				    	 if (left)
 			    			 section.add(new Paragraph("Прицел пращи сдвинут влево:", bold));
-			    			 section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
-			    		 }
-			    	 }
-			    	 //Если планета-снаряд смещена вправо
-			    	 boolean right = true;
-			    	 if (right) {
-			    		 section.add(Chunk.NEWLINE);
-			    		 RuleService rservice = new RuleService();
-			    		 Rule rule = (Rule)rservice.find(86L);
-			    		 if (rule != null) {
+				    	 else
 			    			 section.add(new Paragraph("Прицел пращи сдвинут вправо:", bold));
-			    			 section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
-			    		 }
+
+				    	 for (String pid : sids) {
+				    		 Planet planet = event.getPlanets().get(Long.getLong(pid));
+			    			 Rule rule = EventRules.ruleCardKind("sling", planet, direction);
+				    		 if (rule != null)
+				    			 section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+				    	 }
 			    	 }
 			     }
 
@@ -2062,6 +2060,11 @@ public class PDFExporter {
 							section.add(Chunk.NEWLINE);
 						}
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
+						Rule rule = EventRules.rulePlanetUnaspected(planet, event);
+						if (rule != null) {
+							section.add(Chunk.NEWLINE);
+							section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+						}
 
 						PlanetService planetService = new PlanetService();
 						Sign sign = planet.getSign();
@@ -2827,8 +2830,34 @@ public class PDFExporter {
 								}
 
 							} else if (code.equals("stretcher")) {
-								if (!female) {
-									Rule rule = (Rule)ruleService.find(101L);
+								int malec = 0, femalec = 0;
+								List<Long> ids = Arrays.asList(new Long[] {19L, 21L, 23L, 25L, 28L, 30L, 31L, 34L});
+								for (Planet planet : configuration.getLeftHand()) {
+									if (ids.contains(planet.getId()))
+										++malec;
+									else
+										++femalec;
+								}
+								for (Planet planet : configuration.getRightHand()) {
+									if (ids.contains(planet.getId()))
+										++malec;
+									else
+										++femalec;
+								}
+								for (Planet planet : configuration.getLeftFoot()) {
+									if (ids.contains(planet.getId()))
+										++malec;
+									else
+										++femalec;
+								}
+								for (Planet planet : configuration.getRightFoot()) {
+									if (ids.contains(planet.getId()))
+										++malec;
+									else
+										++femalec;
+								}
+								if (malec > femalec) {
+									Rule rule = (Rule)ruleService.find(34L);
 									if (rule != null)
 										shapes.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
 								}
@@ -2843,6 +2872,40 @@ public class PDFExporter {
 										shapes.add(new Paragraph(s + ":", bold));
 										shapes.add(new Paragraph(PDFUtil.html2pdf(ptext.getText(), font)));
 									}
+								}
+
+							} else if (code.equals("sail")) {
+								int light = 0, gigant = 0;
+								List<Long> lights = Arrays.asList(new Long[] {19L, 20L});
+								List<Long> gigants = Arrays.asList(new Long[] {30L, 31L, 32L, 33L});
+								for (Planet planet : configuration.getVertex()) {
+									if (lights.contains(planet.getId()))
+										++light;
+									if (gigants.contains(planet.getId()))
+										++gigant;
+								}
+								for (Planet planet : configuration.getBase()) {
+									if (lights.contains(planet.getId()))
+										++light;
+									if (gigants.contains(planet.getId()))
+										++gigant;
+								}
+								for (Planet planet : configuration.getLeftFoot()) {
+									if (lights.contains(planet.getId()))
+										++light;
+									if (gigants.contains(planet.getId()))
+										++gigant;
+								}
+								for (Planet planet : configuration.getRightFoot()) {
+									if (lights.contains(planet.getId()))
+										++light;
+									if (gigants.contains(planet.getId()))
+										++gigant;
+								}
+								if (light > 0 && gigant > 1) {
+									Rule rule = (Rule)ruleService.find(40L);
+									if (rule != null)
+										shapes.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
 								}
 							}
 
@@ -2917,6 +2980,10 @@ public class PDFExporter {
 
 						} else if (code.equals("javelin")) {
 							String ctext = "Т.к. треугольников несколько, то их напряжение будет раздражать. Научитесь преодолевать эти невидимые внутренние препятствия, не портя себе нервы. Для этого надо регулярно снимать напряжение: не тонуть в нём, а выныривать и возвышаться над суетой. Не ведитесь на внешний негатив и тогда не попадёте в опасную крайность, результатом которой станет нарушение закона и принудительная изоляция  (что характерно для людей, которым нечего терять)";
+							appendix.add(new Paragraph(PDFUtil.removeTags(ctext, font)));
+
+						} else if (code.equals("vehicle")) {
+							String ctext = "Т.к. прямоугольников несколько, человек даже неудачные ситуации жизни будет обращать в удачные. Он умеет быстро выходить из различных затруднений, умеет радоваться малому и не теряет надежды при крупных неудачах. В лучшем случае ему обеспечена защита, гармония и сохранение сил; в худшем - лень, испорченность, поиск лёгких наслаждений";
 							appendix.add(new Paragraph(PDFUtil.removeTags(ctext, font)));
 						}
 					}
