@@ -1909,10 +1909,14 @@ public class PDFExporter {
 						}
 						section.add(new Paragraph(PDFUtil.removeTags(planetText.getText(), font)));
 
-						Rule rule = EventRules.rulePlanetSword(planet, female);
-						if (rule != null) {
-							section.add(Chunk.NEWLINE);
-							section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+						List<Rule> rules = EventRules.rulePlanetSword(planet, event);
+						if (rules != null && !rules.isEmpty()) {
+							for (Rule rule : rules) {
+								if (null == rule)
+									continue;
+								section.add(Chunk.NEWLINE);
+								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+							}
 						}
 						PDFUtil.printGender(section, planetText, female, child, true, lang);
 						section.add(Chunk.NEWLINE);
@@ -2577,11 +2581,15 @@ public class PDFExporter {
 						if (dict != null) {
 							exists = true;
 							section.add(new Paragraph(PDFUtil.removeTags(dict.getText(), font)));
-		
-							Rule rule = EventRules.rulePlanetAspect(aspect, female);
-							if (rule != null) {
-			    				section.add(Chunk.NEWLINE);
-								section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font))); 
+
+							List<Rule> rules = EventRules.rulePlanetAspect(aspect, female);
+							if (rules != null && !rules.isEmpty()) {
+								for (Rule rule : rules) {
+									if (null == rule)
+										continue;
+									section.add(Chunk.NEWLINE);
+									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
+								}
 							}
 							PDFUtil.printGender(section, dict, female, child, true, lang);
 							section.add(Chunk.NEWLINE);
@@ -3468,6 +3476,12 @@ public class PDFExporter {
 						}
 					}
 					PDFUtil.printGender(section, dict, female, child, true, lang);
+
+					Rule rule = EventRules.ruleHouseSign(house, sign, event);
+					if (rule != null) {
+						section.add(Chunk.NEWLINE);
+						section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+					}
 				}
 				if (section != null)
 					section.add(Chunk.NEWLINE);

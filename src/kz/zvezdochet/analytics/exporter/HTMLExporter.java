@@ -258,10 +258,11 @@ public class HTMLExporter {
 						tag.add(planet.getShortName() + "-меч");
 						div.add(tag);
 						div.add(planetText.getText());
-
-						Rule rule = EventRules.rulePlanetSword(planet, female);
-						if (rule != null)
-							div.add(PDFUtil.html2pdf(rule.getText(), null));
+						
+						List<Rule> rules = EventRules.rulePlanetSword(planet, event);
+						for (Rule rule : rules)
+							if (rule != null)
+								div.add(PDFUtil.html2pdf(rule.getText(), null));
 
 						printGender(div, planetText, female, child, true);
 
