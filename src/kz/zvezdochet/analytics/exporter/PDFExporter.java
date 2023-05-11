@@ -904,7 +904,7 @@ public class PDFExporter {
 								Rule rule = EventRules.rulePlanetSign(planet, sign, event, category);
 								if (rule != null) {
 									section.add(Chunk.NEWLINE);
-									section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 									section.add(Chunk.NEWLINE);
 								}
 								section.add(Chunk.NEWLINE);
@@ -2867,7 +2867,7 @@ public class PDFExporter {
 								if (malec > femalec) {
 									Rule rule = (Rule)ruleService.find(34L);
 									if (rule != null)
-										shapes.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+										shapes.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 								}
 
 							} else if (code.equals("buoy")) {
@@ -2913,7 +2913,7 @@ public class PDFExporter {
 								if (light > 0 && gigant > 1) {
 									Rule rule = (Rule)ruleService.find(40L);
 									if (rule != null)
-										shapes.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+										shapes.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 								}
 							}
 
@@ -2956,7 +2956,7 @@ public class PDFExporter {
 							Rule rule = EventRules.ruleConfiguration(configuration);
 							if (rule != null) {
 								shapes.add(Chunk.NEWLINE);
-								shapes.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+								shapes.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 							}
 							if (confs.size() != j)
 								shapes.add(Chunk.NEXTPAGE);
@@ -3221,7 +3221,7 @@ public class PDFExporter {
 									if (null == rule)
 										continue;
 									section.add(Chunk.NEWLINE);
-									section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+									section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 									PDFUtil.printGender(section, rule, female, child, true, lang);
 								}
 							}
@@ -3238,7 +3238,7 @@ public class PDFExporter {
 								int owner = rule.getSignOwner();
 
 								if (null == aspectType) {
-									//2 планеты в доме с аспектом или без
+									//2 планеты в доме
 									if (null == rsign) {
 										Planet p2 = eplanets.get(planet2.getId());
 										if (house2.getId().equals(p2.getHouse().getId())) {
@@ -3480,7 +3480,7 @@ public class PDFExporter {
 					Rule rule = EventRules.ruleHouseSign(house, sign, event);
 					if (rule != null) {
 						section.add(Chunk.NEWLINE);
-						section.add(new Paragraph(PDFUtil.removeTags("Rule" + rule.getText(), font)));
+						section.add(new Paragraph(PDFUtil.removeTags(rule.getText(), font)));
 					}
 				}
 				if (section != null)

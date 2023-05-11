@@ -323,6 +323,12 @@ public class EventRules {
 						&& planet.isStrong()
 						&& planet2.isWeak())
 					rules.add((Rule)service.find(51L));
+
+			} else if (planet2.getCode().equals("Mars")) {
+				if (code.equals("POSITIVE")
+						&& !event.isFemale()
+						&& !partner.isFemale())
+					rules.add((Rule)service.find(78L));
 			}
 
 		} else if (planet.getCode().equals("Moon")) {
@@ -582,9 +588,11 @@ public class EventRules {
 			if (planet.getSign().getCode().equals("Leo"))
 				strong = true;
 			else {
-				House house = planet.getHouse();
-				if (house.getCode().equals("V") || house.getCode().equals("V_2") || house.getCode().equals("V_3"))
-					strong = true;
+				if (event.isHousable()) {
+					House house = planet.getHouse();
+					if (house.getCode().equals("V") || house.getCode().equals("V_2") || house.getCode().equals("V_3"))
+						strong = true;
+				}
 			}
 			if (strong)
 				return (Rule)service.find(9L);
