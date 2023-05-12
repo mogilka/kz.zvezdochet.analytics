@@ -336,10 +336,10 @@ public class PDFExporter {
 			} else {
 				String sdate = DateFormat.getDateInstance(DateFormat.FULL, Locale.getDefault()).format(event.getBirth());
 				text = rus ? "Психотип – это обобщённый образ людей, рождённых вблизи " + sdate
-						+ ". Психотип характеризует вас как представителя своего поколения, а не как уникальную личность. "
+						+ " Психотип характеризует вас как представителя своего поколения, а не как уникальную личность. "
 						+ "Более точное и персонализированное описание вашей натуры приведено в дальнейших разделах" :
 					"Psychotype is a generalized image of people born near " + sdate
-						+ ". it describes you as a representative of your generation not a unique individual. "
+						+ " it describes you as a representative of your generation not a unique individual. "
 						+ "A more accurate and personalized description of your nature is given in the following sections";
 				chapter.add(new Paragraph(text, PDFUtil.getWarningFont()));
 			}
@@ -4756,6 +4756,27 @@ public class PDFExporter {
 	 */
 	private Paragraph printRhombus(Event event, AspectConfiguration conf) {
 		try {
+			boolean housable = event.isHousable();
+			Paragraph paragraph = new Paragraph();
+			if (term) {
+				paragraph.add(Chunk.NEWLINE);
+				Font aifont = PDFUtil.getAnnotationFont(false);
+				com.itextpdf.text.List list = new com.itextpdf.text.List(false, false, 10);
+				ListItem li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getVertex(), housable, "Вершина"), aifont));
+				list.add(li);
+				li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getLeftFoot(), housable, "Слева"), aifont));
+				list.add(li);
+				li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getRightFoot(), housable, "Справа"), aifont));
+				list.add(li);
+				li = new ListItem();
+				li.add(new Chunk(vertexToStr(conf.getBase(), housable, "Снизу"), aifont));
+				list.add(li);
+				paragraph.add(list);
+			}
+			
 	        PdfPTable table = new PdfPTable(3);
 	        table.setWidthPercentage(100);
 	        Font font = PDFUtil.getSmallFont();
@@ -4770,12 +4791,12 @@ public class PDFExporter {
 			String text = "";
 			String htext = "";
 			for (Planet planet : conf.getVertex()) {
-				if (event.isHousable()) {
+				if (housable) {
 					House house = planet.getHouse();
-					String hname = term ? house.getDesignation() + " дом" : house.getName();
-					htext = text.contains(hname) ? "" : (term ? " " : "\n") + "(" + hname + ")";
+					String hname = house.getName();
+					htext = text.contains(hname) ? "" : "\n(" + hname + ")";
 				}
-				text += (term ? planet.getName() : conf.isVertexPositive() ? planet.getPositive() : planet.getNegative()) + htext;
+				text += (conf.isVertexPositive() ? planet.getPositive() : planet.getNegative()) + htext;
 				text += "\n";
 			}
 			Paragraph p = new Paragraph(text, font);
@@ -4793,12 +4814,12 @@ public class PDFExporter {
 			text = "";
 			htext = "";
 			for (Planet planet : conf.getLeftFoot()) {
-				if (event.isHousable()) {
+				if (housable) {
 					House house = planet.getHouse();
-					String hname = term ? house.getDesignation() + " дом" : house.getName();
-					htext = text.contains(hname) ? "" : (term ? " " : "\n") + "(" + hname + ")";
+					String hname = house.getName();
+					htext = text.contains(hname) ? "" : "\n(" + hname + ")";
 				}
-				text += (term ? planet.getName() : conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative()) + htext;
+				text += (conf.isLeftFootPositive() ? planet.getPositive() : planet.getNegative()) + htext;
 				text += "\n";
 			}
 			p = new Paragraph(text, font);
@@ -4823,12 +4844,12 @@ public class PDFExporter {
 			text = "";
 			htext = "";
 			for (Planet planet : conf.getRightFoot()) {
-				if (event.isHousable()) {
+				if (housable) {
 					House house = planet.getHouse();
-					String hname = term ? house.getDesignation() + " дом" : house.getName();
-					htext = text.contains(hname) ? "" : (term ? " " : "\n") + "(" + hname + ")";
+					String hname = house.getName();
+					htext = text.contains(hname) ? "" : "\n(" + hname + ")";
 				}
-				text += (term ? planet.getName() : conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative()) + htext;
+				text += (conf.isRightFootPositive() ? planet.getPositive() : planet.getNegative()) + htext;
 				text += "\n";
 			}
 			p = new Paragraph(text, font);
@@ -4846,12 +4867,12 @@ public class PDFExporter {
 			text = "";
 			htext = "";
 			for (Planet planet : conf.getBase()) {
-				if (event.isHousable()) {
+				if (housable) {
 					House house = planet.getHouse();
-					String hname = term ? house.getDesignation() + " дом" : house.getName();
-					htext = text.contains(hname) ? "" : (term ? " " : "\n") + "(" + hname + ")";
+					String hname = house.getName();
+					htext = text.contains(hname) ? "" : "\n(" + hname + ")";
 				}
-				text += (term ? planet.getName() : conf.isBasePositive() ? planet.getPositive() : planet.getNegative()) + htext;
+				text += (conf.isBasePositive() ? planet.getPositive() : planet.getNegative()) + htext;
 				text += "\n";
 			}
 			p = new Paragraph(text, font);
@@ -4864,8 +4885,7 @@ public class PDFExporter {
 			cell = new PdfPCell();
 			cell.setBorder(Rectangle.NO_BORDER);
 			table.addCell(cell);
-
-			Paragraph paragraph = new Paragraph();
+			
 			table.setSpacingBefore(1);
 			table.setSpacingAfter(5);
 			paragraph.add(table);
@@ -4917,6 +4937,11 @@ public class PDFExporter {
 					Paragraph p = new Paragraph();
 					p.add(new Chunk(kz.zvezdochet.core.Messages.getString("Symbol") + ": ", new Font(baseFont, 12, Font.BOLD)));
 			        p.add(new Chunk(moonday.getSymbol(), font));
+			        section.add(p);
+
+					p = new Paragraph();
+					p.add(new Chunk(Messages.getString("Mineral") + ": ", new Font(baseFont, 12, Font.BOLD)));
+			        p.add(new Chunk(moonday.getMineral(), font));
 			        section.add(p);
 
 					section.add(new Paragraph(PDFUtil.removeTags(moonday.getBirth(), font)));

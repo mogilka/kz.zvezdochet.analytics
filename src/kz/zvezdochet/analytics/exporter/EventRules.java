@@ -213,6 +213,10 @@ public class EventRules {
 			if (pcode.equals("Uranus")) {
 				if (planet.isRetrograde())
 					rules.add((Rule)service.find(44L));
+
+			} else if (pcode.equals("Kethu")) {
+				if (planet.isNegative())
+					rules.add((Rule)service.find(79L));
 			}
 
 		} else if (hcode.equals("I_3")) {
@@ -231,12 +235,6 @@ public class EventRules {
 			if (pcode.equals("Mars")) {
 				if (planet.isPerfect())
 					rules.add((Rule)service.find(22L));
-			}
-
-		} else if (hcode.equals("VII")) {
-			if (pcode.equals("Rakhu")) {
-				if (female && !planet.isNegative())
-					rules.add((Rule)service.find(70L));
 			}
 
 		} else if (hcode.equals("X")) {
@@ -500,6 +498,15 @@ public class EventRules {
 			double val = planetMap.get("air");
 			if (val > 4)
 				return (Rule)service.find(5L);
+
+		} else if (110 == id) {
+			EventStatistics statistics = new EventStatistics(event);
+			statistics.initPlanetDivisions();
+			Map<String, Double> planetMap = statistics.getPlanetElements();
+			double water = planetMap.get("water");
+			double earth = planetMap.get("earth");
+			if (water > 4 || earth > 4)
+				return (Rule)service.find(70L);
 
 		} else if (147 == id) {
 			Planet mars = event.getPlanets().get(25L);
